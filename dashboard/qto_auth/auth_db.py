@@ -5,7 +5,7 @@ import pymysql
 import pymysql.cursors
 import streamlit as st
 
-# CONFIG
+# ================= CONFIG =================
 DB_CONFIG = {
     "host": st.secrets.get("DB_HOST", "localhost"),
     "port": st.secrets.get("DB_PORT", 3306),
@@ -15,7 +15,7 @@ DB_CONFIG = {
     "charset": "utf8mb4",
 }
 
-# CONNEXION
+# ================= CONNEXION =================
 def get_conn():
     return pymysql.connect(
         host=DB_CONFIG["host"],
@@ -28,18 +28,15 @@ def get_conn():
         autocommit=False,
     )
 
-# HASH
+# ================= UTILS =================
 def _hash(password, salt):
     return hashlib.sha256((password + salt).encode()).hexdigest()
 
-# LOG
-def _log(cursor, email, action, ok, details=""):
-    cursor.execute("""
-        INSERT INTO logs(email, action, ok, details, ts)
-        VALUES(%s, %s, %s, %s, NOW())
-    """, (email, action, int(ok), details))
+def _gen_key(length=24):
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-# INIT DB
+# ================= INIT DB =================
 def init():
     conn = get_conn()
     try:
@@ -65,45 +62,98 @@ def init():
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS licenses (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                `key` VARCHAR(255) UNIQUE,
+                license_key VARCHAR(255) UNIQUE,
                 plan VARCHAR(20),
                 days INT,
                 active BOOLEAN DEFAULT 1,
                 used_by VARCHAR(255),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                expires_at TIMESTAMP NULL
-            )
-            """)
-
-            # LOGS
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS logs (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                email VARCHAR(255),
-                action VARCHAR(50),
-                ok BOOLEAN,
-                details TEXT,
-                ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                expires_at TIMESTAMP NULL,
+                renewed_at TIMESTAMP NULL,
+                renew_count INT DEFAULT 0
             )
             """)
 
         conn.commit()
-        print("✅ DB initialisée correctement")
+        print("✅ DB initialisée")
 
     finally:
         conn.close()
 
-# VERIFY LICENSE
-def verify_license(key):
+# ================= CREATE LICENSE =================
+def create_license(plan="PRO", days=30):
+    key = _gen_key()
+    now = datetime.utcnow()
+    exp = now + timedelta(days=days)
+
     conn = get_conn()
     try:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM licenses WHERE `key`=%s", (key,))
-            return cursor.fetchone() is not None
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO licenses(license_key, plan, days, created_at, expires_at)
+                VALUES(%s, %s, %s, %s, %s)
+            """, (key, plan, days, now, exp))
+        conn.commit()
+        return key
     finally:
         conn.close()
 
-# REGISTER
+# ================= VERIFY LICENSE =================
+def check_license(email):
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM licenses WHERE used_by=%s", (email,))
+            lic = cur.fetchone()
+
+            if not lic:
+                return {"ok": False, "msg": "Aucune licence"}
+
+            if not lic["active"]:
+                return {"ok": False, "msg": "Licence désactivée"}
+
+            if lic["expires_at"] and datetime.utcnow() > lic["expires_at"]:
+                return {"ok": False, "expired": True, "msg": "Licence expirée"}
+
+            return {"ok": True, "plan": lic["plan"], "expires_at": lic["expires_at"]}
+
+    finally:
+        conn.close()
+
+# ================= RENEW LICENSE =================
+def renew_license(key, days=30):
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM licenses WHERE license_key=%s", (key,))
+            lic = cur.fetchone()
+
+            if not lic:
+                return {"ok": False, "msg": "Licence introuvable"}
+
+            now = datetime.utcnow()
+
+            if lic["expires_at"] and now > lic["expires_at"]:
+                new_exp = now + timedelta(days=days)
+            else:
+                base = lic["expires_at"] or now
+                new_exp = base + timedelta(days=days)
+
+            cur.execute("""
+                UPDATE licenses
+                SET expires_at=%s,
+                    renewed_at=%s,
+                    renew_count = renew_count + 1
+                WHERE license_key=%s
+            """, (new_exp, now, key))
+
+        conn.commit()
+        return {"ok": True, "new_exp": new_exp}
+
+    finally:
+        conn.close()
+
+# ================= REGISTER =================
 def register(email, username, password, key):
     email = email.lower().strip()
     key   = key.strip().upper()
@@ -112,44 +162,42 @@ def register(email, username, password, key):
     try:
         with conn.cursor() as cur:
 
-            # EMAIL EXISTE ?
+            # email existe ?
             cur.execute("SELECT id FROM users WHERE email=%s", (email,))
             if cur.fetchone():
                 return {"ok": False, "msg": "Email déjà utilisé"}
 
-            # LICENSE OK ?
-            cur.execute("SELECT * FROM licenses WHERE `key`=%s AND active=1", (key,))
+            # licence valide ?
+            cur.execute("SELECT * FROM licenses WHERE license_key=%s AND active=1", (key,))
             lic = cur.fetchone()
+
             if not lic:
                 return {"ok": False, "msg": "Clé invalide"}
 
             if lic["used_by"]:
                 return {"ok": False, "msg": "Clé déjà utilisée"}
 
-            # CREATE USER
             salt = secrets.token_hex(16)
-            cur.execute("""
-                INSERT INTO users(email, username, pw_hash, salt, plan)
-                VALUES(%s, %s, %s, %s, %s)
-            """, (email, username, _hash(password, salt), salt, lic["plan"]))
 
-            cur.execute("UPDATE licenses SET used_by=%s WHERE `key`=%s", (email, key))
+            cur.execute("""
+                INSERT INTO users(email, username, pw_hash, salt, plan, expires_at)
+                VALUES(%s, %s, %s, %s, %s, %s)
+            """, (email, username, _hash(password, salt), salt, lic["plan"], lic["expires_at"]))
+
+            cur.execute("UPDATE licenses SET used_by=%s WHERE license_key=%s", (email, key))
 
         conn.commit()
         return {"ok": True}
 
-    except Exception as e:
-        conn.rollback()
-        return {"ok": False, "msg": str(e)}
-
     finally:
         conn.close()
 
-# LOGIN
+# ================= LOGIN =================
 def login(email, password):
     conn = get_conn()
     try:
         with conn.cursor() as cur:
+
             cur.execute("SELECT * FROM users WHERE email=%s", (email,))
             user = cur.fetchone()
 
@@ -159,11 +207,21 @@ def login(email, password):
             if _hash(password, user["salt"]) != user["pw_hash"]:
                 return {"ok": False}
 
-            return {"ok": True, "username": user["username"]}
+            # vérifier licence
+            lic = check_license(email)
+            if not lic["ok"]:
+                return lic
+
+            return {
+                "ok": True,
+                "username": user["username"],
+                "plan": lic["plan"],
+                "expires_at": lic["expires_at"]
+            }
 
     finally:
         conn.close()
 
-# MAIN
+# ================= MAIN =================
 if __name__ == "__main__":
     init()
