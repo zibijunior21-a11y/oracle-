@@ -9,10 +9,11 @@
   Lancement : streamlit run dashboard.py
 ================================================================================
 """
-
+from qto_auth.auth_db import register, login
 import sys, time
 from datetime import datetime
 from pathlib import Path
+from qto_auth.auth_ui import auth_gate
 
 import streamlit as st
 import plotly.graph_objects as go
