@@ -30,20 +30,36 @@ except ImportError:
 print("✅ auth_db chargé")
 import os
 
+# 1. imports
+import os
+
+# 2. config
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "port": int(os.getenv("DB_PORT", 3306)),
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", "qto_users"),
+    "host": "localhost",
+    "port": 3306,
+    "user": "root",
+    "password": "",
+    "database": "qto_users",
     "charset": "utf8mb4",
 }
-# ══════════════════════════════════════════════════════════════════════════════
-#  CONNEXION
-# ══════════════════════════════════════════════════════════════════════════════
+
+# 3. fonctions
+def get_conn():
+    pass
+
+def init():
+    pass
+
+# 4. exécution
+if __name__ == "__main__":
+    init()
 def get_conn():
     if not MYSQL_OK:
-        raise RuntimeError("pymysql non installé. Lancez : pip install pymysql")
+        raise RuntimeError("pymysql non installé → pip install pymysql")
+
+    if not DB_CONFIG["host"]:
+        raise RuntimeError("❌ DB_CONFIG vide → configure tes variables d’environnement")
+
     try:
         conn = pymysql.connect(
             host=DB_CONFIG["host"],
@@ -56,73 +72,9 @@ def get_conn():
             autocommit=False,
         )
         return conn
+
     except pymysql.err.OperationalError as e:
-        raise RuntimeError(f"""
-❌ ERREUR CONNEXION MYSQL :
-   {e}
-
-   Vérifiez :
-   1. WAMPServer est lancé (icône verte)
-   2. La base 'qto_users' existe dans phpMyAdmin
-      → http://localhost/phpmyadmin
-   3. Le mot de passe dans DB_CONFIG est correct
-        """)
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  INITIALISATION — Crée les tables automatiquement
-# ══════════════════════════════════════════════════════════════════════════════
-def init():
-    if not MYSQL_OK:
-        print("⚠️  pymysql manquant — pip install pymysql")
-        return
-    try:
-        conn = get_conn()
-        with conn.cursor() as cur:
-
-            cur.execute("""
-            CREATE TABLE IF NOT EXISTS licenses (
-                `key`       VARCHAR(25)  PRIMARY KEY,
-                plan        VARCHAR(20)  DEFAULT 'PRO',
-                days        INT          DEFAULT 365,
-                created_at  DATETIME     NOT NULL,
-                expires_at  DATETIME     DEFAULT NULL,
-                active      TINYINT(1)   DEFAULT 1,
-                used_by     VARCHAR(255) DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-            """)
-
-            cur.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id          INT          AUTO_INCREMENT PRIMARY KEY,
-                email       VARCHAR(255) UNIQUE NOT NULL,
-                username    VARCHAR(100) NOT NULL,
-                pw_hash     VARCHAR(64)  NOT NULL,
-                salt        VARCHAR(32)  NOT NULL,
-                plan        VARCHAR(20)  DEFAULT 'PRO',
-                expires_at  DATETIME     DEFAULT NULL,
-                active      TINYINT(1)   DEFAULT 1,
-                created_at  DATETIME     NOT NULL,
-                last_login  DATETIME     DEFAULT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-            """)
-
-            cur.execute("""
-            CREATE TABLE IF NOT EXISTS logs (
-                id      INT         AUTO_INCREMENT PRIMARY KEY,
-                email   VARCHAR(255),
-                action  VARCHAR(20),
-                ok      TINYINT(1),
-                info    VARCHAR(255),
-                ts      DATETIME    NOT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-            """)
-
-        conn.commit()
-        conn.close()
-        print("✅ Base MySQL initialisée avec succès.")
-    except Exception as e:
-        print(f"❌ Erreur init MySQL : {e}")
-
+        raise RuntimeError(f"MySQL connection error: {e}")
 # ══════════════════════════════════════════════════════════════════════════════
 #  UTILITAIRES
 # ══════════════════════════════════════════════════════════════════════════════
