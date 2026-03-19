@@ -88,7 +88,7 @@ def init():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS licenses (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        `key` VARCHAR(255) NOT NULL UNIQUE,
+        `key` VARCHAR(255) NOT NULL UNIQUE,  -- Backticks pour 'key'
         plan VARCHAR(20) NOT NULL,
         days INT,
         active BOOLEAN DEFAULT 1,
