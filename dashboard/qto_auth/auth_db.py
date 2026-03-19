@@ -25,14 +25,14 @@ except ImportError:
 # ══════════════════════════════════════════════════════════════════════════════
 #  ⚙️  CONFIGURATION — MODIFIEZ ICI
 # ══════════════════════════════════════════════════════════════════════════════
-DB_CONFIG = {
-    "host":     "localhost",
-    "port":     3306,
-    "user":     "root",       # Utilisateur phpMyAdmin (par défaut = root)
-    "password": "",           # Mot de passe phpMyAdmin (par défaut = vide)
-    "database": "qto_users",  # Nom de la base à créer dans phpMyAdmin
-    "charset":  "utf8mb4",
-}
+import sqlite3
+
+DB_PATH = "qto_users.db"
+
+conn = sqlite3.connect(DB_PATH)
+cursor = conn.cursor()
+
+print("✅ SQLite connecté")
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  CONNEXION
