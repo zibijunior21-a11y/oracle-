@@ -11,7 +11,9 @@
 ================================================================================
 """
 
-import hashlib, secrets, os
+import hashlib
+import secrets
+import os
 from datetime import datetime, timedelta
 import pymysql
 import pymysql.cursors
@@ -85,10 +87,11 @@ def init():
     )
     """)
 
+    # Vérification et correction de la table 'licenses'
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS licenses (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        `key` VARCHAR(255) NOT NULL UNIQUE,  -- Backticks pour 'key'
+        `key` VARCHAR(255) NOT NULL UNIQUE,
         plan VARCHAR(20) NOT NULL,
         days INT,
         active BOOLEAN DEFAULT 1,
@@ -97,6 +100,13 @@ def init():
         expires_at TIMESTAMP NULL
     )
     """)
+
+    # Vérification de l'existence de la colonne 'key'
+    cursor.execute("SHOW COLUMNS FROM licenses LIKE 'key'")
+    if not cursor.fetchone():
+        print("⚠️ La colonne 'key' est manquante dans la table 'licenses'. Ajout en cours...")
+        cursor.execute("ALTER TABLE licenses ADD COLUMN `key` VARCHAR(255) NOT NULL UNIQUE AFTER id")
+        print("✅ Colonne 'key' ajoutée avec succès.")
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS logs (
@@ -110,7 +120,7 @@ def init():
     """)
 
     conn.commit()
-    print("✅ Tables 'users', 'licenses' et 'logs' créées avec succès !")
+    print("✅ Tables 'users', 'licenses' et 'logs' sont prêtes !")
     cursor.close()
     conn.close()
 
