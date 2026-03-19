@@ -304,3 +304,7 @@ def stats():
 
 # Init automatique
 init()
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logging.info("Ceci est un message d'information")
