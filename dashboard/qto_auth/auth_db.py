@@ -35,7 +35,7 @@ import os
 
 # 2. config
 DB_CONFIG = {
-    "host": "localhost",
+    "host": os.getenv("DB_HOST"),  # ⚠️ plus localhost
     "port": 3306,
     "user": "root",
     "password": "",
