@@ -67,19 +67,32 @@ def init():
     conn = get_conn()
     cursor = conn.cursor()
 
-    sql_create_table = """
+    # Création de la table users
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL
     )
-    """
-    cursor.execute(sql_create_table)
+    """)
+
+    # Création de la table licenses
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS licenses (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        license_key VARCHAR(255) NOT NULL UNIQUE,
+        email VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
     conn.commit()
-    print("✅ Table 'users' créée avec succès sur Aiven !")
+    print("✅ Tables 'users' et 'licenses' créées avec succès !")
 
     cursor.close()
     conn.close()
+
+
 
 # 4. exécution
 if __name__ == "__main__":
