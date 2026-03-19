@@ -13,30 +13,11 @@
 
 import hashlib, secrets, os
 from datetime import datetime, timedelta
-
-try:
-    import pymysql
-    import pymysql.cursors
-    MYSQL_OK = True
-except ImportError:
-    MYSQL_OK = False
-    print("❌ pymysql manquant — installez : pip install pymysql")
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  ⚙️  CONFIGURATION — MODIFIEZ ICI
-# ══════════════════════════════════════════════════════════════════════════════
-
-
-print("✅ auth_db chargé")
-import os
-
-# 1. imports
-import os
-import streamlit as st
 import pymysql
-import hashlib, secrets
-from datetime import datetime
+import pymysql.cursors
+import streamlit as st
 
+# Configuration de la base de données
 DB_CONFIG = {
     "host": st.secrets.get("DB_HOST", "localhost"),
     "port": st.secrets.get("DB_PORT", 3306),
@@ -47,6 +28,7 @@ DB_CONFIG = {
     "ssl_disabled": False
 }
 
+# Fonction pour se connecter à la base de données
 def get_conn():
     try:
         conn = pymysql.connect(
@@ -63,43 +45,76 @@ def get_conn():
     except pymysql.err.OperationalError as e:
         raise RuntimeError(f"MySQL connection error: {e}")
 
+# Fonction pour hacher un mot de passe avec un sel
+def _hash(password, salt):
+    return hashlib.sha256((password + salt).encode()).hexdigest()
+
+# Fonction pour générer une clé de licence aléatoire
+def _gen_key(length=24):
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
+
+# Fonction pour enregistrer un événement dans la table 'logs'
+def _log(cursor, email, action, ok, details=""):
+    try:
+        cursor.execute("""
+            INSERT INTO logs(email, action, ok, details, ts)
+            VALUES(%s, %s, %s, %s, NOW())
+        """, (email, action, int(ok), details))
+    except Exception as e:
+        print(f"⚠️ Erreur lors de l'enregistrement du log : {e}")
+
+# Initialisation de la base de données
 def init():
     conn = get_conn()
     cursor = conn.cursor()
 
-    # Création de la table users
+    # Création des tables
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL
+        username VARCHAR(255) NOT NULL,
+        pw_hash VARCHAR(255) NOT NULL,
+        salt VARCHAR(32) NOT NULL,
+        plan VARCHAR(20),
+        expires_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_login TIMESTAMP NULL,
+        active BOOLEAN DEFAULT 1
     )
     """)
 
-    # Création de la table licenses
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS licenses (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        license_key VARCHAR(255) NOT NULL UNIQUE,
-        email VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        `key` VARCHAR(255) NOT NULL UNIQUE,
+        plan VARCHAR(20) NOT NULL,
+        days INT,
+        active BOOLEAN DEFAULT 1,
+        used_by VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NULL
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255),
+        action VARCHAR(50),
+        ok BOOLEAN,
+        details TEXT,
+        ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
     conn.commit()
-    print("✅ Tables 'users' et 'licenses' créées avec succès !")
-
+    print("✅ Tables 'users', 'licenses' et 'logs' créées avec succès !")
     cursor.close()
     conn.close()
 
-
-
-# 4. exécution
-if __name__ == "__main__":
-    init()
-# ══════════════════════════════════════════════════════════════════════════════
-#  GESTION DES CLÉS (ADMIN)
-# ══════════════════════════════════════════════════════════════════════════════
+# Gestion des clés (ADMIN)
 def add_key(plan="PRO", days=365):
     key = _gen_key()
     now = datetime.utcnow()
@@ -108,7 +123,7 @@ def add_key(plan="PRO", days=365):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO licenses(`key`,plan,days,created_at,expires_at) VALUES(%s,%s,%s,%s,%s)",
+                "INSERT INTO licenses(`key`, plan, days, created_at, expires_at) VALUES(%s, %s, %s, %s, %s)",
                 (key, plan, days, now, exp))
         conn.commit()
     finally:
@@ -123,7 +138,7 @@ def add_key_manual(key, plan="PRO", days=365):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO licenses(`key`,plan,days,created_at,expires_at) VALUES(%s,%s,%s,%s,%s)",
+                "INSERT INTO licenses(`key`, plan, days, created_at, expires_at) VALUES(%s, %s, %s, %s, %s)",
                 (key, plan, days, now, exp))
         conn.commit()
         return True
@@ -136,9 +151,11 @@ def list_keys():
     conn = get_conn()
     try:
         with conn.cursor() as cur:
-            cur.execute("""SELECT `key`,plan,active,used_by,
-                           DATE_FORMAT(expires_at,'%Y-%m-%d') AS expires_at
-                           FROM licenses ORDER BY created_at DESC""")
+            cur.execute("""
+                SELECT `key`, plan, active, used_by,
+                DATE_FORMAT(expires_at, '%Y-%m-%d') AS expires_at
+                FROM licenses ORDER BY created_at DESC
+            """)
             return cur.fetchall()
     finally:
         conn.close()
@@ -152,9 +169,7 @@ def revoke_key(key):
     finally:
         conn.close()
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  INSCRIPTION
-# ══════════════════════════════════════════════════════════════════════════════
+# Inscription
 def register(email, username, password, key):
     email = email.lower().strip()
     key   = key.strip().upper()
@@ -169,7 +184,6 @@ def register(email, username, password, key):
     conn = get_conn()
     try:
         with conn.cursor() as cur:
-
             # Email déjà utilisé ?
             cur.execute("SELECT id FROM users WHERE email=%s", (email,))
             if cur.fetchone():
@@ -191,17 +205,16 @@ def register(email, username, password, key):
             # Créer le compte
             salt = secrets.token_hex(16)
             now  = datetime.utcnow()
-            cur.execute("""INSERT INTO users(email,username,pw_hash,salt,plan,expires_at,created_at)
-                           VALUES(%s,%s,%s,%s,%s,%s,%s)""",
-                        (email, username.strip(), _hash(password, salt),
-                         salt, lic["plan"], lic["expires_at"], now))
+            cur.execute("""
+                INSERT INTO users(email, username, pw_hash, salt, plan, expires_at, created_at)
+                VALUES(%s, %s, %s, %s, %s, %s, %s)
+            """, (email, username.strip(), _hash(password, salt), salt, lic["plan"], lic["expires_at"], now))
             cur.execute("UPDATE licenses SET used_by=%s WHERE `key`=%s", (email, key))
             _log(cur, email, "REGISTER", True, f"plan={lic['plan']}")
 
         conn.commit()
         exp_str = str(lic["expires_at"])[:10] if lic["expires_at"] else ""
-        return {"ok": True, "username": username.strip(),
-                "plan": lic["plan"], "expires_at": exp_str}
+        return {"ok": True, "username": username.strip(), "plan": lic["plan"], "expires_at": exp_str}
 
     except pymysql.err.IntegrityError:
         conn.rollback()
@@ -212,9 +225,7 @@ def register(email, username, password, key):
     finally:
         conn.close()
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  CONNEXION
-# ══════════════════════════════════════════════════════════════════════════════
+# Connexion
 def login(email, password):
     email = email.lower().strip()
     conn  = get_conn()
@@ -247,16 +258,14 @@ def login(email, password):
                     if isinstance(exp, str): exp = datetime.fromisoformat(exp)
                     if datetime.utcnow() > exp:
                         j = (datetime.utcnow() - exp).days
-                        return {"ok": False,
-                                "msg": f"Licence expirée il y a {j} jour(s). Renouvelez votre accès."}
+                        return {"ok": False, "msg": f"Licence expirée il y a {j} jour(s). Renouvelez votre accès."}
                     expires = str(lic["expires_at"])[:10]
 
             cur.execute("UPDATE users SET last_login=%s WHERE email=%s", (now, email))
             _log(cur, email, "LOGIN", True, "OK")
             conn.commit()
 
-        return {"ok": True, "email": email, "username": u["username"],
-                "plan": u["plan"], "expires_at": expires}
+        return {"ok": True, "email": email, "username": u["username"], "plan": u["plan"], "expires_at": expires}
 
     except Exception as e:
         conn.rollback()
@@ -264,17 +273,17 @@ def login(email, password):
     finally:
         conn.close()
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  ADMIN
-# ══════════════════════════════════════════════════════════════════════════════
+# Admin
 def list_users():
     conn = get_conn()
     try:
         with conn.cursor() as cur:
-            cur.execute("""SELECT email,username,plan,active,
-                           DATE_FORMAT(created_at,'%Y-%m-%d') AS created_at,
-                           DATE_FORMAT(last_login,'%Y-%m-%d %H:%i') AS last_login
-                           FROM users ORDER BY created_at DESC""")
+            cur.execute("""
+                SELECT email, username, plan, active,
+                DATE_FORMAT(created_at, '%Y-%m-%d') AS created_at,
+                DATE_FORMAT(last_login, '%Y-%m-%d %H:%i') AS last_login
+                FROM users ORDER BY created_at DESC
+            """)
             return cur.fetchall()
     finally:
         conn.close()
@@ -302,9 +311,6 @@ def stats():
     finally:
         conn.close()
 
-# Init automatique
-init()
-import logging
-
-logging.basicConfig(level=logging.INFO)
-logging.info("Ceci est un message d'information")
+# Exécution
+if __name__ == "__main__":
+    init()
