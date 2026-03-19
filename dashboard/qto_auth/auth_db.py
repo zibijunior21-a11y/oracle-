@@ -37,64 +37,72 @@ import pymysql
 import hashlib, secrets
 from datetime import datetime
 
+import pymysql
+
 DB_CONFIG = {
-    "host": st.secrets.get("DB_HOST", "localhost"),
-    "port": st.secrets.get("DB_PORT", 3306),
-    "user": st.secrets.get("DB_USER", "root"),
-    "password": st.secrets.get("DB_PASS", ""),
-    "database": st.secrets.get("DB_NAME", "qto_users"),
-    "charset": "utf8mb4",
-    "ssl_disabled": False
+    "host": "localhost",
+    "port": 3306,
+    "user": "root",
+    "password": "",
+    "database": "qto_users",
+    "charset": "utf8mb4"
 }
 
 def get_conn():
-    try:
-        conn = pymysql.connect(
-            host=DB_CONFIG["host"],
-            port=DB_CONFIG["port"],
-            user=DB_CONFIG["user"],
-            password=DB_CONFIG["password"],
-            database=DB_CONFIG["database"],
-            charset=DB_CONFIG["charset"],
-            cursorclass=pymysql.cursors.DictCursor,
-            autocommit=False,
-        )
-        return conn
-    except pymysql.err.OperationalError as e:
-        raise RuntimeError(f"MySQL connection error: {e}")
+    return pymysql.connect(
+        host=DB_CONFIG["host"],
+        port=DB_CONFIG["port"],
+        user=DB_CONFIG["user"],
+        password=DB_CONFIG["password"],
+        database=DB_CONFIG["database"],
+        charset=DB_CONFIG["charset"],
+        cursorclass=pymysql.cursors.DictCursor,
+        autocommit=False,
+    )
 
 def init():
     conn = get_conn()
     cursor = conn.cursor()
 
-    # Création de la table users
+    # Table users
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
-    # Création de la table licenses
+    # Table licenses
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS licenses (
         id INT AUTO_INCREMENT PRIMARY KEY,
         license_key VARCHAR(255) NOT NULL UNIQUE,
         email VARCHAR(255) NOT NULL,
+        status ENUM('active','inactive','expired') DEFAULT 'active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
+    # Table logs
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL,
+        action VARCHAR(255) NOT NULL,
+        ok TINYINT(1) NOT NULL,
+        info TEXT,
+        ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
     conn.commit()
-    print("✅ Tables 'users' et 'licenses' créées avec succès !")
+    print("✅ Tables 'users', 'licenses' et 'logs' créées avec succès !")
 
     cursor.close()
     conn.close()
 
-
-
-# 4. exécution
 if __name__ == "__main__":
     init()
 # ══════════════════════════════════════════════════════════════════════════════
