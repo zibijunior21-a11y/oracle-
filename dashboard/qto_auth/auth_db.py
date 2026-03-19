@@ -32,9 +32,10 @@ import os
 
 # 1. imports
 import os
-
-#import streamlit as st
 import streamlit as st
+import pymysql
+import hashlib, secrets
+from datetime import datetime
 
 DB_CONFIG = {
     "host": st.secrets.get("DB_HOST", "localhost"),
@@ -43,26 +44,10 @@ DB_CONFIG = {
     "password": st.secrets.get("DB_PASS", ""),
     "database": st.secrets.get("DB_NAME", "qto_users"),
     "charset": "utf8mb4",
-    "ssl_disabled": False  # <-- LIGNE MAGIQUE POUR AIVEN
+    "ssl_disabled": False
 }
 
-# 3. fonctions
 def get_conn():
-    pass
-
-def init():
-    pass
-
-# 4. exécution
-if __name__ == "__main__":
-    init()
-def get_conn():
-    if not MYSQL_OK:
-        raise RuntimeError("pymysql non installé → pip install pymysql")
-
-    if not DB_CONFIG["host"]:
-        raise RuntimeError("❌ DB_CONFIG vide → configure tes variables d’environnement")
-
     try:
         conn = pymysql.connect(
             host=DB_CONFIG["host"],
@@ -75,24 +60,30 @@ def get_conn():
             autocommit=False,
         )
         return conn
-
     except pymysql.err.OperationalError as e:
         raise RuntimeError(f"MySQL connection error: {e}")
-# ══════════════════════════════════════════════════════════════════════════════
-#  UTILITAIRES
-# ══════════════════════════════════════════════════════════════════════════════
-def _hash(password, salt):
-    return hashlib.sha256(f"{salt}{password}{salt}".encode()).hexdigest()
 
-def _gen_key():
-    b = hashlib.sha256(secrets.token_hex(16).encode()).hexdigest()[:16].upper()
-    return f"QTO-{b[0:4]}-{b[4:8]}-{b[8:12]}-{b[12:16]}"
+def init():
+    conn = get_conn()
+    cursor = conn.cursor()
 
-def _log(cur, email, action, ok, info=""):
-    cur.execute(
-        "INSERT INTO logs(email,action,ok,info,ts) VALUES(%s,%s,%s,%s,%s)",
-        (email, action, 1 if ok else 0, info, datetime.utcnow()))
+    sql_create_table = """
+    CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL
+    )
+    """
+    cursor.execute(sql_create_table)
+    conn.commit()
+    print("✅ Table 'users' créée avec succès sur Aiven !")
 
+    cursor.close()
+    conn.close()
+
+# 4. exécution
+if __name__ == "__main__":
+    init()
 # ══════════════════════════════════════════════════════════════════════════════
 #  GESTION DES CLÉS (ADMIN)
 # ══════════════════════════════════════════════════════════════════════════════
