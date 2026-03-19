@@ -25,15 +25,19 @@ except ImportError:
 # ══════════════════════════════════════════════════════════════════════════════
 #  ⚙️  CONFIGURATION — MODIFIEZ ICI
 # ══════════════════════════════════════════════════════════════════════════════
-import sqlite3
 
-DB_PATH = "qto_users.db"
 
-conn = sqlite3.connect(DB_PATH)
-cursor = conn.cursor()
+print("✅ auth_db chargé")
+import os
 
-print("✅ SQLite connecté")
-
+DB_CONFIG = {
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", 3306)),
+    "user": os.getenv("DB_USER", "root"),
+    "password": os.getenv("DB_PASSWORD", ""),
+    "database": os.getenv("DB_NAME", "qto_users"),
+    "charset": "utf8mb4",
+}
 # ══════════════════════════════════════════════════════════════════════════════
 #  CONNEXION
 # ══════════════════════════════════════════════════════════════════════════════
