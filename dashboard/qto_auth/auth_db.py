@@ -100,14 +100,12 @@ def init():
         expires_at TIMESTAMP NULL
     )
     """)
-
-    # Vérification de l'existence de la colonne 'key'
-    cursor.execute("SHOW COLUMNS FROM licenses LIKE 'key'")
-    if not cursor.fetchone():
-        print("⚠️ La colonne 'key' est manquante dans la table 'licenses'. Ajout en cours...")
-        cursor.execute("ALTER TABLE licenses ADD COLUMN `key` VARCHAR(255) NOT NULL UNIQUE AFTER id")
-        print("✅ Colonne 'key' ajoutée avec succès.")
-
+# Vérification si la clé de licence existe
+cursor.execute("SELECT * FROM licenses WHERE license_key = %s", (cle,))
+if not cursor.fetchone():
+    print("❌ Clé de licence invalide ou inexistante.")
+else:
+    print("✅ Clé de licence valide.")
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS logs (
         id INT AUTO_INCREMENT PRIMARY KEY,
