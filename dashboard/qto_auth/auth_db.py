@@ -33,13 +33,17 @@ import os
 # 1. imports
 import os
 
+#import streamlit as st
+import os
+import streamlit as st  # <-- ADD THIS LINE
+
 # 2. config
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST"),  # ⚠️ plus localhost
-    "port": 3306,
-    "user": "root",
-    "password": "",
-    "database": "qto_users",
+    "host": st.secrets.get("DB_HOST", "localhost"),  
+    "port": st.secrets.get("DB_PORT", 3306),
+    "user": st.secrets.get("DB_USER", "root"),
+    "password": st.secrets.get("DB_PASS", ""),
+    "database": st.secrets.get("DB_NAME", "qto_users"),
     "charset": "utf8mb4",
 }
 
