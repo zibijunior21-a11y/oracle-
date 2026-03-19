@@ -34,18 +34,18 @@ import os
 import os
 
 #import streamlit as st
-import os
-import streamlit as st  # <-- ADD THIS LINE
+import streamlit as st
+
 DB_CONFIG = {
-    "host":     "mysql-1778e45f-renov939-f98c.j.aivencloud.com",
-    "port":     13244,
-    "user":     "avnadmin",
-    # BON ✅ 
-"password": st.secrets.get("DB_PASS", ""),
-    "database": "defaultdb",
-    "charset":  "utf8mb4",
-    "ssl":      {"ca": "/etc/ssl/certs/ca-certificates.crt"}
+    "host": st.secrets.get("DB_HOST", "localhost"),
+    "port": st.secrets.get("DB_PORT", 3306),
+    "user": st.secrets.get("DB_USER", "root"),
+    "password": st.secrets.get("DB_PASS", ""),
+    "database": st.secrets.get("DB_NAME", "qto_users"),
+    "charset": "utf8mb4",
+    "ssl_disabled": False  # <-- LIGNE MAGIQUE POUR AIVEN
 }
+
 # 3. fonctions
 def get_conn():
     pass
