@@ -9,11 +9,10 @@
   Lancement : streamlit run dashboard.py
 ================================================================================
 """
-from qto_auth.auth_db import register, login
+
 import sys, time
 from datetime import datetime
 from pathlib import Path
-from qto_auth.auth_ui import auth_gate
 
 import streamlit as st
 import plotly.graph_objects as go
@@ -64,8 +63,8 @@ except ImportError:
     SCRAPE_OK = False
 
 # ══════════════════════════════════════════════════════════════════════════════
-st.set_page_config(page_title="⬡ Quantum Trade Oracle v4", page_icon="⬡",
-                   layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="⬡ Quantum Trade Oracle", page_icon="⬡",
+                   layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
@@ -559,6 +558,203 @@ details summary {
 .stTabs [data-baseweb="tab-list"] { animation: fade-up .3s ease both; }
 .block-container > div > div { animation: fade-up .35s ease both; }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   📱 MOBILE RESPONSIVE — Quantum Trade Oracle
+   Breakpoints : 768px (tablette) · 480px (mobile)
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tablette (≤ 768px) ─────────────────────────────────────────────────── */
+@media screen and (max-width: 768px) {
+
+  /* Container principal */
+  .block-container {
+    padding: 0.5rem 0.6rem !important;
+    max-width: 100% !important;
+  }
+
+  /* Sidebar collapse auto */
+  section[data-testid="stSidebar"] {
+    min-width: 0 !important;
+    width: 85vw !important;
+    max-width: 320px !important;
+  }
+
+  /* Tabs — plus grandes pour les doigts */
+  .stTabs [data-baseweb="tab-list"] {
+    flex-wrap: wrap !important;
+    gap: 3px !important;
+    padding: 4px !important;
+  }
+  .stTabs [data-baseweb="tab"] {
+    font-size: 8px !important;
+    padding: 8px 8px !important;
+    letter-spacing: 0.8px !important;
+    min-height: 36px !important;
+    flex: 1 1 auto !important;
+    text-align: center !important;
+  }
+
+  /* Métriques — 2 par ligne */
+  [data-testid="metric-container"] {
+    padding: 10px 12px !important;
+    min-width: 0 !important;
+  }
+  [data-testid="stMetricValue"] {
+    font-size: 1.5rem !important;
+  }
+  [data-testid="metric-container"] label {
+    font-size: 7px !important;
+  }
+
+  /* Colonnes Streamlit → stack vertical */
+  [data-testid="column"] {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Graphiques pleine largeur */
+  .js-plotly-plot, .plotly, .plot-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+  }
+
+  /* Inputs plus grands */
+  .stTextInput input,
+  .stSelectbox select,
+  .stNumberInput input,
+  .stTextArea textarea {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+    min-height: 44px !important;
+  }
+
+  /* Boutons plus grands (touch-friendly) */
+  .stButton > button {
+    min-height: 44px !important;
+    font-size: 11px !important;
+    padding: 10px 14px !important;
+    width: 100% !important;
+  }
+
+  /* Cards news */
+  div[style*="border-radius:6px"] {
+    padding: 12px !important;
+  }
+
+  /* Réduire taille police des titres */
+  .stMarkdown h1 { font-size: 1.4rem !important; }
+  .stMarkdown h2 { font-size: 1.2rem !important; }
+  .stMarkdown h3 { font-size: 1rem !important; }
+}
+
+/* ── Mobile (≤ 480px) ───────────────────────────────────────────────────── */
+@media screen and (max-width: 480px) {
+
+  /* Container ultra compact */
+  .block-container {
+    padding: 0.3rem 0.4rem !important;
+  }
+
+  /* Grille de fond réduite */
+  .stApp {
+    background-size: 30px 30px, 30px 30px, 100% 100%, 100% 100%, 100% 100% !important;
+  }
+
+  /* Scanlines désactivées (perf mobile) */
+  .stApp::before { display: none !important; }
+
+  /* Header sidebar */
+  section[data-testid="stSidebar"] {
+    width: 90vw !important;
+  }
+
+  /* Tabs encore plus compactes */
+  .stTabs [data-baseweb="tab"] {
+    font-size: 7px !important;
+    padding: 6px 5px !important;
+    letter-spacing: 0px !important;
+  }
+
+  /* Métriques compactes */
+  [data-testid="stMetricValue"] {
+    font-size: 1.3rem !important;
+  }
+  [data-testid="metric-container"] {
+    padding: 8px 10px !important;
+  }
+
+  /* Signal HOLD/BUY/SELL texte réduit */
+  .stMarkdown [style*="font-size:7rem"],
+  .stMarkdown [style*="font-size:6rem"] {
+    font-size: 3.5rem !important;
+  }
+
+  /* Cards compactes */
+  .msg-ai, .msg-user {
+    font-size: 12px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Boutons sidebar pleine largeur */
+  .stButton > button {
+    font-size: 10px !important;
+    letter-spacing: 1px !important;
+    padding: 8px 10px !important;
+  }
+
+  /* Inputs touch-friendly */
+  .stTextInput input,
+  .stNumberInput input {
+    font-size: 16px !important; /* Évite zoom iOS */
+    min-height: 48px !important;
+  }
+
+  /* Selectbox */
+  .stSelectbox [data-baseweb="select"] > div {
+    min-height: 44px !important;
+    font-size: 13px !important;
+  }
+
+  /* Graphiques scrollables */
+  [data-testid="stPlotlyChart"] {
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* News cards */
+  .stMarkdown a {
+    font-size: 12px !important;
+  }
+
+  /* Cacher les décorations lourdes */
+  section[data-testid="stSidebar"]::after {
+    display: none !important;
+  }
+}
+
+/* ── Touch improvements (tous mobiles) ─────────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+
+  /* Supprimer hover effects qui bloquent sur touch */
+  .stButton > button:hover {
+    transform: none !important;
+  }
+  [data-testid="metric-container"]:hover {
+    box-shadow: none !important;
+  }
+
+  /* Zone de tap minimum 44px (standard Apple/Google) */
+  .stButton > button,
+  .stTabs [data-baseweb="tab"],
+  .stCheckbox label,
+  .stSelectbox [data-baseweb="select"] {
+    min-height: 44px !important;
+  }
+
+  /* Scrollbar invisible sur mobile */
+  ::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+}
+
 </style>""", unsafe_allow_html=True)
 
 # ── GATE D'AUTHENTIFICATION ─────────────────────────────────────────────────
@@ -1025,6 +1221,11 @@ def run_analysis(symbol,period,capital,include_news,use_finbert,context=""):
         st.session_state.signal=signal
         st.session_state.signal_history.insert(0,{**signal,"ts":datetime.utcnow().strftime("%H:%M:%S"),"capital":capital})
         st.session_state.status_msg=f"✓ {get_name(symbol)} ({symbol}) @ {datetime.utcnow().strftime('%H:%M')} UTC"
+        # Sauvegarder le signal dans l'espace personnel
+        if AUTH_OK and st.session_state.get("user_email"):
+            try:
+                save_signal(st.session_state.user_email, signal, capital)
+            except Exception: pass
     prog.empty(); msg_ph.empty()
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -2170,9 +2371,9 @@ sig=st.session_state.signal; df=st.session_state.df_feat
 sent=st.session_state.sentiment; news=st.session_state.news_data
 bt=st.session_state.backtest_result
 
-(t_sig,t_chart,t_models,t_risk,t_profit,t_news,t_scan,t_chat,t_bt,t_hist)=st.tabs([
+(t_sig,t_chart,t_models,t_risk,t_profit,t_news,t_scan,t_chat,t_bt,t_hist,t_profil)=st.tabs([
     "⬡ SIGNAL","📈 GRAPHIQUE","🤖 MODÈLES IA","⚡ RISQUE","💰 PROFIT",
-    "📰 NEWS","🌐 SCANNER","⬡ IA ORACLE","📊 BACKTEST","🕐 HISTORIQUE"])
+    "📰 NEWS","🌐 SCANNER","⬡ IA ORACLE","📊 BACKTEST","🕐 HISTORIQUE","👤 MON ESPACE"])
 
 # ── SIGNAL ─────────────────────────────────────────────────────────────────
 with t_sig:
@@ -2632,13 +2833,16 @@ with t_news:
                          "CoinDesk":"₿","Investing.com":"📈"}.get(_src,"📰")
 
             # Bouton de lien
-            _link_btn = (f'<a href="{_url}" target="_blank" style="'
-                         f'display:inline-flex;align-items:center;gap:5px;'
-                         f'background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.3);'
-                         f'color:{C["accent"]};font-family:JetBrains Mono,monospace;font-size:9px;'
-                         f'padding:4px 10px;border-radius:3px;text-decoration:none;'
-                         f'letter-spacing:1px;transition:all .2s">'
-                         f'🔗 LIRE L&#39;ARTICLE &rarr;</a>') if _url else ""
+            _btn_style = (
+                "display:inline-flex;align-items:center;gap:5px;"
+                "background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.3);"
+                f"color:{C['accent']};font-family:JetBrains Mono,monospace;font-size:9px;"
+                "padding:4px 10px;border-radius:3px;text-decoration:none;"
+                "letter-spacing:1px;transition:all .2s"
+            )
+            _link_btn = (
+                f'<a href="{_url}" target="_blank" style="{_btn_style}">🔗 LIRE L\'ARTICLE</a>'
+            ) if _url else ""
 
             st.markdown(f'''
             <div style="background:linear-gradient(135deg,{C["card"]},{C["card2"]});
@@ -2870,6 +3074,252 @@ with t_bt:
                     "Ratio Gains bruts / Pertes brutes. > 1.5 = profitable · > 2 = excellent. "
                     "Si PF = 2, pour chaque $1 perdu vous gagnez $2.", C["green"])
 
+# ── MON ESPACE PERSONNEL ─────────────────────────────────────────────────────
+with t_profil:
+    _uemail = st.session_state.get("user_email", "") if AUTH_OK else ""
+
+    if not _uemail:
+        st.markdown(f'''
+        <div style="text-align:center;padding:60px 20px">
+          <div style="font-size:64px">👤</div>
+          <div style="font-family:JetBrains Mono,monospace;font-size:13px;
+            color:{C["muted"]};margin-top:18px;letter-spacing:2px">
+            CONNECTEZ-VOUS POUR ACCÉDER À VOTRE ESPACE PERSONNEL
+          </div>
+        </div>
+        ''', unsafe_allow_html=True)
+    else:
+        # ── Récupérer la clé IP ────────────────────────────────────────────
+        try:
+            import socket
+            _ip = socket.gethostbyname(socket.gethostname())
+        except Exception:
+            _ip = "127.0.0.1"
+
+        try:
+            _ip_key = get_or_create_ip_key(_uemail, _ip, "QTO Dashboard")
+        except Exception:
+            _ip_key = "—"
+
+        try:
+            _stats  = get_user_stats(_uemail)
+            _favs   = get_favorites(_uemail)
+            _alerts = get_alerts(_uemail, active_only=False)
+            _sigs   = get_user_signals(_uemail, limit=100)
+            _ip_keys = get_user_ip_keys(_uemail)
+        except Exception:
+            _stats = {"total":0,"buys":0,"sells":0,"holds":0,"top_symbol":"—","avg_conf":0,"avg_rsi":0}
+            _favs = []; _alerts = []; _sigs = []; _ip_keys = []
+
+        # ── Header profil ─────────────────────────────────────────────────
+        st.markdown(f'''
+        <div style="background:linear-gradient(135deg,{C["card"]},{C["card2"]});
+            border:1px solid {C["border2"]};border-radius:8px;
+            padding:20px 24px;margin-bottom:20px;
+            display:flex;align-items:center;gap:20px">
+          <div style="width:56px;height:56px;border-radius:50%;
+            background:linear-gradient(135deg,{C["accent"]},{C["accent2"]});
+            display:flex;align-items:center;justify-content:center;
+            font-size:24px;flex-shrink:0">👤</div>
+          <div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:22px;
+              color:{C["bright"]};letter-spacing:2px">
+              {st.session_state.get("username","Utilisateur")}
+            </div>
+            <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+              color:{C["muted"]};margin-top:4px">{_uemail}</div>
+            <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+              color:{C["accent"]};margin-top:3px;letter-spacing:1px">
+              Plan {st.session_state.get("plan","PRO")} · Expire {st.session_state.get("expires_at","—")}
+            </div>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+              color:{C["muted"]};text-transform:uppercase;letter-spacing:1px">
+              Clé IP Appareil
+            </div>
+            <div style="font-family:JetBrains Mono,monospace;font-size:11px;
+              color:{C["green"]};margin-top:4px;letter-spacing:1px">
+              {_ip_key}
+            </div>
+            <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+              color:{C["muted"]};margin-top:2px">{_ip}</div>
+          </div>
+        </div>
+        ''', unsafe_allow_html=True)
+
+        # ── Stats résumé ──────────────────────────────────────────────────
+        _sm1,_sm2,_sm3,_sm4,_sm5,_sm6 = st.columns(6)
+        _sm1.metric("📊 Analyses", _stats["total"])
+        _sm2.metric("🟢 BUY", _stats["buys"])
+        _sm3.metric("🔴 SELL", _stats["sells"])
+        _sm4.metric("⚪ HOLD", _stats["holds"])
+        _sm5.metric("⚡ Conf. moy.", f"{_stats['avg_conf']:.0f}%")
+        _sm6.metric("🏆 Top actif", _stats["top_symbol"])
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # ── 3 colonnes : Signaux | Favoris | Alertes ──────────────────────
+        _pc1, _pc2 = st.columns([3, 2])
+
+        with _pc1:
+            # ── Historique des signaux ─────────────────────────────────────
+            qtitle("📈 Mes Signaux Sauvegardés", f"{len(_sigs)} analyses")
+            if not _sigs:
+                st.info("Aucun signal sauvegardé — lancez une analyse pour commencer.")
+            else:
+                for _s in _sigs[:20]:
+                    _ac = C["green"] if _s["action"]=="BUY" else C["red"] if _s["action"]=="SELL" else C["muted"]
+                    st.markdown(f'''
+                    <div style="background:{C["card"]};border:1px solid {C["border2"]};
+                        border-left:4px solid {_ac};border-radius:5px;
+                        padding:10px 14px;margin-bottom:6px;
+                        display:flex;justify-content:space-between;align-items:center;
+                        flex-wrap:wrap;gap:8px">
+                      <div>
+                        <span style="font-family:Bebas Neue,sans-serif;font-size:16px;
+                          color:{C["bright"]};letter-spacing:1px">{_s["name"] or _s["symbol"]}</span>
+                        <span style="font-family:JetBrains Mono,monospace;font-size:9px;
+                          color:{C["muted"]};margin-left:8px">{_s["symbol"]}</span>
+                      </div>
+                      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+                        <span style="font-family:Bebas Neue,sans-serif;font-size:18px;
+                          color:{_ac};letter-spacing:2px">{_s["action"]}</span>
+                        <span style="font-family:JetBrains Mono,monospace;font-size:11px;
+                          color:{C["accent"]}">${float(_s["price"] or 0):,.4f}</span>
+                        <span style="font-family:JetBrains Mono,monospace;font-size:10px;
+                          color:{C["green"]}">{float(_s["confidence"] or 0):.0f}%</span>
+                        <span style="font-family:JetBrains Mono,monospace;font-size:9px;
+                          color:{C["muted"]}">{_s["date"]}</span>
+                      </div>
+                    </div>
+                    ''', unsafe_allow_html=True)
+
+        with _pc2:
+            # ── Actifs favoris ─────────────────────────────────────────────
+            qtitle("⭐ Mes Actifs Favoris")
+
+            # Ajouter un favori
+            _fa1, _fa2 = st.columns([3,1])
+            with _fa1:
+                _fav_sym = st.text_input("", placeholder="Ex: BTC-USD, AAPL, GC=F…",
+                    label_visibility="collapsed", key="fav_input")
+            with _fa2:
+                if st.button("➕ AJOUTER", key="add_fav", use_container_width=True):
+                    if _fav_sym:
+                        try:
+                            add_favorite(_uemail, _fav_sym.upper().strip(),
+                                        get_name(_fav_sym.upper().strip()))
+                            st.rerun()
+                        except Exception: pass
+
+            if not _favs:
+                st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]};padding:10px 0">Aucun favori — ajoutez vos actifs préférés.</div>', unsafe_allow_html=True)
+            else:
+                for _f in _favs:
+                    _fc1, _fc2 = st.columns([4,1])
+                    with _fc1:
+                        st.markdown(f'''
+                        <div style="background:{C["card"]};border:1px solid {C["border"]};
+                            border-radius:4px;padding:8px 12px;margin-bottom:4px;
+                            display:flex;justify-content:space-between">
+                          <div>
+                            <span style="font-family:Space Grotesk,sans-serif;font-size:12px;
+                              font-weight:600;color:{C["bright"]}">{_f["name"] or _f["symbol"]}</span>
+                            <span style="font-family:JetBrains Mono,monospace;font-size:9px;
+                              color:{C["muted"]};margin-left:8px">{_f["symbol"]}</span>
+                          </div>
+                          <span style="font-family:JetBrains Mono,monospace;font-size:8px;
+                            color:{C["muted"]}">{_f["added_at"]}</span>
+                        </div>
+                        ''', unsafe_allow_html=True)
+                    with _fc2:
+                        if st.button("🗑", key=f"del_fav_{_f['symbol']}"):
+                            try:
+                                remove_favorite(_uemail, _f["symbol"])
+                                st.rerun()
+                            except Exception: pass
+
+            # ── Alertes de prix ────────────────────────────────────────────
+            st.markdown("<br>", unsafe_allow_html=True)
+            qtitle("🔔 Mes Alertes de Prix")
+
+            with st.expander("➕ Créer une alerte"):
+                _al1, _al2 = st.columns(2)
+                with _al1:
+                    _al_sym   = st.text_input("Symbole", placeholder="BTC-USD", key="al_sym")
+                    _al_cond  = st.selectbox("Condition", ["ABOVE — Prix monte au-dessus", "BELOW — Prix descend en-dessous"], key="al_cond")
+                with _al2:
+                    _al_price = st.number_input("Prix cible ($)", min_value=0.0, value=0.0, format="%.4f", key="al_price")
+                    _al_note  = st.text_input("Note (optionnel)", placeholder="Ex: résistance clé", key="al_note")
+                if st.button("🔔 CRÉER L'ALERTE", use_container_width=True, key="create_alert"):
+                    if _al_sym and _al_price > 0:
+                        try:
+                            cond = "ABOVE" if "ABOVE" in _al_cond else "BELOW"
+                            curr = sig.get("price", 0) if sig and sig.get("symbol","") == _al_sym.upper() else 0
+                            add_alert(_uemail, _al_sym.upper(), get_name(_al_sym.upper()),
+                                     cond, _al_price, curr, _al_note)
+                            st.success("✅ Alerte créée !")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Erreur : {e}")
+
+            if not _alerts:
+                st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]};padding:10px 0">Aucune alerte — créez votre première alerte ci-dessus.</div>', unsafe_allow_html=True)
+            else:
+                for _al in _alerts:
+                    _al_c = C["green"] if not _al["triggered"] else C["muted"]
+                    _al_icon = "🔔" if not _al["triggered"] else "✅"
+                    _cond_txt = "↑ AU-DESSUS" if _al["condition_type"]=="ABOVE" else "↓ EN-DESSOUS"
+                    st.markdown(f'''
+                    <div style="background:{C["card"]};border:1px solid {C["border"]};
+                        border-left:3px solid {_al_c};border-radius:4px;
+                        padding:8px 12px;margin-bottom:5px">
+                      <div style="display:flex;justify-content:space-between;align-items:center">
+                        <div>
+                          <span style="font-family:Space Grotesk,sans-serif;font-size:11px;
+                            font-weight:600;color:{C["bright"]}">{_al_icon} {_al["symbol"]}</span>
+                          <span style="font-family:JetBrains Mono,monospace;font-size:9px;
+                            color:{_al_c};margin-left:8px">{_cond_txt} ${float(_al["target_price"]):,.4f}</span>
+                        </div>
+                        <span style="font-family:JetBrains Mono,monospace;font-size:8px;
+                          color:{C["muted"]}">{_al["created_at"]}</span>
+                      </div>
+                      {f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};margin-top:3px">{_al["note"]}</div>' if _al["note"] else ""}
+                    </div>
+                    ''', unsafe_allow_html=True)
+
+        # ── Clés IP (appareils) ────────────────────────────────────────────
+        st.markdown("<br>", unsafe_allow_html=True)
+        qtitle("🔐 Mes Appareils Reconnus", "Clés générées par adresse IP")
+        if not _ip_keys:
+            st.info("Aucun appareil enregistré.")
+        else:
+            _ipc = st.columns(min(len(_ip_keys), 3))
+            for _ii, _ik in enumerate(_ip_keys):
+                with _ipc[_ii % 3]:
+                    st.markdown(f'''
+                    <div style="background:{C["card"]};border:1px solid {C["border2"]};
+                        border-top:3px solid {C["accent"]};border-radius:6px;
+                        padding:14px;margin-bottom:8px">
+                      <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                        color:{C["muted"]};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">
+                        🖥️ Appareil {_ii+1}
+                      </div>
+                      <div style="font-family:JetBrains Mono,monospace;font-size:11px;
+                        color:{C["green"]};letter-spacing:1px;margin-bottom:6px">
+                        {_ik["ip_key"]}
+                      </div>
+                      <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                        color:{C["muted"]}">IP : {_ik["ip_address"]}</div>
+                      <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                        color:{C["muted"]};margin-top:3px">
+                        Dernière connexion : {_ik["last_seen"]}
+                      </div>
+                    </div>
+                    ''', unsafe_allow_html=True)
+
+
 # ── HISTORIQUE ───────────────────────────────────────────────────────────────
 with t_hist:
     _history=st.session_state.signal_history
@@ -2894,4 +3344,3 @@ with t_hist:
         st.dataframe(pd.DataFrame(_rows_h),use_container_width=True,hide_index=True)
         if st.button("🗑  Effacer l'historique"):
             st.session_state.signal_history=[]; st.rerun()
-
