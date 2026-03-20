@@ -64,7 +64,7 @@ except ImportError:
 
 # ══════════════════════════════════════════════════════════════════════════════
 st.set_page_config(page_title="⬡ Quantum Trade Oracle", page_icon="⬡",
-                   layout="wide", initial_sidebar_state="collapsed")
+                   layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
