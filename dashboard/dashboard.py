@@ -3074,250 +3074,645 @@ with t_bt:
                     "Ratio Gains bruts / Pertes brutes. > 1.5 = profitable · > 2 = excellent. "
                     "Si PF = 2, pour chaque $1 perdu vous gagnez $2.", C["green"])
 
-# ── MON ESPACE PERSONNEL ─────────────────────────────────────────────────────
+# ── MON ESPACE PERSONNEL — SaaS Grade ────────────────────────────────────────
 with t_profil:
     _uemail = st.session_state.get("user_email", "") if AUTH_OK else ""
 
     if not _uemail:
         st.markdown(f'''
-        <div style="text-align:center;padding:60px 20px">
-          <div style="font-size:64px">👤</div>
-          <div style="font-family:JetBrains Mono,monospace;font-size:13px;
-            color:{C["muted"]};margin-top:18px;letter-spacing:2px">
-            CONNECTEZ-VOUS POUR ACCÉDER À VOTRE ESPACE PERSONNEL
+        <div style="text-align:center;padding:80px 20px">
+          <div style="font-size:72px;filter:grayscale(1);opacity:.3">👤</div>
+          <div style="font-family:Bebas Neue,sans-serif;font-size:28px;letter-spacing:4px;
+            color:{C["border2"]};margin-top:18px">ESPACE PERSONNEL</div>
+          <div style="font-family:JetBrains Mono,monospace;font-size:11px;
+            color:{C["muted"]};margin-top:10px;letter-spacing:2px">
+            CONNECTEZ-VOUS POUR ACCÉDER À VOTRE TABLEAU DE BORD PERSONNEL
+          </div>
+          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+            color:{C["muted"]};margin-top:8px;opacity:.6">
+            Signaux · Favoris · Alertes · Performance · Appareils
           </div>
         </div>
         ''', unsafe_allow_html=True)
     else:
-        # ── Récupérer la clé IP ────────────────────────────────────────────
+        # ── Données ────────────────────────────────────────────────────────
         try:
             import socket
             _ip = socket.gethostbyname(socket.gethostname())
         except Exception:
             _ip = "127.0.0.1"
-
         try:
             _ip_key = get_or_create_ip_key(_uemail, _ip, "QTO Dashboard")
         except Exception:
             _ip_key = "—"
-
         try:
-            _stats  = get_user_stats(_uemail)
-            _favs   = get_favorites(_uemail)
-            _alerts = get_alerts(_uemail, active_only=False)
-            _sigs   = get_user_signals(_uemail, limit=100)
+            _stats   = get_user_stats(_uemail)
+            _favs    = get_favorites(_uemail)
+            _alerts  = get_alerts(_uemail, active_only=False)
+            _sigs    = get_user_signals(_uemail, limit=100)
             _ip_keys = get_user_ip_keys(_uemail)
         except Exception:
             _stats = {"total":0,"buys":0,"sells":0,"holds":0,"top_symbol":"—","avg_conf":0,"avg_rsi":0}
             _favs = []; _alerts = []; _sigs = []; _ip_keys = []
 
-        # ── Header profil ─────────────────────────────────────────────────
+        _username  = st.session_state.get("username","Utilisateur")
+        _plan      = st.session_state.get("plan","PRO")
+        _expires   = st.session_state.get("expires_at","—")
+        _plan_col  = C["yellow"] if _plan=="ELITE" else C["accent"] if _plan=="PRO" else C["green"]
+        _plan_icon = "👑" if _plan=="ELITE" else "⚡" if _plan=="PRO" else "🎯"
+        _initials  = _username[:2].upper() if _username else "?"
+
+        # ── Bannière Hero Profile ──────────────────────────────────────────
         st.markdown(f'''
-        <div style="background:linear-gradient(135deg,{C["card"]},{C["card2"]});
-            border:1px solid {C["border2"]};border-radius:8px;
-            padding:20px 24px;margin-bottom:20px;
-            display:flex;align-items:center;gap:20px">
-          <div style="width:56px;height:56px;border-radius:50%;
-            background:linear-gradient(135deg,{C["accent"]},{C["accent2"]});
-            display:flex;align-items:center;justify-content:center;
-            font-size:24px;flex-shrink:0">👤</div>
-          <div>
-            <div style="font-family:Bebas Neue,sans-serif;font-size:22px;
-              color:{C["bright"]};letter-spacing:2px">
-              {st.session_state.get("username","Utilisateur")}
+        <div style="background:linear-gradient(135deg,{C["card"]} 0%,{C["card2"]} 50%,rgba(0,212,255,.05) 100%);
+            border:1px solid {C["border2"]};border-radius:12px;
+            padding:28px 30px;margin-bottom:6px;position:relative;overflow:hidden">
+
+          <!-- Décoration fond -->
+          <div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;
+            border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.06),transparent 70%)"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:1px;
+            background:linear-gradient(90deg,transparent,{_plan_col}44,transparent)"></div>
+
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+
+            <!-- Avatar -->
+            <div style="width:66px;height:66px;border-radius:50%;flex-shrink:0;
+              background:linear-gradient(135deg,{_plan_col}33,{C["surface"]});
+              border:2px solid {_plan_col}55;
+              display:flex;align-items:center;justify-content:center;
+              font-family:Bebas Neue,sans-serif;font-size:24px;color:{_plan_col};
+              box-shadow:0 0 20px {_plan_col}22">
+              {_initials}
             </div>
-            <div style="font-family:JetBrains Mono,monospace;font-size:9px;
-              color:{C["muted"]};margin-top:4px">{_uemail}</div>
-            <div style="font-family:JetBrains Mono,monospace;font-size:9px;
-              color:{C["accent"]};margin-top:3px;letter-spacing:1px">
-              Plan {st.session_state.get("plan","PRO")} · Expire {st.session_state.get("expires_at","—")}
+
+            <!-- Infos principales -->
+            <div style="flex:1;min-width:180px">
+              <div style="font-family:Bebas Neue,sans-serif;font-size:26px;
+                color:{C["bright"]};letter-spacing:3px;line-height:1">
+                {_username}
+              </div>
+              <div style="font-family:JetBrains Mono,monospace;font-size:10px;
+                color:{C["muted"]};margin-top:5px">{_uemail}</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap">
+                <span style="background:{_plan_col}22;border:1px solid {_plan_col}55;
+                  color:{_plan_col};font-family:Bebas Neue,sans-serif;font-size:13px;
+                  letter-spacing:2px;padding:3px 12px;border-radius:20px">
+                  {_plan_icon} PLAN {_plan}
+                </span>
+                <span style="font-family:JetBrains Mono,monospace;font-size:9px;
+                  color:{C["muted"]}">Expire : {_expires}</span>
+                <span style="background:rgba(0,255,157,.1);border:1px solid rgba(0,255,157,.2);
+                  color:{C["green"]};font-family:JetBrains Mono,monospace;font-size:9px;
+                  padding:2px 10px;border-radius:10px">● ACTIF</span>
+              </div>
             </div>
-          </div>
-          <div style="margin-left:auto;text-align:right">
-            <div style="font-family:JetBrains Mono,monospace;font-size:8px;
-              color:{C["muted"]};text-transform:uppercase;letter-spacing:1px">
-              Clé IP Appareil
+
+            <!-- Clé IP -->
+            <div style="text-align:right;min-width:200px">
+              <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                color:{C["muted"]};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px">
+                🔐 Clé appareil
+              </div>
+              <div style="font-family:JetBrains Mono,monospace;font-size:12px;
+                color:{C["green"]};letter-spacing:2px;
+                background:rgba(0,255,157,.05);border:1px solid rgba(0,255,157,.15);
+                border-radius:4px;padding:6px 12px;display:inline-block">
+                {_ip_key}
+              </div>
+              <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                color:{C["muted"]};margin-top:4px">{_ip}</div>
             </div>
-            <div style="font-family:JetBrains Mono,monospace;font-size:11px;
-              color:{C["green"]};margin-top:4px;letter-spacing:1px">
-              {_ip_key}
-            </div>
-            <div style="font-family:JetBrains Mono,monospace;font-size:8px;
-              color:{C["muted"]};margin-top:2px">{_ip}</div>
+
           </div>
         </div>
         ''', unsafe_allow_html=True)
 
-        # ── Stats résumé ──────────────────────────────────────────────────
-        _sm1,_sm2,_sm3,_sm4,_sm5,_sm6 = st.columns(6)
-        _sm1.metric("📊 Analyses", _stats["total"])
-        _sm2.metric("🟢 BUY", _stats["buys"])
-        _sm3.metric("🔴 SELL", _stats["sells"])
-        _sm4.metric("⚪ HOLD", _stats["holds"])
-        _sm5.metric("⚡ Conf. moy.", f"{_stats['avg_conf']:.0f}%")
-        _sm6.metric("🏆 Top actif", _stats["top_symbol"])
+        # ── KPI Cards ─────────────────────────────────────────────────────
+        _total = _stats["total"] or 1
+        _win_rate = round(_stats["buys"] / _total * 100) if _total > 0 else 0
+        _kpi_data = [
+            ("📊","Analyses totales", str(_stats["total"]), "", C["accent"]),
+            ("🟢","Signaux BUY",       str(_stats["buys"]),  f"{_win_rate}% du total", C["green"]),
+            ("🔴","Signaux SELL",      str(_stats["sells"]), "", C["red"]),
+            ("⚪","Signaux HOLD",      str(_stats["holds"]), "", C["muted"]),
+            ("⚡","Confiance moy.",    f"{_stats['avg_conf']:.0f}%", "IA", C["yellow"]),
+            ("🏆","Actif favori",      _stats["top_symbol"], "le + analysé", C["purple"]),
+        ]
+        _kpi_cols = st.columns(6)
+        for _ki, (_icon, _lbl, _val, _sub, _kcol) in enumerate(_kpi_data):
+            with _kpi_cols[_ki]:
+                st.markdown(f'''
+                <div style="background:linear-gradient(135deg,{C["card"]},{C["card2"]});
+                    border:1px solid {C["border2"]};border-top:2px solid {_kcol};
+                    border-radius:8px;padding:14px 12px;text-align:center;
+                    position:relative;overflow:hidden">
+                  <div style="position:absolute;top:0;left:0;right:0;height:1px;
+                    background:linear-gradient(90deg,transparent,{_kcol}55,transparent)"></div>
+                  <div style="font-size:20px;margin-bottom:6px">{_icon}</div>
+                  <div style="font-family:Bebas Neue,sans-serif;font-size:28px;
+                    color:{_kcol};letter-spacing:2px;line-height:1;
+                    text-shadow:0 0 15px {_kcol}44">{_val}</div>
+                  <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                    color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;
+                    margin-top:5px">{_lbl}</div>
+                  {f'<div style="font-family:JetBrains Mono,monospace;font-size:8px;color:{_kcol};margin-top:2px">{_sub}</div>' if _sub else ""}
+                </div>
+                ''', unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 
-        # ── 3 colonnes : Signaux | Favoris | Alertes ──────────────────────
-        _pc1, _pc2 = st.columns([3, 2])
+        # ── Sous-onglets ───────────────────────────────────────────────────
+        _pt1, _pt2, _pt3, _pt4 = st.tabs([
+            "📈 Mes Signaux",
+            "⭐ Favoris & Alertes",
+            "🔐 Sécurité & Appareils",
+            "📊 Performance",
+        ])
 
-        with _pc1:
-            # ── Historique des signaux ─────────────────────────────────────
-            qtitle("📈 Mes Signaux Sauvegardés", f"{len(_sigs)} analyses")
+        # ════════ ONGLET 1 — SIGNAUX ════════════════════════════════════
+        with _pt1:
+            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
             if not _sigs:
-                st.info("Aucun signal sauvegardé — lancez une analyse pour commencer.")
+                st.markdown(f'''
+                <div style="text-align:center;padding:50px 20px;
+                    background:{C["card"]};border:1px dashed {C["border2"]};border-radius:8px">
+                  <div style="font-size:48px;opacity:.3">📈</div>
+                  <div style="font-family:JetBrains Mono,monospace;font-size:11px;
+                    color:{C["muted"]};margin-top:12px">
+                    Aucun signal sauvegardé — lancez votre première analyse
+                  </div>
+                </div>
+                ''', unsafe_allow_html=True)
             else:
-                for _s in _sigs[:20]:
+                # Filtres
+                _sf1, _sf2, _sf3 = st.columns([2,2,1])
+                with _sf1:
+                    _sig_filter = st.selectbox("Signal", ["Tous","BUY","SELL","HOLD"],
+                        label_visibility="collapsed", key="sig_filter")
+                with _sf2:
+                    _sig_syms = ["Tous"] + list(dict.fromkeys(s["symbol"] for s in _sigs))
+                    _sig_sym_filter = st.selectbox("Symbole", _sig_syms,
+                        label_visibility="collapsed", key="sig_sym_filter")
+                with _sf3:
+                    _sig_limit = st.selectbox("Nb", ["20","50","Tous"],
+                        label_visibility="collapsed", key="sig_limit")
+
+                _sig_max = 999 if _sig_limit=="Tous" else int(_sig_limit)
+                _shown_sigs = 0
+
+                for _s in _sigs:
+                    if _shown_sigs >= _sig_max: break
+                    if _sig_filter != "Tous" and _s["action"] != _sig_filter: continue
+                    if _sig_sym_filter != "Tous" and _s["symbol"] != _sig_sym_filter: continue
+                    _shown_sigs += 1
+
                     _ac = C["green"] if _s["action"]=="BUY" else C["red"] if _s["action"]=="SELL" else C["muted"]
+                    _icon_sig = "🟢" if _s["action"]=="BUY" else "🔴" if _s["action"]=="SELL" else "⚪"
+                    _conf_v = float(_s["confidence"] or 0)
+                    _rsi_v  = float(_s["rsi"] or 0)
+                    _price_v = float(_s["price"] or 0)
+                    _sl_v   = float(_s["sl"] or 0)
+                    _tp_v   = float(_s["tp"] or 0)
+                    _rr_v   = float(_s["rr"] or 0)
+
                     st.markdown(f'''
-                    <div style="background:{C["card"]};border:1px solid {C["border2"]};
-                        border-left:4px solid {_ac};border-radius:5px;
-                        padding:10px 14px;margin-bottom:6px;
-                        display:flex;justify-content:space-between;align-items:center;
-                        flex-wrap:wrap;gap:8px">
-                      <div>
-                        <span style="font-family:Bebas Neue,sans-serif;font-size:16px;
-                          color:{C["bright"]};letter-spacing:1px">{_s["name"] or _s["symbol"]}</span>
-                        <span style="font-family:JetBrains Mono,monospace;font-size:9px;
-                          color:{C["muted"]};margin-left:8px">{_s["symbol"]}</span>
+                    <div style="background:linear-gradient(135deg,{C["card"]},{C["card2"]});
+                        border:1px solid {C["border2"]};border-left:4px solid {_ac};
+                        border-radius:8px;padding:14px 18px;margin-bottom:8px;
+                        position:relative;overflow:hidden">
+                      <div style="position:absolute;top:0;left:0;right:0;height:1px;
+                        background:linear-gradient(90deg,{_ac}33,transparent)"></div>
+
+                      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+
+                        <!-- Gauche : actif + signal -->
+                        <div style="display:flex;align-items:center;gap:14px">
+                          <div style="width:40px;height:40px;border-radius:8px;
+                            background:{_ac}18;border:1px solid {_ac}44;
+                            display:flex;align-items:center;justify-content:center;
+                            font-family:Bebas Neue,sans-serif;font-size:16px;color:{_ac}">
+                            {_icon_sig}
+                          </div>
+                          <div>
+                            <div style="font-family:Space Grotesk,sans-serif;font-size:14px;
+                              font-weight:700;color:{C["bright"]};letter-spacing:.5px">
+                              {_s["name"] or _s["symbol"]}
+                            </div>
+                            <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                              color:{C["muted"]};margin-top:2px">
+                              {_s["symbol"]} · {_s["date"]}
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Centre : métriques clés -->
+                        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+                          <div style="text-align:center">
+                            <div style="font-family:JetBrains Mono,monospace;font-size:7px;
+                              color:{C["muted"]};text-transform:uppercase;letter-spacing:1px">SIGNAL</div>
+                            <div style="font-family:Bebas Neue,sans-serif;font-size:20px;
+                              color:{_ac};letter-spacing:2px">{_s["action"]}</div>
+                          </div>
+                          <div style="text-align:center">
+                            <div style="font-family:JetBrains Mono,monospace;font-size:7px;
+                              color:{C["muted"]};text-transform:uppercase;letter-spacing:1px">PRIX</div>
+                            <div style="font-family:JetBrains Mono,monospace;font-size:13px;
+                              color:{C["accent"]};font-weight:600">${_price_v:,.4f}</div>
+                          </div>
+                          <div style="text-align:center">
+                            <div style="font-family:JetBrains Mono,monospace;font-size:7px;
+                              color:{C["muted"]};text-transform:uppercase;letter-spacing:1px">CONF.</div>
+                            <div style="font-family:Bebas Neue,sans-serif;font-size:18px;
+                              color:{C["yellow"]}">{_conf_v:.0f}%</div>
+                          </div>
+                          <div style="text-align:center">
+                            <div style="font-family:JetBrains Mono,monospace;font-size:7px;
+                              color:{C["muted"]};text-transform:uppercase;letter-spacing:1px">RSI</div>
+                            <div style="font-family:JetBrains Mono,monospace;font-size:13px;
+                              color:{"#00ff9d" if _rsi_v<30 else "#ff2d55" if _rsi_v>70 else "#6fa8c8"}">{_rsi_v:.0f}</div>
+                          </div>
+                          {f'''<div style="text-align:center">
+                            <div style="font-family:JetBrains Mono,monospace;font-size:7px;
+                              color:{C["muted"]};text-transform:uppercase;letter-spacing:1px">R/R</div>
+                            <div style="font-family:JetBrains Mono,monospace;font-size:13px;
+                              color:{C["green"] if _rr_v>=2 else C["yellow"]}">{_rr_v:.1f}:1</div>
+                          </div>''' if _rr_v > 0 else ""}
+                        </div>
+
+                        <!-- Droite : SL/TP -->
+                        {f'''<div style="text-align:right">
+                          <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                            color:{C["red"]}">SL ${_sl_v:,.4f}</div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                            color:{C["green"]};margin-top:3px">TP ${_tp_v:,.4f}</div>
+                        </div>''' if _sl_v > 0 else ""}
+
                       </div>
-                      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-                        <span style="font-family:Bebas Neue,sans-serif;font-size:18px;
-                          color:{_ac};letter-spacing:2px">{_s["action"]}</span>
-                        <span style="font-family:JetBrains Mono,monospace;font-size:11px;
-                          color:{C["accent"]}">${float(_s["price"] or 0):,.4f}</span>
-                        <span style="font-family:JetBrains Mono,monospace;font-size:10px;
-                          color:{C["green"]}">{float(_s["confidence"] or 0):.0f}%</span>
-                        <span style="font-family:JetBrains Mono,monospace;font-size:9px;
-                          color:{C["muted"]}">{_s["date"]}</span>
+
+                      <!-- Barre de confiance -->
+                      <div style="margin-top:10px;background:{C["border"]};border-radius:2px;height:3px;overflow:hidden">
+                        <div style="height:100%;width:{min(_conf_v,100):.0f}%;
+                          background:linear-gradient(90deg,{_ac},{_ac}88);border-radius:2px;
+                          transition:width .5s"></div>
                       </div>
                     </div>
                     ''', unsafe_allow_html=True)
 
-        with _pc2:
-            # ── Actifs favoris ─────────────────────────────────────────────
-            qtitle("⭐ Mes Actifs Favoris")
+                if _shown_sigs == 0:
+                    st.info("Aucun signal ne correspond aux filtres.")
 
-            # Ajouter un favori
-            _fa1, _fa2 = st.columns([3,1])
-            with _fa1:
-                _fav_sym = st.text_input("", placeholder="Ex: BTC-USD, AAPL, GC=F…",
-                    label_visibility="collapsed", key="fav_input")
-            with _fa2:
-                if st.button("➕ AJOUTER", key="add_fav", use_container_width=True):
-                    if _fav_sym:
-                        try:
-                            add_favorite(_uemail, _fav_sym.upper().strip(),
-                                        get_name(_fav_sym.upper().strip()))
-                            st.rerun()
-                        except Exception: pass
+        # ════════ ONGLET 2 — FAVORIS & ALERTES ══════════════════════════
+        with _pt2:
+            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+            _fav_col, _alert_col = st.columns(2)
 
-            if not _favs:
-                st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]};padding:10px 0">Aucun favori — ajoutez vos actifs préférés.</div>', unsafe_allow_html=True)
-            else:
-                for _f in _favs:
-                    _fc1, _fc2 = st.columns([4,1])
-                    with _fc1:
-                        st.markdown(f'''
-                        <div style="background:{C["card"]};border:1px solid {C["border"]};
-                            border-radius:4px;padding:8px 12px;margin-bottom:4px;
-                            display:flex;justify-content:space-between">
-                          <div>
-                            <span style="font-family:Space Grotesk,sans-serif;font-size:12px;
-                              font-weight:600;color:{C["bright"]}">{_f["name"] or _f["symbol"]}</span>
-                            <span style="font-family:JetBrains Mono,monospace;font-size:9px;
-                              color:{C["muted"]};margin-left:8px">{_f["symbol"]}</span>
-                          </div>
-                          <span style="font-family:JetBrains Mono,monospace;font-size:8px;
-                            color:{C["muted"]}">{_f["added_at"]}</span>
-                        </div>
-                        ''', unsafe_allow_html=True)
-                    with _fc2:
-                        if st.button("🗑", key=f"del_fav_{_f['symbol']}"):
+            # ── Favoris ────────────────────────────────────────────────────
+            with _fav_col:
+                st.markdown(f'''
+                <div style="font-family:Bebas Neue,sans-serif;font-size:16px;
+                  color:{C["accent"]};letter-spacing:2px;margin-bottom:12px">
+                  ⭐ MES ACTIFS FAVORIS
+                  <span style="font-family:JetBrains Mono,monospace;font-size:10px;
+                    color:{C["muted"]};margin-left:10px">{len(_favs)} actifs</span>
+                </div>
+                ''', unsafe_allow_html=True)
+
+                _fa1, _fa2 = st.columns([4,1])
+                with _fa1:
+                    _fav_sym = st.text_input("", placeholder="BTC-USD, AAPL, GC=F…",
+                        label_visibility="collapsed", key="fav_input")
+                with _fa2:
+                    if st.button("➕", key="add_fav", use_container_width=True):
+                        if _fav_sym:
                             try:
-                                remove_favorite(_uemail, _f["symbol"])
+                                add_favorite(_uemail, _fav_sym.upper().strip(),
+                                            get_name(_fav_sym.upper().strip()))
                                 st.rerun()
                             except Exception: pass
 
-            # ── Alertes de prix ────────────────────────────────────────────
-            st.markdown("<br>", unsafe_allow_html=True)
-            qtitle("🔔 Mes Alertes de Prix")
-
-            with st.expander("➕ Créer une alerte"):
-                _al1, _al2 = st.columns(2)
-                with _al1:
-                    _al_sym   = st.text_input("Symbole", placeholder="BTC-USD", key="al_sym")
-                    _al_cond  = st.selectbox("Condition", ["ABOVE — Prix monte au-dessus", "BELOW — Prix descend en-dessous"], key="al_cond")
-                with _al2:
-                    _al_price = st.number_input("Prix cible ($)", min_value=0.0, value=0.0, format="%.4f", key="al_price")
-                    _al_note  = st.text_input("Note (optionnel)", placeholder="Ex: résistance clé", key="al_note")
-                if st.button("🔔 CRÉER L'ALERTE", use_container_width=True, key="create_alert"):
-                    if _al_sym and _al_price > 0:
-                        try:
-                            cond = "ABOVE" if "ABOVE" in _al_cond else "BELOW"
-                            curr = sig.get("price", 0) if sig and sig.get("symbol","") == _al_sym.upper() else 0
-                            add_alert(_uemail, _al_sym.upper(), get_name(_al_sym.upper()),
-                                     cond, _al_price, curr, _al_note)
-                            st.success("✅ Alerte créée !")
-                            st.rerun()
-                        except Exception as e:
-                            st.error(f"Erreur : {e}")
-
-            if not _alerts:
-                st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]};padding:10px 0">Aucune alerte — créez votre première alerte ci-dessus.</div>', unsafe_allow_html=True)
-            else:
-                for _al in _alerts:
-                    _al_c = C["green"] if not _al["triggered"] else C["muted"]
-                    _al_icon = "🔔" if not _al["triggered"] else "✅"
-                    _cond_txt = "↑ AU-DESSUS" if _al["condition_type"]=="ABOVE" else "↓ EN-DESSOUS"
+                if not _favs:
                     st.markdown(f'''
-                    <div style="background:{C["card"]};border:1px solid {C["border"]};
-                        border-left:3px solid {_al_c};border-radius:4px;
-                        padding:8px 12px;margin-bottom:5px">
-                      <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div>
-                          <span style="font-family:Space Grotesk,sans-serif;font-size:11px;
-                            font-weight:600;color:{C["bright"]}">{_al_icon} {_al["symbol"]}</span>
-                          <span style="font-family:JetBrains Mono,monospace;font-size:9px;
-                            color:{_al_c};margin-left:8px">{_cond_txt} ${float(_al["target_price"]):,.4f}</span>
-                        </div>
-                        <span style="font-family:JetBrains Mono,monospace;font-size:8px;
-                          color:{C["muted"]}">{_al["created_at"]}</span>
-                      </div>
-                      {f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};margin-top:3px">{_al["note"]}</div>' if _al["note"] else ""}
-                    </div>
-                    ''', unsafe_allow_html=True)
-
-        # ── Clés IP (appareils) ────────────────────────────────────────────
-        st.markdown("<br>", unsafe_allow_html=True)
-        qtitle("🔐 Mes Appareils Reconnus", "Clés générées par adresse IP")
-        if not _ip_keys:
-            st.info("Aucun appareil enregistré.")
-        else:
-            _ipc = st.columns(min(len(_ip_keys), 3))
-            for _ii, _ik in enumerate(_ip_keys):
-                with _ipc[_ii % 3]:
-                    st.markdown(f'''
-                    <div style="background:{C["card"]};border:1px solid {C["border2"]};
-                        border-top:3px solid {C["accent"]};border-radius:6px;
-                        padding:14px;margin-bottom:8px">
-                      <div style="font-family:JetBrains Mono,monospace;font-size:8px;
-                        color:{C["muted"]};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">
-                        🖥️ Appareil {_ii+1}
-                      </div>
-                      <div style="font-family:JetBrains Mono,monospace;font-size:11px;
-                        color:{C["green"]};letter-spacing:1px;margin-bottom:6px">
-                        {_ik["ip_key"]}
-                      </div>
+                    <div style="text-align:center;padding:30px;
+                        background:{C["card"]};border:1px dashed {C["border2"]};border-radius:8px;margin-top:8px">
+                      <div style="font-size:32px;opacity:.3">⭐</div>
                       <div style="font-family:JetBrains Mono,monospace;font-size:9px;
-                        color:{C["muted"]}">IP : {_ik["ip_address"]}</div>
-                      <div style="font-family:JetBrains Mono,monospace;font-size:8px;
-                        color:{C["muted"]};margin-top:3px">
-                        Dernière connexion : {_ik["last_seen"]}
-                      </div>
+                        color:{C["muted"]};margin-top:8px">Ajoutez vos actifs préférés</div>
                     </div>
                     ''', unsafe_allow_html=True)
+                else:
+                    for _f in _favs:
+                        _frow1, _frow2 = st.columns([5,1])
+                        with _frow1:
+                            st.markdown(f'''
+                            <div style="background:{C["card"]};border:1px solid {C["border2"]};
+                                border-radius:6px;padding:10px 14px;margin-bottom:5px;
+                                display:flex;justify-content:space-between;align-items:center">
+                              <div style="display:flex;align-items:center;gap:10px">
+                                <div style="width:32px;height:32px;border-radius:6px;
+                                  background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);
+                                  display:flex;align-items:center;justify-content:center;
+                                  font-family:Bebas Neue,sans-serif;font-size:11px;color:{C["accent"]}">
+                                  {_f["symbol"][:2]}
+                                </div>
+                                <div>
+                                  <div style="font-family:Space Grotesk,sans-serif;font-size:12px;
+                                    font-weight:600;color:{C["bright"]}">{_f["name"] or _f["symbol"]}</div>
+                                  <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                                    color:{C["muted"]}">{_f["symbol"]} · Ajouté {_f["added_at"]}</div>
+                                </div>
+                              </div>
+                            </div>
+                            ''', unsafe_allow_html=True)
+                        with _frow2:
+                            if st.button("🗑", key=f"del_fav_{_f['symbol']}",
+                                         use_container_width=True):
+                                try:
+                                    remove_favorite(_uemail, _f["symbol"])
+                                    st.rerun()
+                                except Exception: pass
+
+            # ── Alertes ────────────────────────────────────────────────────
+            with _alert_col:
+                _active_alerts = [a for a in _alerts if a.get("active") and not a.get("triggered")]
+                _triggered_alerts = [a for a in _alerts if a.get("triggered")]
+
+                st.markdown(f'''
+                <div style="font-family:Bebas Neue,sans-serif;font-size:16px;
+                  color:{C["accent"]};letter-spacing:2px;margin-bottom:12px">
+                  🔔 MES ALERTES DE PRIX
+                  <span style="background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.3);
+                    color:{C["accent"]};font-family:JetBrains Mono,monospace;font-size:9px;
+                    padding:2px 8px;border-radius:10px;margin-left:8px">{len(_active_alerts)} actives</span>
+                </div>
+                ''', unsafe_allow_html=True)
+
+                with st.expander("➕ Créer une nouvelle alerte"):
+                    _al1, _al2 = st.columns(2)
+                    with _al1:
+                        _al_sym   = st.text_input("Symbole", placeholder="BTC-USD", key="al_sym")
+                        _al_cond  = st.selectbox("Condition",
+                            ["ABOVE — Prix monte au-dessus","BELOW — Prix descend en-dessous"],
+                            key="al_cond")
+                    with _al2:
+                        _al_price = st.number_input("Prix cible ($)",
+                            min_value=0.0, value=0.0, format="%.4f", key="al_price")
+                        _al_note  = st.text_input("Note", placeholder="résistance clé…", key="al_note")
+                    if st.button("🔔 CRÉER L'ALERTE", use_container_width=True, key="create_alert"):
+                        if _al_sym and _al_price > 0:
+                            try:
+                                cond = "ABOVE" if "ABOVE" in _al_cond else "BELOW"
+                                curr = sig.get("price",0) if sig and sig.get("symbol","")==_al_sym.upper() else 0
+                                add_alert(_uemail, _al_sym.upper(), get_name(_al_sym.upper()),
+                                         cond, _al_price, curr, _al_note)
+                                st.success("✅ Alerte créée !")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Erreur : {e}")
+
+                if not _alerts:
+                    st.markdown(f'''
+                    <div style="text-align:center;padding:30px;
+                        background:{C["card"]};border:1px dashed {C["border2"]};border-radius:8px;margin-top:8px">
+                      <div style="font-size:32px;opacity:.3">🔔</div>
+                      <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                        color:{C["muted"]};margin-top:8px">Créez votre première alerte de prix</div>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                else:
+                    for _al in _alerts:
+                        _al_c     = C["green"] if not _al.get("triggered") else C["muted"]
+                        _al_icon  = "🔔" if not _al.get("triggered") else "✅"
+                        _cond_txt = "↑ > " if _al["condition_type"]=="ABOVE" else "↓ < "
+                        _al_status = "DÉCLENCHÉE" if _al.get("triggered") else "ACTIVE"
+                        _al_status_col = C["muted"] if _al.get("triggered") else C["green"]
+                        st.markdown(f'''
+                        <div style="background:{C["card"]};border:1px solid {C["border2"]};
+                            border-left:3px solid {_al_c};border-radius:6px;
+                            padding:10px 14px;margin-bottom:6px">
+                          <div style="display:flex;justify-content:space-between;align-items:center">
+                            <div>
+                              <span style="font-family:Space Grotesk,sans-serif;font-size:12px;
+                                font-weight:700;color:{C["bright"]}">{_al_icon} {_al["symbol"]}</span>
+                              <span style="font-family:JetBrains Mono,monospace;font-size:10px;
+                                color:{_al_c};margin-left:8px">{_cond_txt}${float(_al["target_price"]):,.4f}</span>
+                            </div>
+                            <span style="background:{_al_status_col}18;border:1px solid {_al_status_col}44;
+                              color:{_al_status_col};font-family:JetBrains Mono,monospace;font-size:8px;
+                              padding:2px 8px;border-radius:8px">{_al_status}</span>
+                          </div>
+                          {f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};margin-top:4px">📝 {_al["note"]}</div>' if _al.get("note") else ""}
+                          <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                            color:{C["muted"]};margin-top:4px">Créée : {_al["created_at"]}</div>
+                        </div>
+                        ''', unsafe_allow_html=True)
+
+        # ════════ ONGLET 3 — SÉCURITÉ & APPAREILS ═══════════════════════
+        with _pt3:
+            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+            # Infos compte
+            _sec1, _sec2 = st.columns(2)
+            with _sec1:
+                qtitle("🔑 Informations du Compte")
+                st.markdown(f'''
+                <div style="background:{C["card"]};border:1px solid {C["border2"]};border-radius:8px;padding:18px">
+                  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid {C["border"]}">
+                    <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]}">Nom d&#39;utilisateur</span>
+                    <span style="font-family:Space Grotesk,sans-serif;font-size:12px;font-weight:600;color:{C["bright"]}">{_username}</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid {C["border"]}">
+                    <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]}">Email</span>
+                    <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["accent"]}">{_uemail}</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid {C["border"]}">
+                    <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]}">Plan</span>
+                    <span style="font-family:Bebas Neue,sans-serif;font-size:14px;color:{_plan_col};letter-spacing:1px">{_plan_icon} {_plan}</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid {C["border"]}">
+                    <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]}">Expiration</span>
+                    <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["text"]}">{_expires}</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:8px 0">
+                    <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]}">Statut</span>
+                    <span style="background:rgba(0,255,157,.1);border:1px solid rgba(0,255,157,.2);color:{C["green"]};
+                      font-family:JetBrains Mono,monospace;font-size:9px;padding:2px 10px;border-radius:8px">● ACTIF</span>
+                  </div>
+                </div>
+                ''', unsafe_allow_html=True)
+
+            with _sec2:
+                qtitle("🌍 Clé IP de Cet Appareil")
+                st.markdown(f'''
+                <div style="background:linear-gradient(135deg,rgba(0,255,157,.04),{C["card"]});
+                    border:1px solid rgba(0,255,157,.2);border-radius:8px;padding:20px;
+                    text-align:center">
+                  <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                    color:{C["muted"]};text-transform:uppercase;letter-spacing:2px;margin-bottom:12px">
+                    Identifiant unique de votre appareil
+                  </div>
+                  <div style="font-family:JetBrains Mono,monospace;font-size:16px;
+                    color:{C["green"]};letter-spacing:3px;
+                    background:rgba(0,0,0,.3);border:1px solid rgba(0,255,157,.2);
+                    border-radius:6px;padding:12px 16px;margin-bottom:10px">
+                    {_ip_key}
+                  </div>
+                  <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                    color:{C["muted"]}">Adresse IP : {_ip}</div>
+                  <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                    color:{C["muted"]};margin-top:6px;line-height:1.6">
+                    Cette clé est unique à cet appareil + votre compte.<br>
+                    Elle est régénérée si votre IP change.
+                  </div>
+                </div>
+                ''', unsafe_allow_html=True)
+
+            # Tableau des appareils
+            st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+            qtitle("🖥️ Tous Mes Appareils", f"{len(_ip_keys)} appareil(s) reconnu(s)")
+            if not _ip_keys:
+                st.info("Aucun appareil enregistré.")
+            else:
+                _dev_cols = st.columns(min(len(_ip_keys), 3))
+                for _ii, _ik in enumerate(_ip_keys):
+                    with _dev_cols[_ii % 3]:
+                        _is_current = _ik["ip_address"] == _ip
+                        _dev_col2 = C["green"] if _is_current else C["accent"]
+                        st.markdown(f'''
+                        <div style="background:{C["card"]};border:1px solid {C["border2"]};
+                            border-top:3px solid {_dev_col2};border-radius:8px;
+                            padding:16px;margin-bottom:8px;position:relative">
+                          {f'<div style="position:absolute;top:10px;right:10px;background:rgba(0,255,157,.15);border:1px solid rgba(0,255,157,.3);color:{C["green"]};font-family:JetBrains Mono,monospace;font-size:8px;padding:2px 8px;border-radius:8px">ACTUEL</div>' if _is_current else ""}
+                          <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                            color:{C["muted"]};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">
+                            🖥️ Appareil {_ii+1}
+                          </div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:11px;
+                            color:{_dev_col2};letter-spacing:1.5px;margin-bottom:8px;
+                            word-break:break-all">{_ik["ip_key"]}</div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                            color:{C["muted"]}">🌐 {_ik["ip_address"]}</div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                            color:{C["muted"]};margin-top:4px">
+                            📅 Créé : {_ik["created_at"]}<br>
+                            ⏱ Vu : {_ik["last_seen"]}
+                          </div>
+                        </div>
+                        ''', unsafe_allow_html=True)
+
+        # ════════ ONGLET 4 — PERFORMANCE ═════════════════════════════════
+        with _pt4:
+            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+            if not _sigs:
+                st.info("Lancez des analyses pour générer vos statistiques de performance.")
+            else:
+                # Données de performance
+                _total_sigs = len(_sigs)
+                _buy_count  = sum(1 for s in _sigs if s["action"]=="BUY")
+                _sell_count = sum(1 for s in _sigs if s["action"]=="SELL")
+                _hold_count = sum(1 for s in _sigs if s["action"]=="HOLD")
+                _buy_pct    = _buy_count / _total_sigs * 100 if _total_sigs else 0
+                _sell_pct   = _sell_count / _total_sigs * 100 if _total_sigs else 0
+                _hold_pct   = _hold_count / _total_sigs * 100 if _total_sigs else 0
+                _avg_conf   = float(np.mean([float(s["confidence"] or 0) for s in _sigs]))
+                _avg_rsi    = float(np.mean([float(s["rsi"] or 0) for s in _sigs]))
+                _avg_rr     = float(np.mean([float(s["rr"] or 0) for s in _sigs]))
+                _symbols_used = list(dict.fromkeys(s["symbol"] for s in _sigs))
+
+                # Graphique distribution signaux
+                # plotly already imported as go
+                _fig_dist = go.Figure()
+                _fig_dist.add_trace(go.Bar(
+                    x=["BUY", "SELL", "HOLD"],
+                    y=[_buy_count, _sell_count, _hold_count],
+                    marker=dict(color=[C["green"], C["red"], C["muted"]],
+                                opacity=0.85,
+                                line=dict(width=0)),
+                    text=[f"{_buy_count}<br>{_buy_pct:.0f}%",
+                          f"{_sell_count}<br>{_sell_pct:.0f}%",
+                          f"{_hold_count}<br>{_hold_pct:.0f}%"],
+                    textposition="outside",
+                    textfont=dict(family="JetBrains Mono", size=11, color=C["bright"])
+                ))
+                _fig_dist.update_layout(**PLOT, height=250,
+                    title=dict(text="Distribution des Signaux",
+                               font=dict(family="Bebas Neue", size=14, color=C["accent"])),
+                    showlegend=False)
+                _fig_dist.update_yaxes(gridcolor=C["border"], showgrid=True, zeroline=False)
+                _fig_dist.update_xaxes(gridcolor=C["border"])
+
+                # Stats par actif
+                _sym_stats = {}
+                for _s in _sigs:
+                    _sym = _s["symbol"]
+                    if _sym not in _sym_stats:
+                        _sym_stats[_sym] = {"total":0,"buy":0,"sell":0,"hold":0,"conf_sum":0}
+                    _sym_stats[_sym]["total"] += 1
+                    _sym_stats[_sym][_s["action"].lower()] += 1
+                    _sym_stats[_sym]["conf_sum"] += float(_s["confidence"] or 0)
+
+                _perf1, _perf2 = st.columns(2)
+                with _perf1:
+                    st.plotly_chart(_fig_dist, use_container_width=True)
+                with _perf2:
+                    qtitle("📊 Résumé Statistique")
+                    _perf_data = [
+                        ("Total analyses", str(_total_sigs), C["accent"]),
+                        ("Ratio BUY/SELL", f"{_buy_count}/{_sell_count}", C["green"]),
+                        ("Confiance moyenne", f"{_avg_conf:.1f}%", C["yellow"]),
+                        ("RSI moyen analysé", f"{_avg_rsi:.1f}", C["accent"]),
+                        ("R/R moyen", f"{_avg_rr:.2f}:1", C["green"] if _avg_rr>=2 else C["yellow"]),
+                        ("Actifs uniques", str(len(_symbols_used)), C["purple"]),
+                    ]
+                    for _lbl2, _val2, _col2 in _perf_data:
+                        st.markdown(f'''
+                        <div style="display:flex;justify-content:space-between;
+                            padding:8px 12px;border-bottom:1px solid {C["border"]};
+                            background:{C["card"]};margin-bottom:2px;border-radius:3px">
+                          <span style="font-family:JetBrains Mono,monospace;font-size:10px;
+                            color:{C["muted"]}">{_lbl2}</span>
+                          <span style="font-family:Bebas Neue,sans-serif;font-size:16px;
+                            color:{_col2};letter-spacing:1px">{_val2}</span>
+                        </div>
+                        ''', unsafe_allow_html=True)
+
+                # Top actifs
+                st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+                qtitle("🏆 Top Actifs Analysés", f"{len(_sym_stats)} actifs différents")
+                _sorted_syms = sorted(_sym_stats.items(), key=lambda x: x[1]["total"], reverse=True)
+                _top_cols = st.columns(min(len(_sorted_syms), 4))
+                for _ti, (_sym2, _sdata) in enumerate(_sorted_syms[:4]):
+                    with _top_cols[_ti]:
+                        _dominant = "BUY" if _sdata["buy"]>=_sdata["sell"] else "SELL"
+                        _dom_col  = C["green"] if _dominant=="BUY" else C["red"]
+                        st.markdown(f'''
+                        <div style="background:{C["card"]};border:1px solid {C["border2"]};
+                            border-top:3px solid {_dom_col};border-radius:8px;
+                            padding:14px;text-align:center">
+                          <div style="font-family:Bebas Neue,sans-serif;font-size:18px;
+                            color:{C["bright"]};letter-spacing:2px">{get_name(_sym2)}</div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                            color:{C["muted"]}">{_sym2}</div>
+                          <div style="font-family:Bebas Neue,sans-serif;font-size:28px;
+                            color:{_dom_col};letter-spacing:1px;margin:8px 0">{_sdata["total"]}</div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                            color:{C["muted"]}">analyses</div>
+                          <div style="margin-top:8px;font-family:JetBrains Mono,monospace;
+                            font-size:9px;color:{_dom_col}">
+                            Tendance : {_dominant}
+                          </div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                            color:{C["muted"]};margin-top:4px">
+                            {_sdata["buy"]}B · {_sdata["sell"]}S · {_sdata["hold"]}H
+                          </div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                            color:{C["yellow"]};margin-top:4px">
+                            Conf. {_sdata["conf_sum"]/_sdata["total"]:.0f}%
+                          </div>
+                        </div>
+                        ''', unsafe_allow_html=True)
 
 
 # ── HISTORIQUE ───────────────────────────────────────────────────────────────
