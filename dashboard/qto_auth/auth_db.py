@@ -163,7 +163,7 @@ def init():
             cur.execute("""
             CREATE TABLE IF NOT EXISTS licenses (
                 id          INT          AUTO_INCREMENT PRIMARY KEY,
-                `key`       VARCHAR(25)  UNIQUE NOT NULL,
+                license_key VARCHAR(25)  UNIQUE NOT NULL,
                 plan        VARCHAR(20)  DEFAULT 'PRO',
                 days        INT          DEFAULT 30,
                 active      TINYINT(1)   DEFAULT 1,
@@ -273,7 +273,7 @@ def add_key(plan: str = "PRO", days: int = 30) -> str:
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO licenses(`key`,plan,days,created_at,expires_at) VALUES(%s,%s,%s,%s,%s)",
+                "INSERT INTO licenses(license_key,plan,days,created_at,expires_at) VALUES(%s,%s,%s,%s,%s)",
                 (key, plan, days, now, exp)
             )
         conn.commit()
@@ -286,7 +286,7 @@ def list_keys() -> list:
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT `key`, plan, active, used_by,
+                SELECT license_key AS `key`, plan, active, used_by,
                        DATE_FORMAT(expires_at,'%Y-%m-%d') AS expires_at
                 FROM licenses ORDER BY created_at DESC
             """)
@@ -298,7 +298,7 @@ def revoke_key(key: str):
     conn = get_conn()
     try:
         with conn.cursor() as cur:
-            cur.execute("UPDATE licenses SET active=0 WHERE `key`=%s", (key.upper(),))
+            cur.execute("UPDATE licenses SET active=0 WHERE license_key=%s", (key.upper(),))
         conn.commit()
     finally:
         conn.close()
@@ -336,7 +336,7 @@ def renew_license(key: str, days: int = 30) -> dict:
     conn = get_conn()
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM licenses WHERE `key`=%s", (key.strip().upper(),))
+            cur.execute("SELECT * FROM licenses WHERE license_key=%s", (key.strip().upper(),))
             lic = cur.fetchone()
             if not lic:
                 return {"ok": False, "msg": "Clé introuvable"}
@@ -348,7 +348,7 @@ def renew_license(key: str, days: int = 30) -> dict:
             cur.execute("""
                 UPDATE licenses
                 SET expires_at=%s, renewed_at=%s, renew_count=renew_count+1, active=1
-                WHERE `key`=%s
+                WHERE license_key=%s
             """, (new_exp, now, key.strip().upper()))
 
             # Mettre à jour aussi l'utilisateur si la licence est utilisée
@@ -389,7 +389,7 @@ def register(email: str, username: str, password: str, key: str) -> dict:
                 return {"ok": False, "msg": "Email déjà enregistré. Connectez-vous."}
 
             # Clé valide ?
-            cur.execute("SELECT * FROM licenses WHERE `key`=%s AND active=1", (key,))
+            cur.execute("SELECT * FROM licenses WHERE license_key=%s AND active=1", (key,))
             lic = cur.fetchone()
             if not lic:
                 return {"ok": False, "msg": "Clé de licence invalide ou désactivée."}
@@ -407,7 +407,7 @@ def register(email: str, username: str, password: str, key: str) -> dict:
             """, (email, username.strip(), _hash(password, salt), salt,
                   lic["plan"], lic["expires_at"], now))
 
-            cur.execute("UPDATE licenses SET used_by=%s WHERE `key`=%s", (email, key))
+            cur.execute("UPDATE licenses SET used_by=%s WHERE license_key=%s", (email, key))
             _log(cur, email, "REGISTER", True, f"plan={lic['plan']}")
 
         conn.commit()
