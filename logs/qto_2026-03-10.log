@@ -1,0 +1,872 @@
+2026-03-10 16:35:28 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 16:35:28 | INFO     | QuantumTradeOracle        |   🔮  QUANTUM TRADE ORACLE  v2.0
+2026-03-10 16:35:28 | INFO     | QuantumTradeOracle        |   Système de Trading Algorithmique IA
+2026-03-10 16:35:28 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 16:35:28 | INFO     | SentimentEngine           | VADER initialisé avec lexique financier (38 termes)
+2026-03-10 16:35:28 | INFO     | ClassicalModels           | Modèle initialisé : random_forest
+2026-03-10 16:35:28 | INFO     | ClassicalModels           | Modèle initialisé : gradient_boosting
+2026-03-10 16:35:33 | INFO     | LSTMModel                 | PyTorch disponible — device: cpu
+2026-03-10 16:35:33 | INFO     | TransformerModel          | Transformer — device: cpu | d_model=64 | heads=4 | layers=2
+2026-03-10 16:35:33 | INFO     | ModelEnsemble             | Ensemble initialisé — poids: {'random_forest': 0.2, 'gradient_boosting': 0.2, 'lstm': 0.35, 'transformer': 0.25}
+2026-03-10 16:35:33 | INFO     | QuantumTradeOracle        | ✅ Tous les composants initialisés
+2026-03-10 16:35:33 | INFO     | QuantumTradeOracle        | 🚀 Pipeline complet — 1 symboles
+2026-03-10 16:35:33 | INFO     | QuantumTradeOracle        | 📡 Collecte OHLCV — 1 symboles | period=2y
+2026-03-10 16:35:33 | INFO     | MarketCollector           | Téléchargement BTC-USD | period=2y | interval=1d
+2026-03-10 16:35:36 | INFO     | MarketCollector           | ✅ BTC-USD — 731 lignes récupérées [2024-03-10 → 2026-03-10]
+2026-03-10 16:35:36 | INFO     | MarketCollector           | Multi-fetch : 1/1 symboles OK
+2026-03-10 16:35:36 | INFO     | QuantumTradeOracle        | ✅ Données collectées : {'BTC-USD': 731}
+2026-03-10 16:35:36 | INFO     | QuantumTradeOracle        | ⚙️ Feature engineering pour 1 symboles…
+2026-03-10 16:35:36 | INFO     | FeatureEngineering        | Calcul des indicateurs pour 731 lignes…
+2026-03-10 16:35:37 | INFO     | FeatureEngineering        | Target créé : 37.9% haussier | 62.1% baissier
+2026-03-10 16:35:37 | INFO     | FeatureEngineering        | Features calculées : 64 colonnes, 531 lignes (199 supprimées pour NaN)
+2026-03-10 16:35:37 | INFO     | QuantumTradeOracle        |   BTC-USD — 531 lignes, 64 features
+2026-03-10 16:35:37 | WARNING  | ClassicalModels           | Modèle non trouvé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\random_forest.pkl
+2026-03-10 16:35:37 | WARNING  | ClassicalModels           | Modèle non trouvé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\gradient_boosting.pkl
+2026-03-10 16:35:37 | WARNING  | LSTMModel                 | Fichier LSTM non trouvé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\lstm_model.pt
+2026-03-10 16:35:37 | INFO     | QuantumTradeOracle        | 🧠 Entraînement sur BTC-USD (531 lignes)…
+2026-03-10 16:35:37 | INFO     | FeatureEngineering        | Split : train=424 | test=107 | features=56
+2026-03-10 16:35:37 | INFO     | FeatureEngineering        | Séquences : seq_len=60 | X_train=(376, 60, 56) | X_test=(95, 60, 56) | features=56
+2026-03-10 16:35:37 | INFO     | ModelEnsemble             | ════════════════════════════════════════════════════════════
+2026-03-10 16:35:37 | INFO     | ModelEnsemble             |   Démarrage de l'entraînement de l'ensemble
+2026-03-10 16:35:37 | INFO     | ModelEnsemble             | ════════════════════════════════════════════════════════════
+2026-03-10 16:35:37 | INFO     | ModelEnsemble             | ▶ RandomForest…
+2026-03-10 16:35:37 | INFO     | ClassicalModels           | Entraînement random_forest sur 424 samples, 56 features…
+2026-03-10 16:35:39 | DEBUG    | ClassicalModels           | Fold 1 — acc=0.586 f1=0.171 auc=0.322
+2026-03-10 16:35:42 | DEBUG    | ClassicalModels           | Fold 2 — acc=0.543 f1=0.200 auc=0.384
+2026-03-10 16:35:45 | DEBUG    | ClassicalModels           | Fold 3 — acc=0.343 f1=0.410 auc=0.467
+2026-03-10 16:35:47 | DEBUG    | ClassicalModels           | Fold 4 — acc=0.614 f1=0.000 auc=0.369
+2026-03-10 16:35:50 | DEBUG    | ClassicalModels           | Fold 5 — acc=0.586 f1=0.000 auc=0.406
+2026-03-10 16:35:53 | INFO     | ClassicalModels           | ✅ random_forest entraîné — CV AUC: 0.3895 ± 0.0477
+2026-03-10 16:35:53 | INFO     | ModelEnsemble             |   ✅ RF — AUC: 0.3895
+2026-03-10 16:35:53 | INFO     | ModelEnsemble             | ▶ GradientBoosting…
+2026-03-10 16:35:53 | INFO     | ClassicalModels           | Entraînement gradient_boosting sur 424 samples, 56 features…
+2026-03-10 16:35:53 | DEBUG    | ClassicalModels           | Fold 1 — acc=0.557 f1=0.114 auc=0.404
+2026-03-10 16:35:54 | DEBUG    | ClassicalModels           | Fold 2 — acc=0.629 f1=0.000 auc=0.479
+2026-03-10 16:35:56 | DEBUG    | ClassicalModels           | Fold 3 — acc=0.671 f1=0.000 auc=0.623
+2026-03-10 16:35:58 | DEBUG    | ClassicalModels           | Fold 4 — acc=0.614 f1=0.000 auc=0.437
+2026-03-10 16:36:00 | DEBUG    | ClassicalModels           | Fold 5 — acc=0.586 f1=0.000 auc=0.502
+2026-03-10 16:36:03 | INFO     | ClassicalModels           | ✅ gradient_boosting entraîné — CV AUC: 0.4890 ± 0.0748
+2026-03-10 16:36:03 | INFO     | ModelEnsemble             |   ✅ GB — AUC: 0.4890
+2026-03-10 16:36:03 | INFO     | ModelEnsemble             | ▶ LSTM (PyTorch)…
+2026-03-10 16:36:03 | INFO     | LSTMModel                 | Entraînement LSTM — samples=376 | seq=60 | features=56 | device=cpu
+2026-03-10 16:36:07 | INFO     | LSTMModel                 | Epoch   1/50 | train_loss=0.8896 | val_loss=0.8858 | val_acc=0.4211 | lr=0.001000
+2026-03-10 16:36:20 | INFO     | LSTMModel                 | Epoch  10/50 | train_loss=0.8090 | val_loss=0.8235 | val_acc=0.4211 | lr=0.001000
+2026-03-10 16:36:38 | INFO     | LSTMModel                 | Epoch  20/50 | train_loss=0.7468 | val_loss=0.7687 | val_acc=0.4211 | lr=0.001000
+2026-03-10 16:36:56 | INFO     | LSTMModel                 | Epoch  30/50 | train_loss=0.6527 | val_loss=0.6603 | val_acc=0.4211 | lr=0.001000
+2026-03-10 16:37:12 | INFO     | LSTMModel                 | Epoch  40/50 | train_loss=0.6264 | val_loss=0.6627 | val_acc=0.4211 | lr=0.000500
+2026-03-10 16:37:19 | INFO     | LSTMModel                 | Early stopping à l'epoch 43
+2026-03-10 16:37:19 | INFO     | LSTMModel                 | ✅ LSTM entraîné — best_epoch=33 val_acc=0.4211
+2026-03-10 16:37:19 | INFO     | ModelEnsemble             |   ✅ LSTM — val_acc: 0.4211
+2026-03-10 16:37:19 | INFO     | ModelEnsemble             | ▶ Transformer (PyTorch)…
+2026-03-10 16:37:19 | INFO     | TransformerModel          | Transformer construit — 105985 paramètres
+2026-03-10 16:37:19 | INFO     | TransformerModel          | Entraînement Transformer — samples=376 | seq=60 | features=56
+2026-03-10 16:37:21 | INFO     | TransformerModel          | Epoch   1/40 | train=0.6885 | val=0.6888 | acc=0.5789
+2026-03-10 16:37:34 | INFO     | TransformerModel          | Epoch  10/40 | train=0.6476 | val=0.6801 | acc=0.5789
+2026-03-10 16:37:49 | INFO     | TransformerModel          | Epoch  20/40 | train=0.5079 | val=0.6004 | acc=0.7193
+2026-03-10 16:38:03 | INFO     | TransformerModel          | Epoch  30/40 | train=0.4557 | val=0.4864 | acc=0.7368
+2026-03-10 16:38:17 | INFO     | TransformerModel          | Epoch  40/40 | train=0.4603 | val=0.4642 | acc=0.7544
+2026-03-10 16:38:17 | INFO     | TransformerModel          | ✅ Transformer entraîné — best_epoch=40 val_acc=0.7544
+2026-03-10 16:38:17 | INFO     | ModelEnsemble             |   ✅ Transformer — val_acc: 0.7544
+2026-03-10 16:38:17 | INFO     | ModelEnsemble             | ════════════════════════════════════════════════════════════
+2026-03-10 16:38:17 | INFO     | ModelEnsemble             |   Ensemble entraîné avec succès
+2026-03-10 16:38:17 | INFO     | ModelEnsemble             | ════════════════════════════════════════════════════════════
+2026-03-10 16:38:17 | INFO     | ClassicalModels           | random_forest Test — acc=0.6729 f1=0.0000 auc=0.5437
+2026-03-10 16:38:17 | INFO     | ClassicalModels           | gradient_boosting Test — acc=0.6729 f1=0.0000 auc=0.4571
+2026-03-10 17:51:21 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:51:21 | INFO     | QuantumTradeOracle        |   🔮  QUANTUM TRADE ORACLE  v2.0
+2026-03-10 17:51:21 | INFO     | QuantumTradeOracle        |   Système de Trading Algorithmique IA
+2026-03-10 17:51:21 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:51:21 | INFO     | SentimentEngine           | VADER initialisé avec lexique financier (38 termes)
+2026-03-10 17:51:21 | INFO     | ClassicalModels           | Modèle initialisé : random_forest
+2026-03-10 17:51:21 | INFO     | ClassicalModels           | Modèle initialisé : gradient_boosting
+2026-03-10 17:51:29 | INFO     | LSTMModel                 | PyTorch disponible — device: cpu
+2026-03-10 17:51:29 | INFO     | TransformerModel          | Transformer — device: cpu | d_model=64 | heads=4 | layers=2
+2026-03-10 17:51:29 | INFO     | ModelEnsemble             | Ensemble initialisé — poids: {'random_forest': 0.2, 'gradient_boosting': 0.2, 'lstm': 0.35, 'transformer': 0.25}
+2026-03-10 17:51:29 | INFO     | QuantumTradeOracle        | ✅ Tous les composants initialisés
+2026-03-10 17:51:29 | INFO     | QuantumTradeOracle        | 🚀 Pipeline complet — 1 symboles
+2026-03-10 17:51:29 | INFO     | QuantumTradeOracle        | 📡 Collecte OHLCV — 1 symboles | period=2y
+2026-03-10 17:51:29 | INFO     | MarketCollector           | Téléchargement BTC-USD | period=2y | interval=1d
+2026-03-10 17:51:31 | INFO     | MarketCollector           | ✅ BTC-USD — 731 lignes récupérées [2024-03-10 → 2026-03-10]
+2026-03-10 17:51:31 | INFO     | MarketCollector           | Multi-fetch : 1/1 symboles OK
+2026-03-10 17:51:31 | INFO     | QuantumTradeOracle        | ✅ Données collectées : {'BTC-USD': 731}
+2026-03-10 17:51:31 | INFO     | QuantumTradeOracle        | ⚙️ Feature engineering pour 1 symboles…
+2026-03-10 17:51:31 | INFO     | FeatureEngineering        | Calcul des indicateurs pour 731 lignes…
+2026-03-10 17:51:32 | INFO     | FeatureEngineering        | Target créé : 37.9% haussier | 62.1% baissier
+2026-03-10 17:51:32 | INFO     | FeatureEngineering        | Features calculées : 64 colonnes, 531 lignes (199 supprimées pour NaN)
+2026-03-10 17:51:32 | INFO     | QuantumTradeOracle        |   BTC-USD — 531 lignes, 64 features
+2026-03-10 17:51:32 | WARNING  | ClassicalModels           | Modèle non trouvé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\random_forest.pkl
+2026-03-10 17:51:32 | WARNING  | ClassicalModels           | Modèle non trouvé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\gradient_boosting.pkl
+2026-03-10 17:51:32 | WARNING  | LSTMModel                 | Fichier LSTM non trouvé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\lstm_model.pt
+2026-03-10 17:51:32 | INFO     | QuantumTradeOracle        | 🧠 Entraînement sur BTC-USD (531 lignes)…
+2026-03-10 17:51:32 | INFO     | FeatureEngineering        | Split : train=424 | test=107 | features=56
+2026-03-10 17:51:32 | INFO     | FeatureEngineering        | Séquences : seq_len=60 | X_train=(376, 60, 56) | X_test=(95, 60, 56) | features=56
+2026-03-10 17:51:32 | INFO     | ModelEnsemble             | ════════════════════════════════════════════════════════════
+2026-03-10 17:51:32 | INFO     | ModelEnsemble             |   Démarrage de l'entraînement de l'ensemble
+2026-03-10 17:51:32 | INFO     | ModelEnsemble             | ════════════════════════════════════════════════════════════
+2026-03-10 17:51:32 | INFO     | ModelEnsemble             | ▶ RandomForest…
+2026-03-10 17:51:32 | INFO     | ClassicalModels           | Entraînement random_forest sur 424 samples, 56 features…
+2026-03-10 17:51:37 | DEBUG    | ClassicalModels           | Fold 1 — acc=0.586 f1=0.171 auc=0.322
+2026-03-10 17:51:42 | DEBUG    | ClassicalModels           | Fold 2 — acc=0.543 f1=0.200 auc=0.384
+2026-03-10 17:51:48 | DEBUG    | ClassicalModels           | Fold 3 — acc=0.343 f1=0.410 auc=0.467
+2026-03-10 17:51:53 | DEBUG    | ClassicalModels           | Fold 4 — acc=0.614 f1=0.000 auc=0.369
+2026-03-10 17:51:59 | DEBUG    | ClassicalModels           | Fold 5 — acc=0.586 f1=0.000 auc=0.406
+2026-03-10 17:52:04 | INFO     | ClassicalModels           | ✅ random_forest entraîné — CV AUC: 0.3895 ± 0.0477
+2026-03-10 17:52:04 | INFO     | ModelEnsemble             |   ✅ RF — AUC: 0.3895
+2026-03-10 17:52:04 | INFO     | ModelEnsemble             | ▶ GradientBoosting…
+2026-03-10 17:52:04 | INFO     | ClassicalModels           | Entraînement gradient_boosting sur 424 samples, 56 features…
+2026-03-10 17:52:06 | DEBUG    | ClassicalModels           | Fold 1 — acc=0.557 f1=0.114 auc=0.404
+2026-03-10 17:52:09 | DEBUG    | ClassicalModels           | Fold 2 — acc=0.629 f1=0.000 auc=0.479
+2026-03-10 17:52:12 | DEBUG    | ClassicalModels           | Fold 3 — acc=0.671 f1=0.000 auc=0.623
+2026-03-10 17:52:16 | DEBUG    | ClassicalModels           | Fold 4 — acc=0.614 f1=0.000 auc=0.437
+2026-03-10 17:52:20 | DEBUG    | ClassicalModels           | Fold 5 — acc=0.586 f1=0.000 auc=0.502
+2026-03-10 17:52:23 | INFO     | ClassicalModels           | ✅ gradient_boosting entraîné — CV AUC: 0.4890 ± 0.0748
+2026-03-10 17:52:23 | INFO     | ModelEnsemble             |   ✅ GB — AUC: 0.4890
+2026-03-10 17:52:23 | INFO     | ModelEnsemble             | ▶ LSTM (PyTorch)…
+2026-03-10 17:52:23 | INFO     | LSTMModel                 | Entraînement LSTM — samples=376 | seq=60 | features=56 | device=cpu
+2026-03-10 17:52:28 | INFO     | LSTMModel                 | Epoch   1/50 | train_loss=0.8940 | val_loss=0.8880 | val_acc=0.4211 | lr=0.001000
+2026-03-10 17:52:47 | INFO     | LSTMModel                 | Epoch  10/50 | train_loss=0.8197 | val_loss=0.9336 | val_acc=0.4211 | lr=0.001000
+2026-03-10 17:53:09 | INFO     | LSTMModel                 | Epoch  20/50 | train_loss=0.7668 | val_loss=0.8180 | val_acc=0.4211 | lr=0.001000
+2026-03-10 17:53:32 | INFO     | LSTMModel                 | Epoch  30/50 | train_loss=0.6644 | val_loss=0.7001 | val_acc=0.4211 | lr=0.001000
+2026-03-10 17:53:53 | INFO     | LSTMModel                 | Epoch  40/50 | train_loss=0.6398 | val_loss=0.6537 | val_acc=0.4211 | lr=0.000500
+2026-03-10 17:54:15 | INFO     | LSTMModel                 | Epoch  50/50 | train_loss=0.6263 | val_loss=0.6674 | val_acc=0.4211 | lr=0.000250
+2026-03-10 17:54:15 | INFO     | LSTMModel                 | ✅ LSTM entraîné — best_epoch=43 val_acc=0.4211
+2026-03-10 17:54:15 | INFO     | ModelEnsemble             |   ✅ LSTM — val_acc: 0.4211
+2026-03-10 17:54:15 | INFO     | ModelEnsemble             | ▶ Transformer (PyTorch)…
+2026-03-10 17:54:15 | INFO     | TransformerModel          | Transformer construit — 105985 paramètres
+2026-03-10 17:54:15 | INFO     | TransformerModel          | Entraînement Transformer — samples=376 | seq=60 | features=56
+2026-03-10 17:54:16 | INFO     | TransformerModel          | Epoch   1/40 | train=0.6672 | val=0.7176 | acc=0.5789
+2026-03-10 17:54:31 | INFO     | TransformerModel          | Epoch  10/40 | train=0.6516 | val=0.6966 | acc=0.5789
+2026-03-10 17:54:47 | INFO     | TransformerModel          | Epoch  20/40 | train=0.6261 | val=0.6142 | acc=0.6491
+2026-03-10 17:55:04 | INFO     | TransformerModel          | Epoch  30/40 | train=0.5596 | val=0.5893 | acc=0.6491
+2026-03-10 17:55:07 | INFO     | TransformerModel          | Early stopping Transformer à l'epoch 32
+2026-03-10 17:55:07 | INFO     | TransformerModel          | ✅ Transformer entraîné — best_epoch=24 val_acc=0.7193
+2026-03-10 17:55:07 | INFO     | ModelEnsemble             |   ✅ Transformer — val_acc: 0.7193
+2026-03-10 17:55:07 | INFO     | ModelEnsemble             | ════════════════════════════════════════════════════════════
+2026-03-10 17:55:07 | INFO     | ModelEnsemble             |   Ensemble entraîné avec succès
+2026-03-10 17:55:07 | INFO     | ModelEnsemble             | ════════════════════════════════════════════════════════════
+2026-03-10 17:55:08 | INFO     | ClassicalModels           | random_forest Test — acc=0.6729 f1=0.0000 auc=0.5437
+2026-03-10 17:55:08 | INFO     | ClassicalModels           | gradient_boosting Test — acc=0.6729 f1=0.0000 auc=0.4571
+2026-03-10 17:55:08 | INFO     | QuantumTradeOracle        | 📊 Performances sur le test set :
+2026-03-10 17:55:08 | INFO     | QuantumTradeOracle        |   random_forest — acc=0.6729 | auc=0.5437
+2026-03-10 17:55:08 | INFO     | QuantumTradeOracle        |   gradient_boosting — acc=0.6729 | auc=0.4571
+2026-03-10 17:55:08 | INFO     | QuantumTradeOracle        |   lstm — acc=0.3158 | auc=0.0000
+2026-03-10 17:55:08 | INFO     | QuantumTradeOracle        |   transformer — acc=0.0000 | auc=0.5123
+2026-03-10 17:55:08 | INFO     | ClassicalModels           | 💾 Modèle sauvegardé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\random_forest.pkl
+2026-03-10 17:55:08 | INFO     | ClassicalModels           | 💾 Modèle sauvegardé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\gradient_boosting.pkl
+2026-03-10 17:55:08 | INFO     | LSTMModel                 | 💾 LSTM sauvegardé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\lstm_model.pt
+2026-03-10 17:55:08 | INFO     | TransformerModel          | 💾 Transformer sauvegardé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\transformer_model.pt
+2026-03-10 17:55:08 | INFO     | QuantumTradeOracle        | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:55:08 | INFO     | QuantumTradeOracle        | 🔍 Analyse : BTC-USD
+2026-03-10 17:55:08 | INFO     | QuantumTradeOracle        | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:55:10 | WARNING  | NewsScraper               | NewsAPI échec pour BTC: 401 Client Error: Unauthorized for url: https://newsapi.org/v2/everything?q=bitcoin+OR+crypto&from=2026-03-09T16%3A55%3A08.994572%2B00%3A00&sortBy=publishedAt&language=en&pageSize=20&apiKey=your_newsapi_key_here
+2026-03-10 17:55:12 | WARNING  | NewsScraper               | Yahoo RSS échoué pour BTC: Couldn't find a tree builder with the features you requested: xml. Do you need to install a parser library?
+2026-03-10 17:55:24 | WARNING  | NewsScraper               | CryptoCompare échec pour BTC: HTTPSConnectionPool(host='min-api.cryptocompare.com', port=443): Read timed out. (read timeout=10)
+2026-03-10 17:55:24 | INFO     | NewsScraper               | 📰 0 articles collectés pour ['BTC']
+2026-03-10 17:55:24 | INFO     | StrategyEngine            | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:55:24 | INFO     | StrategyEngine            | ⚪ SIGNAL : HOLD | BTC-USD
+2026-03-10 17:55:24 | INFO     | StrategyEngine            |   Composite : -0.1691 | Confiance : 68%
+2026-03-10 17:55:24 | INFO     | StrategyEngine            |   Bull prob : 32.1% | Bear prob : 67.9%
+2026-03-10 17:55:24 | INFO     | StrategyEngine            | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:55:24 | INFO     | QuantumTradeOracle        | ⏱️  Analyse terminée en 16.06s
+2026-03-10 17:56:02 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:56:02 | INFO     | QuantumTradeOracle        |   🔮  QUANTUM TRADE ORACLE  v2.0
+2026-03-10 17:56:02 | INFO     | QuantumTradeOracle        |   Système de Trading Algorithmique IA
+2026-03-10 17:56:02 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:56:02 | INFO     | SentimentEngine           | VADER initialisé avec lexique financier (38 termes)
+2026-03-10 17:56:02 | INFO     | ClassicalModels           | Modèle initialisé : random_forest
+2026-03-10 17:56:02 | INFO     | ClassicalModels           | Modèle initialisé : gradient_boosting
+2026-03-10 17:56:05 | INFO     | LSTMModel                 | PyTorch disponible — device: cpu
+2026-03-10 17:56:05 | INFO     | TransformerModel          | Transformer — device: cpu | d_model=64 | heads=4 | layers=2
+2026-03-10 17:56:05 | INFO     | ModelEnsemble             | Ensemble initialisé — poids: {'random_forest': 0.2, 'gradient_boosting': 0.2, 'lstm': 0.35, 'transformer': 0.25}
+2026-03-10 17:56:05 | INFO     | QuantumTradeOracle        | ✅ Tous les composants initialisés
+2026-03-10 17:56:05 | INFO     | QuantumTradeOracle        | 🚀 Pipeline complet — 1 symboles
+2026-03-10 17:56:05 | INFO     | QuantumTradeOracle        | 📡 Collecte OHLCV — 1 symboles | period=2y
+2026-03-10 17:56:05 | INFO     | MarketCollector           | Téléchargement BTC-USD | period=2y | interval=1d
+2026-03-10 17:56:07 | INFO     | MarketCollector           | ✅ BTC-USD — 731 lignes récupérées [2024-03-10 → 2026-03-10]
+2026-03-10 17:56:07 | INFO     | MarketCollector           | Multi-fetch : 1/1 symboles OK
+2026-03-10 17:56:07 | INFO     | QuantumTradeOracle        | ✅ Données collectées : {'BTC-USD': 731}
+2026-03-10 17:56:07 | INFO     | QuantumTradeOracle        | ⚙️ Feature engineering pour 1 symboles…
+2026-03-10 17:56:07 | INFO     | FeatureEngineering        | Calcul des indicateurs pour 731 lignes…
+2026-03-10 17:56:07 | INFO     | FeatureEngineering        | Target créé : 37.9% haussier | 62.1% baissier
+2026-03-10 17:56:07 | INFO     | FeatureEngineering        | Features calculées : 64 colonnes, 531 lignes (199 supprimées pour NaN)
+2026-03-10 17:56:07 | INFO     | QuantumTradeOracle        |   BTC-USD — 531 lignes, 64 features
+2026-03-10 17:56:07 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\random_forest.pkl
+2026-03-10 17:56:07 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\gradient_boosting.pkl
+2026-03-10 17:56:07 | ERROR    | LSTMModel                 | Erreur chargement LSTM : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:56:07 | ERROR    | TransformerModel          | Erreur chargement Transformer : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:56:07 | INFO     | QuantumTradeOracle        | ✅ Modèles chargés depuis le disque
+2026-03-10 17:56:07 | INFO     | QuantumTradeOracle        | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:56:07 | INFO     | QuantumTradeOracle        | 🔍 Analyse : BTC-USD
+2026-03-10 17:56:07 | INFO     | QuantumTradeOracle        | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:56:09 | WARNING  | NewsScraper               | NewsAPI échec pour BTC: 401 Client Error: Unauthorized for url: https://newsapi.org/v2/everything?q=bitcoin+OR+crypto&from=2026-03-09T16%3A56%3A08.036355%2B00%3A00&sortBy=publishedAt&language=en&pageSize=20&apiKey=your_newsapi_key_here
+2026-03-10 17:56:10 | WARNING  | NewsScraper               | Yahoo RSS échoué pour BTC: Couldn't find a tree builder with the features you requested: xml. Do you need to install a parser library?
+2026-03-10 17:56:21 | DEBUG    | NewsScraper               | CryptoCompare: 20 articles pour BTC
+2026-03-10 17:56:22 | INFO     | NewsScraper               | 📰 20 articles collectés pour ['BTC']
+2026-03-10 17:56:22 | INFO     | SentimentEngine           | 📊 SSGM: 0.1351 (NEUTRAL) → Signal: HOLD
+2026-03-10 17:56:22 | INFO     | StrategyEngine            | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:56:22 | INFO     | StrategyEngine            | ⚪ SIGNAL : HOLD | BTC-USD
+2026-03-10 17:56:22 | INFO     | StrategyEngine            |   Composite : -0.0347 | Confiance : 59%
+2026-03-10 17:56:22 | INFO     | StrategyEngine            |   Bull prob : 41.5% | Bear prob : 58.5%
+2026-03-10 17:56:22 | INFO     | StrategyEngine            | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:56:22 | INFO     | QuantumTradeOracle        | ⏱️  Analyse terminée en 14.64s
+2026-03-10 17:56:52 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:56:52 | INFO     | QuantumTradeOracle        |   🔮  QUANTUM TRADE ORACLE  v2.0
+2026-03-10 17:56:52 | INFO     | QuantumTradeOracle        |   Système de Trading Algorithmique IA
+2026-03-10 17:56:52 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:56:52 | INFO     | SentimentEngine           | VADER initialisé avec lexique financier (38 termes)
+2026-03-10 17:56:52 | INFO     | ClassicalModels           | Modèle initialisé : random_forest
+2026-03-10 17:56:52 | INFO     | ClassicalModels           | Modèle initialisé : gradient_boosting
+2026-03-10 17:56:56 | INFO     | LSTMModel                 | PyTorch disponible — device: cpu
+2026-03-10 17:56:56 | INFO     | TransformerModel          | Transformer — device: cpu | d_model=64 | heads=4 | layers=2
+2026-03-10 17:56:56 | INFO     | ModelEnsemble             | Ensemble initialisé — poids: {'random_forest': 0.2, 'gradient_boosting': 0.2, 'lstm': 0.35, 'transformer': 0.25}
+2026-03-10 17:56:56 | INFO     | QuantumTradeOracle        | ✅ Tous les composants initialisés
+2026-03-10 17:56:56 | INFO     | QuantumTradeOracle        | 📡 Collecte OHLCV — 1 symboles | period=2y
+2026-03-10 17:56:56 | INFO     | MarketCollector           | Téléchargement BTC-USD | period=2y | interval=1d
+2026-03-10 17:56:57 | INFO     | MarketCollector           | ✅ BTC-USD — 731 lignes récupérées [2024-03-10 → 2026-03-10]
+2026-03-10 17:56:57 | INFO     | MarketCollector           | Multi-fetch : 1/1 symboles OK
+2026-03-10 17:56:57 | INFO     | QuantumTradeOracle        | ✅ Données collectées : {'BTC-USD': 731}
+2026-03-10 17:56:57 | INFO     | QuantumTradeOracle        | ⚙️ Feature engineering pour 1 symboles…
+2026-03-10 17:56:57 | INFO     | FeatureEngineering        | Calcul des indicateurs pour 731 lignes…
+2026-03-10 17:56:58 | INFO     | FeatureEngineering        | Target créé : 37.9% haussier | 62.1% baissier
+2026-03-10 17:56:58 | INFO     | FeatureEngineering        | Features calculées : 64 colonnes, 531 lignes (199 supprimées pour NaN)
+2026-03-10 17:56:58 | INFO     | QuantumTradeOracle        |   BTC-USD — 531 lignes, 64 features
+2026-03-10 17:56:58 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\random_forest.pkl
+2026-03-10 17:56:58 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\gradient_boosting.pkl
+2026-03-10 17:56:58 | ERROR    | LSTMModel                 | Erreur chargement LSTM : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:56:58 | ERROR    | TransformerModel          | Erreur chargement Transformer : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:56:58 | INFO     | QuantumTradeOracle        | ✅ Modèles chargés depuis le disque
+2026-03-10 17:57:23 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:57:23 | INFO     | QuantumTradeOracle        |   🔮  QUANTUM TRADE ORACLE  v2.0
+2026-03-10 17:57:23 | INFO     | QuantumTradeOracle        |   Système de Trading Algorithmique IA
+2026-03-10 17:57:23 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:57:23 | INFO     | SentimentEngine           | VADER initialisé avec lexique financier (38 termes)
+2026-03-10 17:57:23 | INFO     | ClassicalModels           | Modèle initialisé : random_forest
+2026-03-10 17:57:23 | INFO     | ClassicalModels           | Modèle initialisé : gradient_boosting
+2026-03-10 17:57:26 | INFO     | LSTMModel                 | PyTorch disponible — device: cpu
+2026-03-10 17:57:26 | INFO     | TransformerModel          | Transformer — device: cpu | d_model=64 | heads=4 | layers=2
+2026-03-10 17:57:26 | INFO     | ModelEnsemble             | Ensemble initialisé — poids: {'random_forest': 0.2, 'gradient_boosting': 0.2, 'lstm': 0.35, 'transformer': 0.25}
+2026-03-10 17:57:26 | INFO     | QuantumTradeOracle        | ✅ Tous les composants initialisés
+2026-03-10 17:57:26 | INFO     | QuantumTradeOracle        | 📡 Collecte OHLCV — 1 symboles | period=2y
+2026-03-10 17:57:26 | INFO     | MarketCollector           | Téléchargement BTC-USD | period=2y | interval=1d
+2026-03-10 17:57:28 | INFO     | MarketCollector           | ✅ BTC-USD — 731 lignes récupérées [2024-03-10 → 2026-03-10]
+2026-03-10 17:57:28 | INFO     | MarketCollector           | Multi-fetch : 1/1 symboles OK
+2026-03-10 17:57:28 | INFO     | QuantumTradeOracle        | ✅ Données collectées : {'BTC-USD': 731}
+2026-03-10 17:57:28 | INFO     | QuantumTradeOracle        | ⚙️ Feature engineering pour 1 symboles…
+2026-03-10 17:57:28 | INFO     | FeatureEngineering        | Calcul des indicateurs pour 731 lignes…
+2026-03-10 17:57:28 | INFO     | FeatureEngineering        | Target créé : 37.9% haussier | 62.1% baissier
+2026-03-10 17:57:28 | INFO     | FeatureEngineering        | Features calculées : 64 colonnes, 531 lignes (199 supprimées pour NaN)
+2026-03-10 17:57:28 | INFO     | QuantumTradeOracle        |   BTC-USD — 531 lignes, 64 features
+2026-03-10 17:57:28 | INFO     | QuantumTradeOracle        | Modèles non entraînés — tentative de chargement…
+2026-03-10 17:57:28 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\random_forest.pkl
+2026-03-10 17:57:29 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\gradient_boosting.pkl
+2026-03-10 17:57:29 | ERROR    | LSTMModel                 | Erreur chargement LSTM : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:57:29 | ERROR    | TransformerModel          | Erreur chargement Transformer : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:57:29 | INFO     | QuantumTradeOracle        | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:57:29 | INFO     | QuantumTradeOracle        | 🔍 Analyse : BTC-USD
+2026-03-10 17:57:29 | INFO     | QuantumTradeOracle        | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:57:30 | WARNING  | NewsScraper               | NewsAPI échec pour BTC: 401 Client Error: Unauthorized for url: https://newsapi.org/v2/everything?q=bitcoin+OR+crypto&from=2026-03-09T16%3A57%3A29.347602%2B00%3A00&sortBy=publishedAt&language=en&pageSize=20&apiKey=your_newsapi_key_here
+2026-03-10 17:57:31 | WARNING  | NewsScraper               | Yahoo RSS échoué pour BTC: Couldn't find a tree builder with the features you requested: xml. Do you need to install a parser library?
+2026-03-10 17:57:42 | WARNING  | NewsScraper               | CryptoCompare échec pour BTC: slice(None, 20, None)
+2026-03-10 17:57:42 | INFO     | NewsScraper               | 📰 0 articles collectés pour ['BTC']
+2026-03-10 17:57:42 | INFO     | StrategyEngine            | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:57:42 | INFO     | StrategyEngine            | ⚪ SIGNAL : HOLD | BTC-USD
+2026-03-10 17:57:42 | INFO     | StrategyEngine            |   Composite : -0.0752 | Confiance : 59%
+2026-03-10 17:57:42 | INFO     | StrategyEngine            |   Bull prob : 41.5% | Bear prob : 58.5%
+2026-03-10 17:57:42 | INFO     | StrategyEngine            | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:57:42 | INFO     | QuantumTradeOracle        | ⏱️  Analyse terminée en 13.58s
+2026-03-10 17:58:02 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:58:02 | INFO     | QuantumTradeOracle        |   🔮  QUANTUM TRADE ORACLE  v2.0
+2026-03-10 17:58:02 | INFO     | QuantumTradeOracle        |   Système de Trading Algorithmique IA
+2026-03-10 17:58:02 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:58:02 | INFO     | SentimentEngine           | VADER initialisé avec lexique financier (38 termes)
+2026-03-10 17:58:02 | INFO     | ClassicalModels           | Modèle initialisé : random_forest
+2026-03-10 17:58:02 | INFO     | ClassicalModels           | Modèle initialisé : gradient_boosting
+2026-03-10 17:58:05 | INFO     | LSTMModel                 | PyTorch disponible — device: cpu
+2026-03-10 17:58:05 | INFO     | TransformerModel          | Transformer — device: cpu | d_model=64 | heads=4 | layers=2
+2026-03-10 17:58:05 | INFO     | ModelEnsemble             | Ensemble initialisé — poids: {'random_forest': 0.2, 'gradient_boosting': 0.2, 'lstm': 0.35, 'transformer': 0.25}
+2026-03-10 17:58:05 | INFO     | QuantumTradeOracle        | ✅ Tous les composants initialisés
+2026-03-10 17:58:05 | INFO     | QuantumTradeOracle        | 📡 Collecte OHLCV — 1 symboles | period=2y
+2026-03-10 17:58:05 | INFO     | MarketCollector           | Téléchargement BTC-USD | period=2y | interval=1d
+2026-03-10 17:58:07 | INFO     | MarketCollector           | ✅ BTC-USD — 731 lignes récupérées [2024-03-10 → 2026-03-10]
+2026-03-10 17:58:07 | INFO     | MarketCollector           | Multi-fetch : 1/1 symboles OK
+2026-03-10 17:58:07 | INFO     | QuantumTradeOracle        | ✅ Données collectées : {'BTC-USD': 731}
+2026-03-10 17:58:07 | INFO     | QuantumTradeOracle        | ⚙️ Feature engineering pour 1 symboles…
+2026-03-10 17:58:07 | INFO     | FeatureEngineering        | Calcul des indicateurs pour 731 lignes…
+2026-03-10 17:58:07 | INFO     | FeatureEngineering        | Target créé : 37.9% haussier | 62.1% baissier
+2026-03-10 17:58:07 | INFO     | FeatureEngineering        | Features calculées : 64 colonnes, 531 lignes (199 supprimées pour NaN)
+2026-03-10 17:58:07 | INFO     | QuantumTradeOracle        |   BTC-USD — 531 lignes, 64 features
+2026-03-10 17:58:07 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\random_forest.pkl
+2026-03-10 17:58:07 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\gradient_boosting.pkl
+2026-03-10 17:58:07 | ERROR    | LSTMModel                 | Erreur chargement LSTM : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:58:07 | ERROR    | TransformerModel          | Erreur chargement Transformer : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:58:07 | INFO     | QuantumTradeOracle        | ✅ Modèles chargés depuis le disque
+2026-03-10 17:58:07 | INFO     | QuantumTradeOracle        | ═══════════════════════════════════════════════════════
+2026-03-10 17:58:07 | INFO     | QuantumTradeOracle        |   BACKTESTING : BTC-USD
+2026-03-10 17:58:07 | INFO     | QuantumTradeOracle        | ═══════════════════════════════════════════════════════
+2026-03-10 17:58:07 | INFO     | QuantumTradeOracle        | Génération des signaux pour 531 jours…
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 60: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 61: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 62: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 63: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 64: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 65: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 66: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 67: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 68: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 69: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 70: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 71: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 72: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 73: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 74: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 75: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 76: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 77: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 78: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 79: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 80: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 81: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 82: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 83: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 84: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 85: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 86: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 87: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 88: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 89: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 90: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 91: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 92: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 93: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 94: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 95: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 96: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 97: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 98: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 99: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 100: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 101: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 102: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 103: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 104: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 105: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 106: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 107: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 108: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 109: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 110: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 111: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 112: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 113: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 114: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 115: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 116: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 117: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 118: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 119: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 120: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 121: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 122: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 123: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 124: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 125: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 126: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 127: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 128: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 129: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 130: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 131: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 132: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 133: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 134: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 135: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 136: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 137: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 138: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 139: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 140: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:07 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 141: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 142: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 143: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 144: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 145: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 146: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 147: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 148: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 149: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 150: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 151: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 152: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 153: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 154: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 155: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 156: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 157: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 158: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 159: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 160: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 161: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 162: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 163: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 164: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 165: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 166: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 167: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 168: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 169: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 170: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 171: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 172: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 173: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 174: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 175: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 176: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 177: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 178: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 179: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 180: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 181: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 182: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 183: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 184: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 185: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 186: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 187: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 188: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 189: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 190: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 191: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 192: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 193: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 194: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 195: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 196: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 197: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 198: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 199: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 200: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 201: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 202: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 203: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 204: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 205: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 206: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 207: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 208: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 209: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 210: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 211: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 212: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 213: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 214: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 215: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 216: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 217: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 218: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 219: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 220: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 221: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 222: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 223: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 224: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 225: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 226: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 227: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 228: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 229: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 230: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 231: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 232: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 233: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 234: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 235: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 236: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 237: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 238: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 239: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 240: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 241: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 242: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 243: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 244: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 245: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 246: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 247: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 248: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 249: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 250: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 251: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 252: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 253: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 254: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 255: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 256: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 257: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 258: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 259: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 260: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 261: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 262: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 263: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 264: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 265: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 266: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 267: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 268: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 269: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 270: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 271: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 272: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 273: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 274: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 275: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 276: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 277: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 278: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 279: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 280: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 281: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 282: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 283: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 284: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 285: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 286: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 287: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 288: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 289: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 290: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 291: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 292: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 293: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 294: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 295: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 296: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 297: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 298: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 299: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 300: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 301: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 302: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 303: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 304: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 305: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 306: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 307: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 308: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 309: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 310: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 311: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 312: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 313: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 314: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 315: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 316: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 317: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 318: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 319: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 320: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 321: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:08 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 322: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 323: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 324: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 325: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 326: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 327: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 328: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 329: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 330: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 331: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 332: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 333: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 334: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 335: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 336: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 337: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 338: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 339: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 340: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 341: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 342: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 343: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 344: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 345: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 346: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 347: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 348: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 349: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 350: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 351: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 352: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 353: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 354: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 355: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 356: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 357: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 358: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 359: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 360: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 361: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 362: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 363: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 364: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 365: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 366: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 367: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 368: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 369: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 370: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 371: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 372: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 373: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 374: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 375: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 376: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 377: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 378: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 379: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 380: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 381: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 382: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 383: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 384: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 385: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 386: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 387: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 388: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 389: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 390: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 391: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 392: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 393: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 394: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 395: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 396: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 397: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 398: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 399: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 400: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 401: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 402: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 403: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 404: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 405: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 406: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 407: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 408: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 409: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 410: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 411: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 412: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 413: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 414: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 415: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 416: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 417: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 418: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 419: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 420: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 421: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 422: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 423: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 424: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 425: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 426: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 427: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 428: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 429: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 430: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 431: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 432: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 433: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 434: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 435: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 436: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 437: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 438: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 439: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 440: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 441: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 442: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 443: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 444: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 445: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 446: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 447: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 448: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 449: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 450: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 451: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 452: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 453: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 454: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 455: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 456: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 457: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 458: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 459: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 460: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 461: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 462: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 463: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 464: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 465: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 466: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 467: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 468: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 469: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 470: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 471: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 472: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 473: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 474: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 475: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 476: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 477: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 478: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 479: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 480: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 481: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 482: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 483: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 484: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 485: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 486: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 487: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 488: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 489: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 490: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 491: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 492: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 493: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 494: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 495: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 496: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 497: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 498: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 499: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 500: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 501: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 502: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 503: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 504: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 505: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 506: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 507: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 508: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 509: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 510: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 511: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 512: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 513: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 514: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 515: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 516: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 517: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 518: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 519: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 520: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 521: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 522: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 523: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 524: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 525: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 526: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 527: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 528: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 529: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | DEBUG    | QuantumTradeOracle        | Erreur signal jour 530: This RobustScaler instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.
+2026-03-10 17:58:09 | INFO     | QuantumTradeOracle        | ✅ 0 signaux générés
+2026-03-10 17:58:09 | INFO     | Backtester                | Démarrage du backtest — 531 jours | 0 signaux | capital: $10000
+2026-03-10 17:58:10 | INFO     | Backtester                | Backtest terminé — 0 trades | Return: +0.00% | Sharpe: -92875109822894016.00 | MaxDD: 0.00%
+2026-03-10 17:58:10 | INFO     | QuantumTradeOracle        | 💾 Résultats backtesting sauvegardés : C:\Users\BEST COMPUTER\Desktop\qto_v2\reports\backtest_BTC-USD_20260310_175810.json
+2026-03-10 17:58:57 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:58:57 | INFO     | QuantumTradeOracle        |   🔮  QUANTUM TRADE ORACLE  v2.0
+2026-03-10 17:58:57 | INFO     | QuantumTradeOracle        |   Système de Trading Algorithmique IA
+2026-03-10 17:58:57 | INFO     | QuantumTradeOracle        | ═════════════════════════════════════════════════════════════════
+2026-03-10 17:58:57 | INFO     | SentimentEngine           | VADER initialisé avec lexique financier (38 termes)
+2026-03-10 17:58:57 | INFO     | ClassicalModels           | Modèle initialisé : random_forest
+2026-03-10 17:58:57 | INFO     | ClassicalModels           | Modèle initialisé : gradient_boosting
+2026-03-10 17:59:00 | INFO     | LSTMModel                 | PyTorch disponible — device: cpu
+2026-03-10 17:59:00 | INFO     | TransformerModel          | Transformer — device: cpu | d_model=64 | heads=4 | layers=2
+2026-03-10 17:59:00 | INFO     | ModelEnsemble             | Ensemble initialisé — poids: {'random_forest': 0.2, 'gradient_boosting': 0.2, 'lstm': 0.35, 'transformer': 0.25}
+2026-03-10 17:59:00 | INFO     | QuantumTradeOracle        | ✅ Tous les composants initialisés
+2026-03-10 17:59:00 | INFO     | QuantumTradeOracle        | 🚀 Pipeline complet — 1 symboles
+2026-03-10 17:59:00 | INFO     | QuantumTradeOracle        | 📡 Collecte OHLCV — 1 symboles | period=2y
+2026-03-10 17:59:00 | INFO     | MarketCollector           | Téléchargement BTC-USD | period=2y | interval=1d
+2026-03-10 17:59:01 | INFO     | MarketCollector           | ✅ BTC-USD — 731 lignes récupérées [2024-03-10 → 2026-03-10]
+2026-03-10 17:59:01 | INFO     | MarketCollector           | Multi-fetch : 1/1 symboles OK
+2026-03-10 17:59:01 | INFO     | QuantumTradeOracle        | ✅ Données collectées : {'BTC-USD': 731}
+2026-03-10 17:59:01 | INFO     | QuantumTradeOracle        | ⚙️ Feature engineering pour 1 symboles…
+2026-03-10 17:59:01 | INFO     | FeatureEngineering        | Calcul des indicateurs pour 731 lignes…
+2026-03-10 17:59:01 | INFO     | FeatureEngineering        | Target créé : 37.9% haussier | 62.1% baissier
+2026-03-10 17:59:01 | INFO     | FeatureEngineering        | Features calculées : 64 colonnes, 531 lignes (199 supprimées pour NaN)
+2026-03-10 17:59:01 | INFO     | QuantumTradeOracle        |   BTC-USD — 531 lignes, 64 features
+2026-03-10 17:59:01 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\random_forest.pkl
+2026-03-10 17:59:01 | INFO     | ClassicalModels           | ✅ Modèle chargé : C:\Users\BEST COMPUTER\Desktop\qto_v2\data\models\gradient_boosting.pkl
+2026-03-10 17:59:02 | ERROR    | LSTMModel                 | Erreur chargement LSTM : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:59:02 | ERROR    | TransformerModel          | Erreur chargement Transformer : Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy._core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([numpy._core.multiarray.scalar])` or the `torch.serialization.safe_globals([numpy._core.multiarray.scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+2026-03-10 17:59:02 | INFO     | QuantumTradeOracle        | ✅ Modèles chargés depuis le disque
+2026-03-10 17:59:02 | INFO     | QuantumTradeOracle        | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:59:02 | INFO     | QuantumTradeOracle        | 🔍 Analyse : BTC-USD
+2026-03-10 17:59:02 | INFO     | QuantumTradeOracle        | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:59:03 | WARNING  | NewsScraper               | NewsAPI échec pour BTC: 401 Client Error: Unauthorized for url: https://newsapi.org/v2/everything?q=bitcoin+OR+crypto&from=2026-03-09T16%3A59%3A02.312552%2B00%3A00&sortBy=publishedAt&language=en&pageSize=20&apiKey=your_newsapi_key_here
+2026-03-10 17:59:04 | WARNING  | NewsScraper               | Yahoo RSS échoué pour BTC: Couldn't find a tree builder with the features you requested: xml. Do you need to install a parser library?
+2026-03-10 17:59:06 | DEBUG    | NewsScraper               | CryptoCompare: 20 articles pour BTC
+2026-03-10 17:59:07 | INFO     | NewsScraper               | 📰 20 articles collectés pour ['BTC']
+2026-03-10 17:59:07 | INFO     | SentimentEngine           | 📊 SSGM: 0.1351 (NEUTRAL) → Signal: HOLD
+2026-03-10 17:59:07 | INFO     | StrategyEngine            | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:59:07 | INFO     | StrategyEngine            | ⚪ SIGNAL : HOLD | BTC-USD
+2026-03-10 17:59:07 | INFO     | StrategyEngine            |   Composite : -0.0347 | Confiance : 59%
+2026-03-10 17:59:07 | INFO     | StrategyEngine            |   Bull prob : 41.5% | Bear prob : 58.5%
+2026-03-10 17:59:07 | INFO     | StrategyEngine            | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2026-03-10 17:59:07 | INFO     | QuantumTradeOracle        | ⏱️  Analyse terminée en 5.08s

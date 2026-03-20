@@ -28,59 +28,102 @@ except ImportError:
 # ══════════════════════════════════════════════════════════════════════════════
 #  CONFIGURATION — priorité : variables d'environnement > valeurs locales
 # ══════════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════════════════════
+#  ⚙️  CONFIGURATION LOCALE (développement sur votre PC)
+#  ─────────────────────────────────────────────────────
+#  Remplissez uniquement ces valeurs pour tester en local.
+#  En production (Streamlit Cloud), elles sont ignorées automatiquement.
+# ══════════════════════════════════════════════════════════════════════════════
+LOCAL_CONFIG = {
+    "host":     "localhost",   # Votre PC local (WAMP)
+    "port":     3306,
+    "user":     "root",
+    "password": "",            # Mot de passe phpMyAdmin
+    "database": "qto_users",
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  ⚙️  CONFIGURATION CLEVER CLOUD (production en ligne)
+#  ─────────────────────────────────────────────────────
+#  Copiez ces valeurs depuis votre console Clever Cloud.
+#  Format : clever-cloud.com → votre add-on MySQL → Informations de connexion
+#  Ces valeurs sont écrasées par st.secrets en production.
+# ══════════════════════════════════════════════════════════════════════════════
+CLEVER_CLOUD_CONFIG = {
+    "host":     "VOTRE_HOST.mysql.clevercloud.com",
+    "port":     3306,
+    "user":     "VOTRE_USER",
+    "password": "VOTRE_PASSWORD",
+    "database": "VOTRE_DATABASE",
+}
+
 def _get_secrets():
     """
-    Charge les secrets depuis :
-    1. Variables d'environnement (Railway, Streamlit Cloud)
-    2. st.secrets si Streamlit est disponible
-    3. Valeurs locales par défaut (développement local)
+    Ordre de priorité :
+    1. st.secrets (Streamlit Cloud — paramètres de l'app)
+    2. Variables d'environnement (Railway, Heroku, Docker)
+    3. DATABASE_URL (format mysql://user:pass@host:port/db)
+    4. LOCAL_CONFIG (développement local WAMP/phpMyAdmin)
     """
-    config = {
-        "host":     "localhost",
-        "port":     3306,
-        "user":     "root",
-        "password": "",
-        "database": "qto_users",
-        "charset":  "utf8mb4",
-    }
+    config = {**LOCAL_CONFIG, "charset": "utf8mb4"}
 
-    # Variables d'environnement (Railway, Heroku, etc.)
-    if os.environ.get("DB_HOST"):
-        config["host"]     = os.environ.get("DB_HOST", "localhost")
-        config["port"]     = int(os.environ.get("DB_PORT", 3306))
-        config["user"]     = os.environ.get("DB_USER", "root")
-        config["password"] = os.environ.get("DB_PASS", "")
-        config["database"] = os.environ.get("DB_NAME", "qto_users")
-        return config
-
-    # DATABASE_URL (Railway PostgreSQL → format MySQL ici ignoré)
-    if os.environ.get("DATABASE_URL"):
-        url = os.environ["DATABASE_URL"]
-        # Parsing basique mysql://user:pass@host:port/db
-        try:
-            url = url.replace("mysql://", "").replace("mysql2://", "")
-            user_pass, rest = url.split("@")
-            user, password   = user_pass.split(":") if ":" in user_pass else (user_pass, "")
-            host_port, db    = rest.split("/")
-            host, port       = host_port.split(":") if ":" in host_port else (host_port, "3306")
-            config.update({"host":host,"port":int(port),"user":user,
-                           "password":password,"database":db})
-        except Exception:
-            pass
-        return config
-
-    # st.secrets si Streamlit Cloud (import conditionnel pour éviter crash)
+    # ── 1. Streamlit Cloud st.secrets ─────────────────────────────────────
     try:
         import streamlit as st
-        if hasattr(st, "secrets") and "DB_HOST" in st.secrets:
-            config["host"]     = st.secrets.get("DB_HOST", "localhost")
-            config["port"]     = int(st.secrets.get("DB_PORT", 3306))
-            config["user"]     = st.secrets.get("DB_USER", "root")
-            config["password"] = st.secrets.get("DB_PASS", "")
-            config["database"] = st.secrets.get("DB_NAME", "qto_users")
+        if hasattr(st, "secrets"):
+            s = st.secrets
+            # Format clé par clé
+            if "DB_HOST" in s:
+                config.update({
+                    "host":     str(s.get("DB_HOST", config["host"])),
+                    "port":     int(s.get("DB_PORT", config["port"])),
+                    "user":     str(s.get("DB_USER", config["user"])),
+                    "password": str(s.get("DB_PASS", config["password"])),
+                    "database": str(s.get("DB_NAME", config["database"])),
+                })
+                return config
+            # Format objet [mysql]
+            if "mysql" in s:
+                m = s["mysql"]
+                config.update({
+                    "host":     str(m.get("host",     config["host"])),
+                    "port":     int(m.get("port",     config["port"])),
+                    "user":     str(m.get("user",     config["user"])),
+                    "password": str(m.get("password", config["password"])),
+                    "database": str(m.get("database", config["database"])),
+                })
+                return config
     except Exception:
         pass
 
+    # ── 2. Variables d'environnement ──────────────────────────────────────
+    if os.environ.get("DB_HOST"):
+        config.update({
+            "host":     os.environ["DB_HOST"],
+            "port":     int(os.environ.get("DB_PORT", 3306)),
+            "user":     os.environ.get("DB_USER", "root"),
+            "password": os.environ.get("DB_PASS", ""),
+            "database": os.environ.get("DB_NAME", "qto_users"),
+        })
+        return config
+
+    # ── 3. DATABASE_URL (mysql://user:pass@host:port/db) ──────────────────
+    if os.environ.get("DATABASE_URL"):
+        try:
+            url = os.environ["DATABASE_URL"]
+            url = url.replace("mysql://","").replace("mysql2://","").replace("mysqli://","")
+            user_pass, rest = url.split("@", 1)
+            user, password  = user_pass.split(":", 1) if ":" in user_pass else (user_pass, "")
+            host_port, db   = rest.split("/", 1)
+            host, port      = host_port.split(":", 1) if ":" in host_port else (host_port, "3306")
+            db = db.split("?")[0]  # Retirer les paramètres ?ssl=true etc.
+            config.update({"host":host,"port":int(port),"user":user,
+                           "password":password,"database":db})
+            return config
+        except Exception as e:
+            print(f"⚠️ Erreur parsing DATABASE_URL : {e}")
+
+    # ── 4. Fallback local (WAMP / phpMyAdmin) ─────────────────────────────
     return config
 
 DB_CONFIG = _get_secrets()
