@@ -2371,9 +2371,9 @@ sig=st.session_state.signal; df=st.session_state.df_feat
 sent=st.session_state.sentiment; news=st.session_state.news_data
 bt=st.session_state.backtest_result
 
-(t_sig,t_chart,t_models,t_risk,t_profit,t_news,t_scan,t_chat,t_bt,t_hist,t_profil)=st.tabs([
+(t_sig,t_chart,t_models,t_risk,t_profit,t_news,t_scan,t_chat,t_bt,t_hist,t_profil,t_audit)=st.tabs([
     "⬡ SIGNAL","📈 GRAPHIQUE","🤖 MODÈLES IA","⚡ RISQUE","💰 PROFIT",
-    "📰 NEWS","🌐 SCANNER","⬡ IA ORACLE","📊 BACKTEST","🕐 HISTORIQUE","👤 MON ESPACE"])
+    "📰 NEWS","🌐 SCANNER","⬡ IA ORACLE","📊 BACKTEST","🕐 HISTORIQUE","👤 MON ESPACE","🔬 AUDIT TRADING"])
 
 # ── SIGNAL ─────────────────────────────────────────────────────────────────
 with t_sig:
@@ -3739,3 +3739,599 @@ with t_hist:
         st.dataframe(pd.DataFrame(_rows_h),use_container_width=True,hide_index=True)
         if st.button("🗑  Effacer l'historique"):
             st.session_state.signal_history=[]; st.rerun()
+
+# ── AUDIT TRADING IA ─────────────────────────────────────────────────────────
+with t_audit:
+
+    # ── Fonctions d'analyse ───────────────────────────────────────────────────
+    def _parse_trading_file(uploaded_file):
+        """Parse CSV ou Excel depuis MT4, MT5, Binance ou format générique."""
+        import io
+        try:
+            if uploaded_file.name.endswith((".xlsx",".xls")):
+                df = pd.read_excel(uploaded_file, header=None)
+            else:
+                raw = uploaded_file.read().decode("utf-8", errors="replace")
+                uploaded_file.seek(0)
+                df = pd.read_csv(io.StringIO(raw), header=None, sep=None,
+                                 engine="python", on_bad_lines="skip")
+
+            # Détecter le format
+            header_row = 0
+            for i in range(min(8, len(df))):
+                row_str = " ".join(str(v).lower() for v in df.iloc[i].values)
+                if any(w in row_str for w in ["ticket","order","trade","symbol","profit","open"]):
+                    header_row = i; break
+
+            df.columns = [str(c).strip().lower().replace(" ","_") for c in df.iloc[header_row]]
+            df = df.iloc[header_row+1:].reset_index(drop=True)
+            df = df.dropna(how="all")
+
+            # Normaliser les colonnes MT4/MT5
+            rename_map = {}
+            for col in df.columns:
+                if any(w in col for w in ["symbol","pair","instrumen"]): rename_map[col]="symbol"
+                elif any(w in col for w in ["profit","pnl","gain","result"]): rename_map[col]="profit"
+                elif any(w in col for w in ["type","direction","side","action"]): rename_map[col]="type"
+                elif any(w in col for w in ["open_price","entry","price_open","open"]): rename_map[col]="entry"
+                elif any(w in col for w in ["close_price","exit","price_close","close"]): rename_map[col]="close_price"
+                elif any(w in col for w in ["open_time","entry_time","date_open","time"]): rename_map[col]="open_time"
+                elif any(w in col for w in ["close_time","exit_time","date_close"]): rename_map[col]="close_time"
+                elif any(w in col for w in ["lots","volume","size","qty"]): rename_map[col]="lots"
+                elif any(w in col for w in ["sl","stop_loss","stoploss"]): rename_map[col]="sl"
+                elif any(w in col for w in ["tp","take_profit","takeprofit"]): rename_map[col]="tp"
+                elif any(w in col for w in ["commission","fee","swap"]): rename_map[col]="commission"
+            df = df.rename(columns=rename_map)
+
+            # Convertir les colonnes numériques
+            for col in ["profit","entry","close_price","lots","sl","tp","commission"]:
+                if col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors="coerce")
+
+            df = df.dropna(subset=["profit"]) if "profit" in df.columns else df
+            return df, None
+        except Exception as e:
+            return None, str(e)
+
+    def _analyze_trades(df):
+        """Analyse complète d'un historique de trades."""
+        results = {}
+        if df is None or df.empty or "profit" not in df.columns:
+            return None
+
+        profits = df["profit"].dropna()
+        n = len(profits)
+        if n == 0: return None
+
+        wins  = profits[profits > 0]
+        losses = profits[profits < 0]
+        win_rate = len(wins)/n*100 if n else 0
+        avg_win  = float(wins.mean()) if len(wins) else 0
+        avg_loss = float(losses.mean()) if len(losses) else 0
+        profit_factor = abs(wins.sum()/losses.sum()) if losses.sum() != 0 else 999
+        total_profit  = float(profits.sum())
+        max_win  = float(wins.max()) if len(wins) else 0
+        max_loss = float(losses.min()) if len(losses) else 0
+
+        # Drawdown
+        equity = profits.cumsum()
+        running_max = equity.cummax()
+        drawdown = equity - running_max
+        max_dd = float(drawdown.min())
+        max_dd_pct = (max_dd / (running_max.max() + 1e-9)) * 100 if running_max.max() != 0 else 0
+
+        # Série consécutive
+        streak = 0; max_loss_streak = 0; cur_streak = 0
+        for p in profits:
+            if p < 0:
+                cur_streak += 1
+                max_loss_streak = max(max_loss_streak, cur_streak)
+            else:
+                cur_streak = 0
+
+        # Stats par symbole
+        sym_stats = {}
+        if "symbol" in df.columns:
+            for sym, grp in df.groupby("symbol"):
+                if pd.isna(sym) or str(sym).strip()=="" : continue
+                p = grp["profit"].dropna()
+                w = p[p>0]; l = p[p<0]
+                sym_stats[str(sym)] = {
+                    "total": len(p), "win_rate": len(w)/len(p)*100 if len(p) else 0,
+                    "profit": float(p.sum()),
+                    "avg_win": float(w.mean()) if len(w) else 0,
+                    "avg_loss": float(l.mean()) if len(l) else 0,
+                    "pf": abs(w.sum()/l.sum()) if l.sum()!=0 else 999,
+                }
+
+        # Erreurs détectées
+        errors = []
+        if win_rate < 35:
+            errors.append({"type":"❌","severity":"CRITIQUE","title":"Win Rate très faible",
+                "desc":f"Seulement {win_rate:.0f}% de trades gagnants. Un trader professionnel maintient ≥ 45%.",
+                "fix":"Réduisez la taille de position et attendez des setups plus clairs (RSI < 30 + MACD croisement)."})
+        if profit_factor < 1.0:
+            errors.append({"type":"❌","severity":"CRITIQUE","title":"Profit Factor < 1",
+                "desc":f"Profit Factor de {profit_factor:.2f} signifie que vous perdez plus que vous ne gagnez globalement.",
+                "fix":"Augmentez votre Take-Profit et réduisez votre Stop-Loss. Visez un R/R minimum de 2:1."})
+        if profit_factor < 1.5 and profit_factor >= 1.0:
+            errors.append({"type":"⚠️","severity":"AVERTISSEMENT","title":"Profit Factor insuffisant",
+                "desc":f"Profit Factor de {profit_factor:.2f}. Les pros visent ≥ 1.5.",
+                "fix":"Sélectionnez uniquement les meilleures entrées. Éliminez les trades 'mediocres'."})
+        if avg_win > 0 and avg_loss < 0 and abs(avg_loss) > avg_win:
+            rr = avg_win / abs(avg_loss)
+            errors.append({"type":"❌","severity":"CRITIQUE","title":"R/R moyen défavorable",
+                "desc":f"Vous gagnez en moyenne {avg_win:.2f} mais perdez {abs(avg_loss):.2f} — R/R réel de {rr:.2f}:1.",
+                "fix":"Ne prenez jamais un trade où TP < 2× SL. Utilisez l'outil RISQUE du dashboard pour calibrer."})
+        if max_loss_streak >= 5:
+            errors.append({"type":"⚠️","severity":"AVERTISSEMENT","title":f"{max_loss_streak} pertes consécutives",
+                "desc":f"Vous avez eu une série de {max_loss_streak} trades perdants de suite — signe de revenge trading probable.",
+                "fix":"Après 3 pertes consécutives → STOP de trading pour la journée. Revenez le lendemain."})
+        if max_dd_pct < -20:
+            errors.append({"type":"❌","severity":"CRITIQUE","title":"Drawdown excessif",
+                "desc":f"Drawdown maximum de {max_dd_pct:.1f}%. Au-delà de -20% le compte est en danger.",
+                "fix":"Limitez la taille de chaque trade à 2% du capital. Ne jamais dépasser 10% de drawdown total."})
+        if len(losses) > 0 and abs(max_loss) > abs(avg_loss) * 4:
+            errors.append({"type":"⚠️","severity":"AVERTISSEMENT","title":"Trade catastrophique détecté",
+                "desc":f"Votre pire trade ({max_loss:.2f}) est {abs(max_loss/avg_loss):.0f}× supérieur à votre perte moyenne.",
+                "fix":"Ce trade suggère une absence de Stop-Loss ou un déplacement du SL. C'est une erreur critique."})
+        if n > 0 and len(losses)/n > 0.65:
+            errors.append({"type":"⚠️","severity":"AVERTISSEMENT","title":"Possible surtrading",
+                "desc":f"{len(losses)} pertes sur {n} trades. Trop de trades = moins de sélectivité.",
+                "fix":"Limitez-vous à 3 trades maximum par jour. Qualité > Quantité."})
+
+        # Stratégies IA personnalisées
+        strategies = []
+        if sym_stats:
+            best_sym = max(sym_stats.items(), key=lambda x: x[1]["profit"])
+            worst_sym = min(sym_stats.items(), key=lambda x: x[1]["profit"])
+            strategies.append({"icon":"🎯","title":f"Concentrez-vous sur {best_sym[0]}",
+                "desc":f"Votre meilleure performance est sur {best_sym[0]} (+{best_sym[1]['profit']:.2f}$, win rate {best_sym[1]['win_rate']:.0f}%). Augmentez votre exposition sur cet actif."})
+            if worst_sym[1]["profit"] < 0:
+                strategies.append({"icon":"🚫","title":f"Évitez {worst_sym[0]}",
+                    "desc":f"{worst_sym[0]} vous coûte {worst_sym[1]['profit']:.2f}$. Arrêtez cet actif jusqu'à ce que vous ayez une stratégie testée dessus."})
+        if win_rate > 50 and profit_factor < 1.5:
+            strategies.append({"icon":"📏","title":"Agrandissez vos Take-Profits",
+                "desc":f"Vous avez {win_rate:.0f}% de victoires mais un Profit Factor faible. Vos TP sont trop proches. Doublez-les."})
+        if profit_factor > 1.8:
+            strategies.append({"icon":"📈","title":"Augmentez progressivement la taille",
+                "desc":f"Votre Profit Factor de {profit_factor:.2f} est excellent. Vous pouvez augmenter vos positions de 25% tout en gardant la règle des 2%."})
+        strategies.append({"icon":"⏰","title":"Respectez les sessions de marché",
+            "desc":"Les meilleures opportunités sont pendant la session de Londres (8h-12h UTC) et New York (13h-17h UTC). Évitez de trader la nuit."})
+        strategies.append({"icon":"📓","title":"Tenez un journal de trading",
+            "desc":"Notez la raison de chaque entrée AVANT d'entrer. Si vous ne pouvez pas l'expliquer en 1 phrase claire, n'entrez pas."})
+
+        # Benchmarks professionnels
+        benchmarks = [
+            ("Win Rate",         f"{win_rate:.1f}%",  "≥ 45%",  win_rate >= 45),
+            ("Profit Factor",    f"{profit_factor:.2f}", "≥ 1.5", profit_factor >= 1.5),
+            ("Max Drawdown",     f"{max_dd_pct:.1f}%","< -15%", max_dd_pct > -15),
+            ("Ratio Gain/Perte", f"{abs(avg_win/avg_loss):.2f}:1" if avg_loss!=0 else "—", "≥ 2:1", abs(avg_win/avg_loss)>=2 if avg_loss!=0 else False),
+            ("Pertes consécutives", str(max_loss_streak), "< 5",  max_loss_streak < 5),
+        ]
+
+        return {
+            "n": n, "win_rate": win_rate, "wins": len(wins), "losses": len(losses),
+            "avg_win": avg_win, "avg_loss": avg_loss, "profit_factor": profit_factor,
+            "total_profit": total_profit, "max_win": max_win, "max_loss": max_loss,
+            "max_dd": max_dd, "max_dd_pct": max_dd_pct,
+            "max_loss_streak": max_loss_streak,
+            "equity": equity, "profits": profits,
+            "sym_stats": sym_stats, "errors": errors,
+            "strategies": strategies, "benchmarks": benchmarks,
+        }
+
+    # ── Score global ──────────────────────────────────────────────────────────
+    def _compute_score(a):
+        if not a: return 0
+        s = 0
+        if a["win_rate"] >= 50: s += 25
+        elif a["win_rate"] >= 40: s += 15
+        elif a["win_rate"] >= 30: s += 5
+        if a["profit_factor"] >= 2.0: s += 25
+        elif a["profit_factor"] >= 1.5: s += 18
+        elif a["profit_factor"] >= 1.0: s += 8
+        if a["max_dd_pct"] > -10: s += 25
+        elif a["max_dd_pct"] > -20: s += 15
+        elif a["max_dd_pct"] > -30: s += 5
+        if a["avg_loss"] != 0 and abs(a["avg_win"]/a["avg_loss"]) >= 2: s += 25
+        elif a["avg_loss"] != 0 and abs(a["avg_win"]/a["avg_loss"]) >= 1.5: s += 15
+        elif a["avg_loss"] != 0 and abs(a["avg_win"]/a["avg_loss"]) >= 1: s += 5
+        return min(s, 100)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # UI PRINCIPALE
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown(f'''
+    <div style="background:linear-gradient(135deg,rgba(155,114,255,.08),{C["card"]});
+        border:1px solid rgba(155,114,255,.25);border-radius:10px;
+        padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;
+        background:linear-gradient(90deg,transparent,{C["purple"]},{C["accent"]},transparent)"></div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:24px;
+        color:{C["bright"]};letter-spacing:3px">🔬 AUDITEUR IA DE COMPTE TRADING</div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+        color:{C["muted"]};margin-top:5px;letter-spacing:1px">
+        ANALYSEZ VOS ERREURS · OBTENEZ DES STRATÉGIES PERSONNALISÉES · COMPAREZ AUX PROS
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+        {''.join(f'<span style="background:{C["surface"]};border:1px solid {C["border2"]};color:{C["text"]};font-family:JetBrains Mono,monospace;font-size:9px;padding:4px 12px;border-radius:12px">{t}</span>' for t in ["✅ MetaTrader 4/5","✅ Binance","✅ CSV/Excel","✅ Format générique"])}
+      </div>
+    </div>
+    ''', unsafe_allow_html=True)
+
+    # ── Upload ────────────────────────────────────────────────────────────────
+    _au1, _au2 = st.columns([3, 2])
+    with _au1:
+        _audit_file = st.file_uploader(
+            "📂 Importer votre historique de trades",
+            type=["csv","xlsx","xls"],
+            help="Exportez depuis MT4: Compte → Historique → Clic droit → Enregistrer sous CSV",
+            key="audit_uploader"
+        )
+    with _au2:
+        st.markdown(f'''
+        <div style="background:{C["card"]};border:1px solid {C["border2"]};
+            border-radius:8px;padding:16px;margin-top:28px">
+          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+            color:{C["accent"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">
+            📋 Comment exporter depuis MT4/MT5 ?
+          </div>
+          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+            color:{C["muted"]};line-height:2">
+            1. Ouvrez MetaTrader<br>
+            2. Onglet "Historique du compte"<br>
+            3. Clic droit → "Enregistrer comme rapport"<br>
+            4. Choisissez CSV et uploadez ici
+          </div>
+        </div>
+        ''', unsafe_allow_html=True)
+
+    if _audit_file:
+        _df_audit, _err = _parse_trading_file(_audit_file)
+
+        if _err or _df_audit is None:
+            st.error(f"Erreur de lecture : {_err}. Vérifiez le format du fichier.")
+        else:
+            _analysis = _analyze_trades(_df_audit)
+            if not _analysis:
+                st.warning("Impossible d'analyser ce fichier. Vérifiez qu'il contient une colonne 'profit'.")
+            else:
+                _score = _compute_score(_analysis)
+                _score_col = C["green"] if _score>=70 else C["yellow"] if _score>=45 else C["red"]
+                _score_lbl = "EXCELLENT" if _score>=70 else "À AMÉLIORER" if _score>=45 else "CRITIQUE"
+
+                # ── Score global ───────────────────────────────────────────
+                st.markdown(f'''
+                <div style="background:linear-gradient(135deg,{C["card2"]},{C["card"]});
+                    border:1px solid {_score_col}44;border-radius:10px;
+                    padding:24px;margin-bottom:16px;
+                    display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+                  <div style="text-align:center;min-width:100px">
+                    <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                      color:{C["muted"]};text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">
+                      Score global
+                    </div>
+                    <div style="font-family:Bebas Neue,sans-serif;font-size:64px;
+                      color:{_score_col};line-height:1;
+                      text-shadow:0 0 30px {_score_col}55">{_score}</div>
+                    <div style="font-family:Bebas Neue,sans-serif;font-size:14px;
+                      color:{_score_col};letter-spacing:3px">{_score_lbl}</div>
+                    <div style="font-family:JetBrains Mono,monospace;font-size:8px;
+                      color:{C["muted"]}">/ 100</div>
+                  </div>
+                  <div style="flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px">
+                    {''.join(f'''<div style="background:{C["surface"]};border:1px solid {C["border2"]};border-radius:6px;padding:12px;text-align:center">
+                      <div style="font-family:JetBrains Mono,monospace;font-size:7px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">{lbl}</div>
+                      <div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:{vc};letter-spacing:1px">{val}</div>
+                    </div>''' for lbl,val,vc in [
+                        ("Trades analysés", str(_analysis["n"]), C["accent"]),
+                        ("Win Rate", f"{_analysis['win_rate']:.1f}%", C["green"] if _analysis["win_rate"]>=45 else C["red"]),
+                        ("Profit Factor", f"{_analysis['profit_factor']:.2f}", C["green"] if _analysis["profit_factor"]>=1.5 else C["red"]),
+                        ("P&L Total", f"{'+'if _analysis['total_profit']>=0 else ''}{_analysis['total_profit']:.2f}$", C["green"] if _analysis["total_profit"]>=0 else C["red"]),
+                        ("Max Drawdown", f"{_analysis['max_dd_pct']:.1f}%", C["green"] if _analysis["max_dd_pct"]>-15 else C["red"]),
+                        ("Erreurs détectées", str(len(_analysis["errors"])), C["red"] if _analysis["errors"] else C["green"]),
+                    ])}
+                  </div>
+                </div>
+                ''', unsafe_allow_html=True)
+
+                # ── 4 Onglets d'analyse ────────────────────────────────────
+                _aa1, _aa2, _aa3, _aa4 = st.tabs([
+                    "❌ Erreurs Détectées",
+                    "📊 Statistiques",
+                    "🎯 Stratégies IA",
+                    "🏆 Vs Professionnels",
+                ])
+
+                # ════ ERREURS ═════════════════════════════════════════════
+                with _aa1:
+                    if not _analysis["errors"]:
+                        st.markdown(f'''
+                        <div style="text-align:center;padding:40px;
+                            background:rgba(0,255,157,.04);border:1px solid rgba(0,255,157,.2);
+                            border-radius:8px;margin-top:10px">
+                          <div style="font-size:48px">✅</div>
+                          <div style="font-family:Bebas Neue,sans-serif;font-size:20px;
+                            color:{C["green"]};letter-spacing:2px;margin-top:10px">
+                            AUCUNE ERREUR CRITIQUE DÉTECTÉE
+                          </div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:10px;
+                            color:{C["muted"]};margin-top:8px">
+                            Votre gestion de compte est dans les standards professionnels.
+                          </div>
+                        </div>
+                        ''', unsafe_allow_html=True)
+                    else:
+                        _crit = [e for e in _analysis["errors"] if e["severity"]=="CRITIQUE"]
+                        _warn = [e for e in _analysis["errors"] if e["severity"]=="AVERTISSEMENT"]
+                        if _crit:
+                            st.markdown(f'<div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:{C["red"]};letter-spacing:2px;margin:10px 0 8px">❌ ERREURS CRITIQUES ({len(_crit)})</div>', unsafe_allow_html=True)
+                        for _e in _crit:
+                            st.markdown(f'''
+                            <div style="background:rgba(255,45,85,.06);border:1px solid rgba(255,45,85,.3);
+                                border-left:4px solid {C["red"]};border-radius:8px;
+                                padding:16px 18px;margin-bottom:10px">
+                              <div style="font-family:Space Grotesk,sans-serif;font-size:14px;
+                                font-weight:700;color:{C["red"]};margin-bottom:6px">
+                                {_e["type"]} {_e["title"]}
+                              </div>
+                              <div style="font-family:Space Grotesk,sans-serif;font-size:12px;
+                                color:{C["text"]};line-height:1.7;margin-bottom:10px">
+                                {_e["desc"]}
+                              </div>
+                              <div style="background:rgba(0,0,0,.3);border-radius:4px;padding:10px 14px;
+                                  border-left:3px solid {C["green"]}">
+                                <span style="font-family:JetBrains Mono,monospace;font-size:9px;
+                                  color:{C["muted"]};text-transform:uppercase;letter-spacing:1px">
+                                  💡 Solution :
+                                </span>
+                                <div style="font-family:Space Grotesk,sans-serif;font-size:11px;
+                                  color:{C["green"]};margin-top:4px;line-height:1.6">{_e["fix"]}</div>
+                              </div>
+                            </div>
+                            ''', unsafe_allow_html=True)
+                        if _warn:
+                            st.markdown(f'<div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:{C["yellow"]};letter-spacing:2px;margin:16px 0 8px">⚠️ AVERTISSEMENTS ({len(_warn)})</div>', unsafe_allow_html=True)
+                        for _e in _warn:
+                            st.markdown(f'''
+                            <div style="background:rgba(255,214,10,.04);border:1px solid rgba(255,214,10,.25);
+                                border-left:4px solid {C["yellow"]};border-radius:8px;
+                                padding:14px 18px;margin-bottom:8px">
+                              <div style="font-family:Space Grotesk,sans-serif;font-size:13px;
+                                font-weight:700;color:{C["yellow"]};margin-bottom:5px">
+                                {_e["type"]} {_e["title"]}
+                              </div>
+                              <div style="font-family:Space Grotesk,sans-serif;font-size:11px;
+                                color:{C["text"]};line-height:1.7;margin-bottom:8px">{_e["desc"]}</div>
+                              <div style="font-family:Space Grotesk,sans-serif;font-size:11px;
+                                color:{C["green"]};border-left:2px solid {C["green"]};
+                                padding-left:10px;line-height:1.6">💡 {_e["fix"]}</div>
+                            </div>
+                            ''', unsafe_allow_html=True)
+
+                # ════ STATISTIQUES ════════════════════════════════════════
+                with _aa2:
+                    _stat1, _stat2 = st.columns(2)
+
+                    # Courbe equity
+                    with _stat1:
+                        qtitle("📈 Courbe d'Équité")
+                        _eq = _analysis["equity"].reset_index(drop=True)
+                        _eq_fig = go.Figure()
+                        _eq_fig.add_trace(go.Scatter(
+                            y=_eq.values, mode="lines",
+                            line=dict(color=C["green"] if float(_eq.iloc[-1])>0 else C["red"], width=2),
+                            fill="tozeroy",
+                            fillcolor=f"rgba(0,255,157,.06)" if float(_eq.iloc[-1])>0 else "rgba(255,45,85,.06)",
+                            name="P&L Cumulé"
+                        ))
+                        _eq_fig.add_hline(y=0, line_color=C["muted"], line_dash="dash", line_width=1)
+                        _eq_fig.update_layout(**PLOT, height=240, showlegend=False,
+                            title=dict(text="P&L Cumulatif",
+                                       font=dict(family="Bebas Neue",size=13,color=C["accent"])))
+                        _eq_fig.update_yaxes(tickprefix="$", gridcolor=C["border"], showgrid=True, zeroline=False)
+                        _eq_fig.update_xaxes(gridcolor=C["border"], title_text="N° de trade")
+                        _eq_fig.update_layout(margin=dict(l=50,r=20,t=40,b=30))
+                        st.plotly_chart(_eq_fig, use_container_width=True)
+
+                    # Distribution profits
+                    with _stat2:
+                        qtitle("📊 Distribution des Profits")
+                        _pr = _analysis["profits"]
+                        _dist_fig = go.Figure()
+                        _dist_fig.add_trace(go.Histogram(
+                            x=_pr.values, nbinsx=20,
+                            marker=dict(
+                                color=[C["green"] if v>0 else C["red"] for v in _pr.values],
+                                opacity=0.8, line=dict(width=0)
+                            ),
+                            name="Distribution"
+                        ))
+                        _dist_fig.add_vline(x=0, line_color=C["accent"], line_dash="dash", line_width=1.5)
+                        _dist_fig.update_layout(**PLOT, height=240, showlegend=False,
+                            title=dict(text="Histogramme des P&L",
+                                       font=dict(family="Bebas Neue",size=13,color=C["accent"])))
+                        _dist_fig.update_yaxes(gridcolor=C["border"], showgrid=True, zeroline=False)
+                        _dist_fig.update_xaxes(tickprefix="$", gridcolor=C["border"])
+                        _dist_fig.update_layout(margin=dict(l=50,r=20,t=40,b=30))
+                        st.plotly_chart(_dist_fig, use_container_width=True)
+
+                    # Stats détaillées
+                    qtitle("📋 Statistiques Complètes")
+                    _sc1, _sc2, _sc3 = st.columns(3)
+                    _stat_groups = [
+                        [("Trades totaux", str(_analysis["n"]), C["accent"]),
+                         ("Trades gagnants", f"{_analysis['wins']} ({_analysis['win_rate']:.1f}%)", C["green"]),
+                         ("Trades perdants", f"{_analysis['losses']}", C["red"]),
+                         ("P&L Total", f"{_analysis['total_profit']:+.2f}$", C["green"] if _analysis["total_profit"]>=0 else C["red"])],
+                        [("Gain moyen", f"+{_analysis['avg_win']:.2f}$", C["green"]),
+                         ("Perte moyenne", f"{_analysis['avg_loss']:.2f}$", C["red"]),
+                         ("Meilleur trade", f"+{_analysis['max_win']:.2f}$", C["green"]),
+                         ("Pire trade", f"{_analysis['max_loss']:.2f}$", C["red"])],
+                        [("Profit Factor", f"{_analysis['profit_factor']:.2f}", C["green"] if _analysis["profit_factor"]>=1.5 else C["red"]),
+                         ("Max Drawdown", f"{_analysis['max_dd_pct']:.1f}%", C["green"] if _analysis["max_dd_pct"]>-15 else C["red"]),
+                         ("Pertes consécutives", str(_analysis["max_loss_streak"]), C["yellow"]),
+                         ("R/R Réel", f"{abs(_analysis['avg_win']/_analysis['avg_loss']):.2f}:1" if _analysis["avg_loss"]!=0 else "—", C["accent"])],
+                    ]
+                    for _col, _grp in zip([_sc1,_sc2,_sc3], _stat_groups):
+                        with _col:
+                            for _lbl3, _val3, _col3 in _grp:
+                                st.markdown(f'''
+                                <div style="display:flex;justify-content:space-between;
+                                    padding:7px 10px;border-bottom:1px solid {C["border"]};
+                                    background:{C["card"]};margin-bottom:2px;border-radius:3px">
+                                  <span style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]}">{_lbl3}</span>
+                                  <span style="font-family:Bebas Neue,sans-serif;font-size:15px;color:{_col3};letter-spacing:1px">{_val3}</span>
+                                </div>
+                                ''', unsafe_allow_html=True)
+
+                    # Stats par symbole
+                    if _analysis["sym_stats"]:
+                        st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+                        qtitle("🎯 Performance par Actif")
+                        _sym_fig = go.Figure()
+                        _syms_sorted = sorted(_analysis["sym_stats"].items(),
+                                              key=lambda x: x[1]["profit"], reverse=True)
+                        _sym_names = [s[0] for s in _syms_sorted]
+                        _sym_profits = [s[1]["profit"] for s in _syms_sorted]
+                        _sym_colors = [C["green"] if p>=0 else C["red"] for p in _sym_profits]
+                        _sym_fig.add_trace(go.Bar(
+                            x=_sym_names, y=_sym_profits,
+                            marker=dict(color=_sym_colors, opacity=0.85, line=dict(width=0)),
+                            text=[f"{p:+.2f}$" for p in _sym_profits],
+                            textposition="outside",
+                            textfont=dict(family="JetBrains Mono",size=10,color=C["bright"])
+                        ))
+                        _sym_fig.add_hline(y=0, line_color=C["muted"], line_dash="dash", line_width=1)
+                        _sym_fig.update_layout(**PLOT, height=280, showlegend=False,
+                            title=dict(text="P&L par Symbole",
+                                       font=dict(family="Bebas Neue",size=13,color=C["accent"])))
+                        _sym_fig.update_yaxes(tickprefix="$", gridcolor=C["border"],
+                                              showgrid=True, zeroline=False)
+                        _sym_fig.update_xaxes(gridcolor=C["border"])
+                        _sym_fig.update_layout(margin=dict(l=50,r=20,t=40,b=30))
+                        st.plotly_chart(_sym_fig, use_container_width=True)
+
+                # ════ STRATÉGIES IA ════════════════════════════════════════
+                with _aa3:
+                    st.markdown(f'''
+                    <div style="background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.15);
+                        border-radius:8px;padding:14px 18px;margin-bottom:16px;margin-top:8px">
+                      <span style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["accent"]};
+                        letter-spacing:1px">⬡ STRATÉGIES GÉNÉRÉES PAR L'IA EN FONCTION DE VOS DONNÉES PERSONNELLES</span>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                    for _si, _strat in enumerate(_analysis["strategies"]):
+                        _strat_cols = [C["accent"], C["green"], C["yellow"], C["purple"], C["orange"]]
+                        _sc_strat = _strat_cols[_si % len(_strat_cols)]
+                        st.markdown(f'''
+                        <div style="background:linear-gradient(135deg,{C["card"]},{C["card2"]});
+                            border:1px solid {C["border2"]};border-left:4px solid {_sc_strat};
+                            border-radius:8px;padding:18px 20px;margin-bottom:10px;
+                            position:relative;overflow:hidden">
+                          <div style="position:absolute;top:0;left:0;right:0;height:1px;
+                            background:linear-gradient(90deg,{_sc_strat}44,transparent)"></div>
+                          <div style="display:flex;align-items:flex-start;gap:14px">
+                            <div style="font-size:28px;flex-shrink:0;margin-top:2px">{_strat["icon"]}</div>
+                            <div>
+                              <div style="font-family:Space Grotesk,sans-serif;font-size:14px;
+                                font-weight:700;color:{_sc_strat};margin-bottom:6px">
+                                {_strat["title"]}
+                              </div>
+                              <div style="font-family:Space Grotesk,sans-serif;font-size:12px;
+                                color:{C["text"]};line-height:1.8">{_strat["desc"]}</div>
+                            </div>
+                          </div>
+                        </div>
+                        ''', unsafe_allow_html=True)
+
+                # ════ VS PROFESSIONNELS ════════════════════════════════════
+                with _aa4:
+                    st.markdown(f'''
+                    <div style="background:rgba(155,114,255,.04);border:1px solid rgba(155,114,255,.2);
+                        border-radius:8px;padding:14px 18px;margin-bottom:16px;margin-top:8px">
+                      <span style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["purple"]};
+                        letter-spacing:1px">📊 COMPARAISON AUX STANDARDS DES TRADERS PROFESSIONNELS</span>
+                    </div>
+                    ''', unsafe_allow_html=True)
+
+                    for _lbl4, _val4, _target4, _ok4 in _analysis["benchmarks"]:
+                        _bench_col = C["green"] if _ok4 else C["red"]
+                        _bench_icon = "✅" if _ok4 else "❌"
+                        st.markdown(f'''
+                        <div style="background:{C["card"]};border:1px solid {C["border2"]};
+                            border-radius:8px;padding:16px 18px;margin-bottom:8px;
+                            display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                          <div style="font-size:22px">{_bench_icon}</div>
+                          <div style="flex:1;min-width:140px">
+                            <div style="font-family:Space Grotesk,sans-serif;font-size:13px;
+                              font-weight:600;color:{C["bright"]}">{_lbl4}</div>
+                            <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                              color:{C["muted"]};margin-top:3px">Standard pro : {_target4}</div>
+                          </div>
+                          <div style="text-align:right">
+                            <div style="font-family:Bebas Neue,sans-serif;font-size:24px;
+                              color:{_bench_col};letter-spacing:2px">{_val4}</div>
+                            <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                              color:{_bench_col};margin-top:2px">
+                              {"✓ Dans les standards" if _ok4 else "✗ En dessous des standards"}
+                            </div>
+                          </div>
+                          <!-- Barre de progression -->
+                        </div>
+                        ''', unsafe_allow_html=True)
+
+                    # Tableau de bord pro
+                    st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+                    qtitle("🏆 Niveaux de Trading")
+                    _levels = [
+                        ("🔴 Débutant",       "Score < 30", "Win Rate < 35% · PF < 1.0 · DD > -30%"),
+                        ("🟠 Intermédiaire",  "Score 30–50","Win Rate 35-45% · PF 1.0-1.3 · DD -15-30%"),
+                        ("🟡 Avancé",         "Score 50–70","Win Rate 45-55% · PF 1.3-1.8 · DD -10-15%"),
+                        ("🟢 Professionnel",  "Score 70–85","Win Rate 50-60% · PF 1.8-2.5 · DD < -10%"),
+                        ("👑 Expert",         "Score > 85", "Win Rate > 60% · PF > 2.5 · DD < -5%"),
+                    ]
+                    for _lv_icon, _lv_score, _lv_desc in _levels:
+                        _is_current = (
+                            (_score < 30 and "Débutant" in _lv_icon) or
+                            (30 <= _score < 50 and "Intermédiaire" in _lv_icon) or
+                            (50 <= _score < 70 and "Avancé" in _lv_icon) or
+                            (70 <= _score < 85 and "Professionnel" in _lv_icon) or
+                            (_score >= 85 and "Expert" in _lv_icon)
+                        )
+                        _lv_bg = f"background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.3);" if _is_current else f"background:{C['card']};border:1px solid {C['border']};"
+                        st.markdown(f'''
+                        <div style="{_lv_bg}border-radius:6px;padding:12px 16px;margin-bottom:6px;
+                            display:flex;align-items:center;gap:14px">
+                          <div style="font-size:20px">{_lv_icon.split()[0]}</div>
+                          <div style="flex:1">
+                            <span style="font-family:Space Grotesk,sans-serif;font-size:13px;
+                              font-weight:600;color:{C["bright"] if _is_current else C["text"]}">
+                              {_lv_icon.split(" ",1)[1]}
+                            </span>
+                            <span style="font-family:JetBrains Mono,monospace;font-size:9px;
+                              color:{C["muted"]};margin-left:10px">{_lv_score}</span>
+                          </div>
+                          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+                            color:{C["muted"]};text-align:right">{_lv_desc}</div>
+                          {f'<span style="background:rgba(0,212,255,.2);border:1px solid rgba(0,212,255,.4);color:{C["accent"]};font-family:JetBrains Mono,monospace;font-size:8px;padding:2px 10px;border-radius:10px;white-space:nowrap">VOTRE NIVEAU</span>' if _is_current else ""}
+                        </div>
+                        ''', unsafe_allow_html=True)
+
+    else:
+        # État vide — instructions
+        st.markdown(f'''
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:8px">
+          {''.join(f'''<div style="background:{C["card"]};border:1px solid {C["border2"]};border-top:3px solid {c};border-radius:8px;padding:18px;text-align:center">
+            <div style="font-size:32px;margin-bottom:8px">{icon}</div>
+            <div style="font-family:Space Grotesk,sans-serif;font-size:12px;font-weight:600;color:{C["bright"]};margin-bottom:5px">{title}</div>
+            <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};line-height:1.7">{desc}</div>
+          </div>''' for icon,title,desc,c in [
+            ("📂","Importez votre historique","Glissez votre fichier CSV ou Excel depuis MT4/MT5/Binance",C["accent"]),
+            ("🔍","L'IA analyse vos trades","Détection automatique des erreurs et patterns perdants",C["red"]),
+            ("📊","Statistiques complètes","Win Rate, Profit Factor, Drawdown, R/R réel calculés",C["yellow"]),
+            ("🎯","Stratégies personnalisées","Conseils basés sur VOS données réelles, pas génériques",C["green"]),
+          ])}
+        </div>
+        ''', unsafe_allow_html=True)
