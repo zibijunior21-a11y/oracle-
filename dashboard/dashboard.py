@@ -69,517 +69,678 @@ st.set_page_config(page_title="⬡ Quantum Trade Oracle", page_icon="⬡",
 st.markdown("""
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
-   QUANTUM TRADE ORACLE v5 — NEURAL TERMINAL INTERFACE
-   Aesthetic : Deep-Space Holographic · Cyberpunk Bloomberg · Neural Grid
+   QUANTUM TRADE ORACLE v5 — ULTRA PREMIUM TERMINAL
+   Design: Luxury Dark Finance · Holographic Depth · Magnetic Minimalism
+   Fonts: Orbitron (display) · Outfit (body) · JetBrains Mono (data)
 ═══════════════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,700;1,300&family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Outfit:wght@200;300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,300&family=Syne:wght@700;800&display=swap');
 
-/* ── CSS Variables ─────────────────────────────────────────────────────── */
+/* ── Design Tokens ───────────────────────────────────────────────────────── */
 :root {
-  --bg:       #00050d;
-  --bg2:      #010a15;
-  --surface:  #020e1c;
-  --card:     #051525;
-  --card2:    #071830;
-  --border:   #0a2240;
-  --border2:  #0d2d55;
-  --accent:   #00d4ff;
-  --accent2:  #00ffe5;
-  --green:    #00ff9d;
-  --red:      #ff2d55;
-  --yellow:   #ffd60a;
-  --orange:   #ff6b35;
-  --purple:   #9b72ff;
-  --muted:    #0e3060;
-  --text:     #6fa8c8;
-  --bright:   #c8e8ff;
-  --white:    #eaf4ff;
-  --glow-a:   rgba(0,212,255,.18);
-  --glow-g:   rgba(0,255,157,.14);
-  --glow-r:   rgba(255,45,85,.14);
-  --grid-color: rgba(0,180,255,.04);
+  --bg:        #030912;
+  --bg2:       #040d18;
+  --surface:   #06111f;
+  --card:      #071526;
+  --card2:     #091a2e;
+  --card3:     #0b2040;
+  --border:    #0d2540;
+  --border2:   #123060;
+  --accent:    #00c8f0;
+  --accent2:   #00e8d8;
+  --accent3:   #40d8ff;
+  --green:     #00f59d;
+  --red:       #ff3060;
+  --yellow:    #f0c800;
+  --orange:    #ff7040;
+  --purple:    #9060ff;
+  --pink:      #ff40b0;
+  --muted:     #0e2a50;
+  --muted2:    #1a3a65;
+  --text:      #4a8ab0;
+  --text2:     #6aabcc;
+  --bright:    #b8e0f8;
+  --bright2:   #d8f0ff;
+  --white:     #eef8ff;
+  --gold:      #d4a830;
+  --gold2:     #f0c850;
+
+  /* Glows */
+  --glow-a:    0 0 30px rgba(0,200,240,.2), 0 0 60px rgba(0,200,240,.08);
+  --glow-g:    0 0 30px rgba(0,245,157,.18), 0 0 60px rgba(0,245,157,.06);
+  --glow-r:    0 0 30px rgba(255,48,96,.18), 0 0 60px rgba(255,48,96,.06);
+
+  /* Glass */
+  --glass:     rgba(6,17,31,.7);
+  --glass2:    rgba(9,22,40,.85);
+  --backdrop:  blur(16px) saturate(180%);
+
+  /* Grid */
+  --grid:      rgba(0,180,255,.025);
 }
 
-/* ── Reset & Base ────────────────────────────────────────────────────────── */
-* { box-sizing: border-box; }
-#MainMenu, footer, header { visibility: hidden; }
-.block-container { padding-top: .7rem !important; max-width: 1720px !important; }
+/* ── Reset & Base ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+#MainMenu, footer, header { visibility: hidden !important; }
+html { scroll-behavior: smooth; }
 
-/* ── Animated Background Grid ───────────────────────────────────────────── */
+.block-container {
+  padding-top: 0.6rem !important;
+  padding-left: 1.2rem !important;
+  padding-right: 1.2rem !important;
+  max-width: 1820px !important;
+}
+
+/* ── Premium Animated Background ──────────────────────────────────────── */
 .stApp {
   background-color: var(--bg) !important;
   background-image:
-    linear-gradient(var(--grid-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,100,200,.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(0,60,120,.06) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,30,60,.1) 0%, transparent 70%);
-  background-size: 60px 60px, 60px 60px, 100% 100%, 100% 100%, 100% 100%;
+    /* Fine grid */
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    /* Larger grid */
+    linear-gradient(rgba(0,180,255,.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,180,255,.012) 1px, transparent 1px),
+    /* Atmospheric depth */
+    radial-gradient(ellipse 90% 70% at 15% 0%, rgba(0,90,180,.09) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 85% 100%, rgba(0,50,120,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 80% at 50% 50%, rgba(0,20,50,.12) 0%, transparent 65%),
+    /* Corner accents */
+    radial-gradient(ellipse 30% 30% at 100% 0%, rgba(0,200,255,.04) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 0% 100%, rgba(0,120,255,.03) 0%, transparent 60%);
+  background-size:
+    40px 40px, 40px 40px,
+    200px 200px, 200px 200px,
+    100% 100%, 100% 100%, 100% 100%,
+    100% 100%, 100% 100%;
   background-attachment: fixed;
 }
 
-/* Scanline overlay */
+/* Scanline + Noise overlay */
 .stApp::before {
   content: '';
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,.03) 2px,
-    rgba(0,0,0,.03) 4px
-  );
+  position: fixed; inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,.04) 3px, rgba(0,0,0,.04) 4px
+    );
   pointer-events: none;
   z-index: 9999;
+  animation: scanlines 8s linear infinite;
+}
+@keyframes scanlines {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 200px; }
 }
 
-/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+/* ── Sidebar — Luxury Dark Panel ──────────────────────────────────────── */
 section[data-testid="stSidebar"] {
-  background:
-    linear-gradient(180deg, #010d1e 0%, #000a15 100%) !important;
-  border-right: 1px solid var(--border2) !important;
-  box-shadow: 4px 0 40px rgba(0,212,255,.05) !important;
+  background: linear-gradient(170deg,
+    #030c18 0%, #040f1f 40%, #030b16 100%
+  ) !important;
+  border-right: 1px solid rgba(0,200,240,.12) !important;
+  box-shadow:
+    4px 0 40px rgba(0,0,0,.5),
+    1px 0 0 rgba(0,200,240,.06) !important;
+  backdrop-filter: blur(20px) !important;
 }
+
+/* Glowing right border */
 section[data-testid="stSidebar"]::after {
   content: '';
-  position: absolute;
-  top: 0; right: 0;
+  position: absolute; top: 0; right: 0;
   width: 1px; height: 100%;
   background: linear-gradient(180deg,
     transparent 0%,
-    rgba(0,212,255,.4) 30%,
-    rgba(0,255,229,.4) 70%,
+    rgba(0,200,240,.5) 20%,
+    rgba(0,232,216,.4) 50%,
+    rgba(0,200,240,.5) 80%,
     transparent 100%
   );
+  animation: sidebar-glow 4s ease-in-out infinite;
+}
+@keyframes sidebar-glow {
+  0%, 100% { opacity: .6; }
+  50% { opacity: 1; }
 }
 
-/* ── Typography global ───────────────────────────────────────────────────── */
-* { font-family: 'Space Grotesk', sans-serif !important; }
-code, pre, .mono { font-family: 'JetBrains Mono', monospace !important; }
+/* ── Typography ────────────────────────────────────────────────────────── */
+body, * {
+  font-family: 'Outfit', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, kbd, .mono,
+[data-testid="stCode"],
+[class*="mono"] {
+  font-family: 'JetBrains Mono', monospace !important;
+}
 
-/* ── Scrollbar ───────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--bg2); }
+/* ── Premium Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track {
+  background: var(--bg2);
+  border-radius: 2px;
+}
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--accent), var(--accent2));
   border-radius: 2px;
+  box-shadow: 0 0 6px rgba(0,200,240,.4);
 }
 
-/* ── HR / Dividers ───────────────────────────────────────────────────────── */
+/* ── HR — Glowing Divider ─────────────────────────────────────────────── */
 hr {
   border: none !important;
   height: 1px !important;
   background: linear-gradient(90deg,
-    transparent, var(--border2), rgba(0,212,255,.3), var(--border2), transparent
+    transparent 0%,
+    rgba(0,200,240,.08) 10%,
+    rgba(0,200,240,.25) 40%,
+    rgba(0,232,216,.3) 50%,
+    rgba(0,200,240,.25) 60%,
+    rgba(0,200,240,.08) 90%,
+    transparent 100%
   ) !important;
-  margin: 10px 0 !important;
+  margin: 12px 0 !important;
+  box-shadow: 0 0 8px rgba(0,200,240,.1) !important;
 }
 
-/* ── Inputs ──────────────────────────────────────────────────────────────── */
+/* ── Premium Inputs ────────────────────────────────────────────────────── */
 .stTextInput input,
-.stSelectbox select,
 .stNumberInput input,
 .stTextArea textarea {
-  background: var(--surface) !important;
+  background: var(--glass) !important;
+  backdrop-filter: var(--backdrop) !important;
   border: 1px solid var(--border2) !important;
-  border-radius: 4px !important;
+  border-radius: 6px !important;
   color: var(--bright) !important;
   font-family: 'JetBrains Mono', monospace !important;
-  font-size: 11px !important;
-  transition: border-color .2s, box-shadow .2s !important;
+  font-size: 12px !important;
+  padding: 10px 14px !important;
+  transition: all .25s cubic-bezier(.4,0,.2,1) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.02) !important;
 }
 .stTextInput input:focus,
 .stTextArea textarea:focus {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 2px rgba(0,212,255,.12), 0 0 20px rgba(0,212,255,.08) !important;
+  box-shadow:
+    0 0 0 2px rgba(0,200,240,.12),
+    0 0 20px rgba(0,200,240,.1),
+    inset 0 1px 0 rgba(255,255,255,.03) !important;
   outline: none !important;
-}
-.stSelectbox [data-baseweb="select"] > div {
-  background: var(--surface) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 4px !important;
+  background: rgba(0,200,240,.04) !important;
 }
 
-/* ── Buttons — Holographic Style ────────────────────────────────────────── */
+.stSelectbox [data-baseweb="select"] > div {
+  background: var(--glass) !important;
+  border: 1px solid var(--border2) !important;
+  border-radius: 6px !important;
+  transition: all .2s !important;
+}
+.stSelectbox [data-baseweb="select"] > div:hover {
+  border-color: var(--accent) !important;
+}
+
+/* ── BUTTONS — Magnetic Holographic ──────────────────────────────────── */
 .stButton > button {
   position: relative !important;
   background: linear-gradient(135deg,
-    rgba(0,212,255,.08) 0%,
-    rgba(0,255,229,.05) 50%,
-    rgba(0,150,200,.04) 100%
+    rgba(0,200,240,.06) 0%,
+    rgba(0,232,216,.04) 50%,
+    rgba(0,160,200,.03) 100%
   ) !important;
-  border: 1px solid rgba(0,212,255,.35) !important;
-  border-radius: 3px !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(0,200,240,.28) !important;
+  border-radius: 5px !important;
   color: var(--accent) !important;
-  font-family: 'Rajdhani', sans-serif !important;
+  font-family: 'Outfit', sans-serif !important;
   font-size: 11px !important;
-  font-weight: 700 !important;
-  letter-spacing: 2.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 2px !important;
   text-transform: uppercase !important;
-  padding: 8px 16px !important;
-  transition: all .25s cubic-bezier(.4,0,.2,1) !important;
+  padding: 9px 18px !important;
+  transition: all .3s cubic-bezier(.4,0,.2,1) !important;
   overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.04) !important;
 }
+
+/* Shimmer sweep */
 .stButton > button::before {
   content: '' !important;
   position: absolute !important;
-  top: 0; left: -100% !important;
-  width: 100%; height: 100% !important;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(0,212,255,.12),
-    transparent
+  top: -50%; left: -100% !important;
+  width: 60%; height: 200% !important;
+  background: linear-gradient(105deg,
+    transparent 30%,
+    rgba(0,200,240,.08) 50%,
+    transparent 70%
   ) !important;
-  transition: left .5s !important;
-}
-.stButton > button:hover {
-  background: rgba(0,212,255,.15) !important;
-  border-color: var(--accent) !important;
-  box-shadow:
-    0 0 20px rgba(0,212,255,.25),
-    0 0 40px rgba(0,212,255,.1),
-    inset 0 0 20px rgba(0,212,255,.05) !important;
-  transform: translateY(-1px) !important;
-  color: var(--white) !important;
-}
-.stButton > button:hover::before {
-  left: 100% !important;
-}
-.stButton > button:active {
-  transform: translateY(0) scale(.98) !important;
-  box-shadow: 0 0 10px rgba(0,212,255,.2) !important;
+  transition: left .6s ease !important;
 }
 
-/* ── Tabs — Neural Style ─────────────────────────────────────────────────── */
+/* Top border glow */
+.stButton > button::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 0; left: 10%; right: 10% !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, rgba(0,200,240,.6), transparent) !important;
+}
+
+.stButton > button:hover {
+  background: linear-gradient(135deg,
+    rgba(0,200,240,.14) 0%,
+    rgba(0,232,216,.1) 50%,
+    rgba(0,160,200,.08) 100%
+  ) !important;
+  border-color: rgba(0,200,240,.6) !important;
+  box-shadow:
+    0 0 20px rgba(0,200,240,.2),
+    0 0 40px rgba(0,200,240,.08),
+    0 4px 20px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+  transform: translateY(-2px) !important;
+  color: var(--bright2) !important;
+  letter-spacing: 2.5px !important;
+}
+.stButton > button:hover::before { left: 140% !important; }
+.stButton > button:active {
+  transform: translateY(0) scale(.97) !important;
+  box-shadow: 0 0 12px rgba(0,200,240,.15) !important;
+}
+
+/* ── TABS — Premium Navigation Bar ───────────────────────────────────── */
 .stTabs [data-baseweb="tab-list"] {
-  background: var(--surface) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 5px !important;
-  padding: 3px !important;
+  background: linear-gradient(135deg, var(--card), var(--card2)) !important;
+  border: 1px solid rgba(0,200,240,.12) !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
   gap: 2px !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,.3) !important;
+  box-shadow:
+    0 4px 24px rgba(0,0,0,.4),
+    0 1px 0 rgba(255,255,255,.02),
+    inset 0 1px 0 rgba(255,255,255,.03) !important;
 }
 .stTabs [data-baseweb="tab"] {
   background: transparent !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 9.5px !important;
-  font-weight: 400 !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
   text-transform: uppercase !important;
-  letter-spacing: 1.8px !important;
-  color: var(--muted) !important;
-  border-radius: 3px !important;
-  padding: 7px 14px !important;
-  transition: all .2s !important;
+  letter-spacing: 1.5px !important;
+  color: var(--muted2) !important;
+  border-radius: 6px !important;
+  padding: 8px 14px !important;
+  transition: all .25s cubic-bezier(.4,0,.2,1) !important;
+  white-space: nowrap !important;
 }
 .stTabs [data-baseweb="tab"]:hover {
-  background: rgba(0,212,255,.06) !important;
-  color: var(--text) !important;
+  background: rgba(0,200,240,.06) !important;
+  color: var(--text2) !important;
 }
 .stTabs [aria-selected="true"] {
   background: linear-gradient(135deg,
-    rgba(0,212,255,.14),
-    rgba(0,255,229,.08)
+    rgba(0,200,240,.16),
+    rgba(0,232,216,.1)
   ) !important;
   color: var(--accent) !important;
-  border: 1px solid rgba(0,212,255,.3) !important;
-  box-shadow: 0 0 15px rgba(0,212,255,.15),
-              inset 0 0 10px rgba(0,212,255,.05) !important;
+  border: 1px solid rgba(0,200,240,.3) !important;
+  box-shadow:
+    0 0 16px rgba(0,200,240,.15),
+    inset 0 1px 0 rgba(0,200,240,.2),
+    inset 0 0 12px rgba(0,200,240,.04) !important;
+  text-shadow: 0 0 12px rgba(0,200,240,.5) !important;
 }
 
-/* ── Metric Cards — Glowing ─────────────────────────────────────────────── */
+/* ── METRIC CARDS — Premium KPI Tiles ────────────────────────────────── */
 [data-testid="metric-container"] {
-  background: linear-gradient(135deg, var(--card), var(--card2)) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 6px !important;
-  padding: 14px 18px !important;
+  background: linear-gradient(145deg,
+    var(--card) 0%,
+    var(--card2) 60%,
+    rgba(0,200,240,.02) 100%
+  ) !important;
+  border: 1px solid rgba(0,200,240,.1) !important;
+  border-radius: 8px !important;
+  padding: 16px 18px !important;
   position: relative !important;
   overflow: hidden !important;
-  transition: border-color .3s, box-shadow .3s !important;
+  transition: all .35s cubic-bezier(.4,0,.2,1) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.025) !important;
+  animation: fade-up .4s ease both !important;
 }
+/* Animated top bar */
 [data-testid="metric-container"]::before {
   content: '' !important;
   position: absolute !important;
-  top: 0; left: 0; right: 0 !important;
-  height: 1px !important;
+  top: 0; left: 0; right: 0; height: 2px !important;
   background: linear-gradient(90deg,
     transparent,
-    rgba(0,212,255,.5),
+    rgba(0,200,240,.6) 30%,
+    rgba(0,232,216,.8) 50%,
+    rgba(0,200,240,.6) 70%,
     transparent
+  ) !important;
+  animation: shimmer-bar 3s ease-in-out infinite !important;
+}
+/* Corner accent */
+[data-testid="metric-container"]::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0; right: 0;
+  width: 40px; height: 40px;
+  background: radial-gradient(circle at 100% 100%,
+    rgba(0,200,240,.06), transparent 70%
   ) !important;
 }
 [data-testid="metric-container"]:hover {
-  border-color: rgba(0,212,255,.4) !important;
-  box-shadow: 0 0 25px rgba(0,212,255,.1) !important;
+  border-color: rgba(0,200,240,.3) !important;
+  box-shadow:
+    0 0 24px rgba(0,200,240,.1),
+    0 4px 20px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.04) !important;
+  transform: translateY(-2px) !important;
 }
+
 [data-testid="metric-container"] label {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 8px !important;
-  color: var(--muted) !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 9px !important;
+  color: var(--muted2) !important;
   text-transform: uppercase !important;
-  letter-spacing: 2px !important;
+  letter-spacing: 2.5px !important;
+  font-weight: 500 !important;
 }
 [data-testid="stMetricValue"] {
-  font-family: 'Bebas Neue', sans-serif !important;
-  font-size: 2rem !important;
-  font-weight: 400 !important;
-  letter-spacing: 2px !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 1.8rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
   color: var(--accent) !important;
-  text-shadow: 0 0 20px rgba(0,212,255,.4) !important;
+  text-shadow: 0 0 20px rgba(0,200,240,.4), 0 0 40px rgba(0,200,240,.15) !important;
 }
 [data-testid="stMetricDelta"] {
   font-family: 'JetBrains Mono', monospace !important;
   font-size: 10px !important;
 }
 
-/* ── Progress Bars ───────────────────────────────────────────────────────── */
+/* ── PROGRESS BARS — Glowing ─────────────────────────────────────────── */
 .stProgress > div > div {
-  background: rgba(0,212,255,.08) !important;
-  border-radius: 3px !important;
+  background: rgba(0,200,240,.06) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(0,200,240,.1) !important;
 }
 .stProgress > div > div > div {
-  background: linear-gradient(90deg, var(--accent), var(--accent2)) !important;
-  border-radius: 3px !important;
-  box-shadow: 0 0 10px rgba(0,212,255,.4) !important;
-}
-
-/* ── Dataframe ───────────────────────────────────────────────────────────── */
-.stDataFrame {
-  border: 1px solid var(--border2) !important;
-  border-radius: 6px !important;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3)) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 10px rgba(0,200,240,.5), 0 0 20px rgba(0,200,240,.2) !important;
+  position: relative !important;
   overflow: hidden !important;
 }
+
+/* ── DATAFRAME — Elegant Table ────────────────────────────────────────── */
+.stDataFrame {
+  border: 1px solid rgba(0,200,240,.12) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3) !important;
+}
 [data-testid="stDataFrame"] table {
-  background: var(--surface) !important;
+  background: var(--card) !important;
   font-family: 'JetBrains Mono', monospace !important;
   font-size: 11px !important;
 }
 [data-testid="stDataFrame"] th {
-  background: var(--card) !important;
+  background: linear-gradient(135deg, var(--card2), var(--card3)) !important;
   color: var(--accent) !important;
   font-size: 9px !important;
-  letter-spacing: 1.5px !important;
+  letter-spacing: 2px !important;
   text-transform: uppercase !important;
-  border-color: var(--border2) !important;
-  padding: 8px 12px !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 600 !important;
+  border-color: rgba(0,200,240,.12) !important;
+  padding: 10px 14px !important;
 }
 [data-testid="stDataFrame"] td {
-  color: var(--text) !important;
-  border-color: var(--border) !important;
-  padding: 6px 12px !important;
+  color: var(--text2) !important;
+  border-color: rgba(0,200,240,.06) !important;
+  padding: 7px 14px !important;
+  transition: all .15s !important;
 }
 [data-testid="stDataFrame"] tr:hover td {
-  background: rgba(0,212,255,.04) !important;
+  background: rgba(0,200,240,.04) !important;
   color: var(--bright) !important;
 }
 
-/* ── Spinner ─────────────────────────────────────────────────────────────── */
+/* ── SPINNER ─────────────────────────────────────────────────────────── */
 .stSpinner > div {
   border-color: var(--accent) transparent transparent transparent !important;
+  box-shadow: 0 0 12px rgba(0,200,240,.3) !important;
 }
 
-/* ── Alerts / Info ───────────────────────────────────────────────────────── */
+/* ── ALERTS ──────────────────────────────────────────────────────────── */
 .stAlert {
-  background: var(--card) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 6px !important;
-  color: var(--text) !important;
+  background: linear-gradient(135deg, var(--card), var(--card2)) !important;
+  border: 1px solid rgba(0,200,240,.15) !important;
+  border-radius: 8px !important;
+  color: var(--text2) !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,.2) !important;
 }
 
-/* ── Expander ────────────────────────────────────────────────────────────── */
+/* ── EXPANDER ────────────────────────────────────────────────────────── */
 details {
-  background: var(--surface) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 5px !important;
+  background: linear-gradient(135deg, var(--surface), var(--card)) !important;
+  border: 1px solid rgba(0,200,240,.1) !important;
+  border-radius: 8px !important;
+  transition: border-color .2s !important;
 }
+details:hover { border-color: rgba(0,200,240,.2) !important; }
 details summary {
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: 'Outfit', sans-serif !important;
   font-size: 10px !important;
-  color: var(--text) !important;
-  letter-spacing: 1px !important;
+  color: var(--text2) !important;
+  letter-spacing: 1.5px !important;
   text-transform: uppercase !important;
-  padding: 10px 14px !important;
+  font-weight: 600 !important;
+  padding: 12px 16px !important;
   cursor: pointer !important;
 }
 
-/* ── Custom Components ───────────────────────────────────────────────────── */
+/* ── CHECKBOXES & TOGGLES ────────────────────────────────────────────── */
+.stCheckbox label {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 10px !important;
+  color: var(--text2) !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* ── NUMBER INPUT ────────────────────────────────────────────────────── */
+.stNumberInput button {
+  background: var(--card2) !important;
+  border-color: var(--border2) !important;
+  color: var(--accent) !important;
+  transition: all .2s !important;
+}
+.stNumberInput button:hover {
+  background: rgba(0,200,240,.1) !important;
+  box-shadow: 0 0 10px rgba(0,200,240,.2) !important;
+}
+
+/* ── MULTISELECT ─────────────────────────────────────────────────────── */
+.stMultiSelect [data-baseweb="tag"] {
+  background: rgba(0,200,240,.12) !important;
+  color: var(--accent) !important;
+  border: 1px solid rgba(0,200,240,.3) !important;
+  border-radius: 4px !important;
+}
+
+/* ── SIDEBAR LABELS ──────────────────────────────────────────────────── */
+.slbl {
+  font-family: 'Outfit', sans-serif;
+  font-size: 8.5px;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  display: block;
+  margin: 16px 0 6px;
+  font-weight: 500;
+}
+
+/* ── CUSTOM COMPONENTS ───────────────────────────────────────────────── */
 
 /* Legend box */
 .legend-box {
-  background: linear-gradient(135deg, var(--card), var(--card2));
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  padding: 16px 18px;
+  background: linear-gradient(145deg, var(--card), var(--card2));
+  border: 1px solid rgba(0,200,240,.12);
+  border-radius: 10px;
+  padding: 18px 20px;
   margin-top: 10px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.2);
+}
+.legend-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,200,240,.4), transparent);
 }
 .legend-box::after {
   content: '';
   position: absolute;
-  bottom: 0; left: 0;
-  width: 40%; height: 1px;
-  background: linear-gradient(90deg, var(--accent), transparent);
+  bottom: 0; right: 0;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle at 100% 100%, rgba(0,200,240,.05), transparent 70%);
 }
 
 /* Explain box */
 .explain-box {
-  background: linear-gradient(135deg, var(--surface), var(--card));
-  border: 1px solid var(--border2);
+  background: linear-gradient(145deg, var(--surface), var(--card));
+  border: 1px solid rgba(0,200,240,.12);
   border-left: 3px solid var(--accent);
-  border-radius: 5px;
-  padding: 14px 18px;
+  border-radius: 6px;
+  padding: 16px 20px;
   margin: 10px 0;
-  box-shadow: -4px 0 20px rgba(0,212,255,.08);
+  box-shadow: -4px 0 20px rgba(0,200,240,.06), 0 2px 12px rgba(0,0,0,.2);
+  position: relative;
+}
+.explain-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent2));
+  border-radius: 3px 0 0 3px;
 }
 
 /* Chat messages */
 .msg-user {
-  background: linear-gradient(135deg,
-    rgba(0,212,255,.07), rgba(0,212,255,.03));
-  border: 1px solid rgba(0,212,255,.2);
-  border-radius: 8px 8px 0 8px;
-  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(0,200,240,.08), rgba(0,200,240,.04));
+  border: 1px solid rgba(0,200,240,.2);
+  border-radius: 10px 10px 0 10px;
+  padding: 13px 18px;
   margin: 8px 0;
   font-size: 13px;
   color: var(--bright);
   text-align: right;
-  box-shadow: 0 2px 15px rgba(0,212,255,.06);
+  box-shadow: 0 2px 15px rgba(0,200,240,.06);
 }
 .msg-ai {
-  background: linear-gradient(135deg,
-    rgba(0,255,157,.03), rgba(0,255,229,.02));
-  border: 1px solid rgba(0,255,157,.15);
-  border-radius: 8px 8px 8px 0;
-  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(0,245,157,.04), rgba(0,232,216,.02));
+  border: 1px solid rgba(0,245,157,.15);
+  border-radius: 10px 10px 10px 0;
+  padding: 15px 20px;
   margin: 4px 0 12px;
   font-size: 13px;
-  color: #a0f0d8;
+  color: #90e8cc;
   line-height: 1.9;
-  box-shadow: 0 2px 15px rgba(0,255,157,.04);
+  box-shadow: 0 2px 15px rgba(0,245,157,.04);
 }
 .lbl-user {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--accent);
-  text-align: right;
-  margin-bottom: 3px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  font-size: 8px; color: var(--accent);
+  text-align: right; margin-bottom: 3px;
+  letter-spacing: 2px; text-transform: uppercase;
 }
 .lbl-ai {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--green);
+  font-size: 8px; color: var(--green);
   margin-bottom: 3px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
-/* Sidebar labels */
-.slbl {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8.5px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  display: block;
-  margin: 14px 0 5px;
+  letter-spacing: 2px; text-transform: uppercase;
 }
 
 /* Score badge */
 .score-badge {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 4px 14px;
   border-radius: 20px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Outfit', sans-serif;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
   margin: 2px;
   border: 1px solid currentColor;
 }
 
-/* Checkbox */
-.stCheckbox label {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 10px !important;
-  color: var(--text) !important;
-  letter-spacing: 0.5px !important;
-}
-.stCheckbox [data-baseweb="checkbox"] [data-checked="true"] {
-  background: var(--accent) !important;
-  border-color: var(--accent) !important;
-}
-
-/* Number Input */
-.stNumberInput button {
-  background: var(--card) !important;
-  border-color: var(--border2) !important;
-  color: var(--accent) !important;
-}
-
-/* Multiselect */
-.stMultiSelect [data-baseweb="tag"] {
-  background: rgba(0,212,255,.15) !important;
-  color: var(--accent) !important;
-  border: 1px solid rgba(0,212,255,.3) !important;
-}
-
-/* ── Glow Animation for key elements ────────────────────────────────────── */
-@keyframes pulse-border {
-  0%, 100% { box-shadow: 0 0 10px rgba(0,212,255,.1); }
-  50%       { box-shadow: 0 0 25px rgba(0,212,255,.25), 0 0 50px rgba(0,212,255,.08); }
-}
-@keyframes scan-line {
-  0%   { background-position: 0 0; }
-  100% { background-position: 0 100%; }
-}
-@keyframes flicker {
-  0%,100% { opacity: 1; }
-  92%     { opacity: 1; }
-  93%     { opacity: .85; }
-  94%     { opacity: 1; }
-  96%     { opacity: .9; }
-  97%     { opacity: 1; }
-}
-@keyframes slide-in-left {
-  from { opacity:0; transform: translateX(-12px); }
-  to   { opacity:1; transform: translateX(0); }
+/* ── PREMIUM ANIMATIONS ──────────────────────────────────────────────── */
+@keyframes shimmer-bar {
+  0%, 100% { opacity: .6; transform: scaleX(.6) translateX(-30%); }
+  50%       { opacity: 1; transform: scaleX(1) translateX(0); }
 }
 @keyframes fade-up {
-  from { opacity:0; transform: translateY(8px); }
+  from { opacity:0; transform: translateY(10px); }
   to   { opacity:1; transform: translateY(0); }
 }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slide-left {
+  from { opacity:0; transform: translateX(-14px); }
+  to   { opacity:1; transform: translateX(0); }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(0,200,240,.15); }
+  50%       { box-shadow: 0 0 25px rgba(0,200,240,.3), 0 0 50px rgba(0,200,240,.1); }
+}
+@keyframes border-flow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+@keyframes number-count {
+  from { opacity: 0; transform: translateY(6px) scale(.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
 
-/* Apply animations */
-[data-testid="metric-container"] { animation: fade-up .4s ease both; }
+/* Apply entrance animations */
+[data-testid="metric-container"] { animation: fade-up .45s ease both; }
 .stTabs [data-baseweb="tab-list"] { animation: fade-up .3s ease both; }
-.block-container > div > div { animation: fade-up .35s ease both; }
+.block-container > div > div { animation: fade-in .35s ease both; }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   📱 MOBILE RESPONSIVE — Quantum Trade Oracle
-   Breakpoints : 768px (tablette) · 480px (mobile)
-══════════════════════════════════════════════════════════════════════════ */
+/* Stagger metric cards */
+[data-testid="column"]:nth-child(1) [data-testid="metric-container"] { animation-delay: .05s; }
+[data-testid="column"]:nth-child(2) [data-testid="metric-container"] { animation-delay: .10s; }
+[data-testid="column"]:nth-child(3) [data-testid="metric-container"] { animation-delay: .15s; }
+[data-testid="column"]:nth-child(4) [data-testid="metric-container"] { animation-delay: .20s; }
+[data-testid="column"]:nth-child(5) [data-testid="metric-container"] { animation-delay: .25s; }
+[data-testid="column"]:nth-child(6) [data-testid="metric-container"] { animation-delay: .30s; }
 
-/* ── Tablette (≤ 768px) ─────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════
+   📱 MOBILE RESPONSIVE
+══════════════════════════════════════════════════════════════════════ */
 @media screen and (max-width: 768px) {
-
-  /* Container principal */
   .block-container {
     padding: 0.5rem 0.6rem !important;
     max-width: 100% !important;
   }
-
-  /* Sidebar collapse auto */
   section[data-testid="stSidebar"] {
     min-width: 0 !important;
-    width: 85vw !important;
-    max-width: 320px !important;
+    width: 88vw !important;
+    max-width: 340px !important;
   }
-
-  /* Tabs — plus grandes pour les doigts */
   .stTabs [data-baseweb="tab-list"] {
     flex-wrap: wrap !important;
     gap: 3px !important;
@@ -588,170 +749,77 @@ details summary {
   .stTabs [data-baseweb="tab"] {
     font-size: 8px !important;
     padding: 8px 8px !important;
-    letter-spacing: 0.8px !important;
+    letter-spacing: 0.5px !important;
     min-height: 36px !important;
     flex: 1 1 auto !important;
     text-align: center !important;
   }
-
-  /* Métriques — 2 par ligne */
   [data-testid="metric-container"] {
     padding: 10px 12px !important;
-    min-width: 0 !important;
   }
   [data-testid="stMetricValue"] {
-    font-size: 1.5rem !important;
+    font-size: 1.4rem !important;
   }
-  [data-testid="metric-container"] label {
-    font-size: 7px !important;
-  }
-
-  /* Colonnes Streamlit → stack vertical */
   [data-testid="column"] {
     min-width: 100% !important;
     width: 100% !important;
   }
-
-  /* Graphiques pleine largeur */
   .js-plotly-plot, .plotly, .plot-container {
     width: 100% !important;
     overflow-x: auto !important;
   }
-
-  /* Inputs plus grands */
-  .stTextInput input,
-  .stSelectbox select,
-  .stNumberInput input,
-  .stTextArea textarea {
-    font-size: 14px !important;
-    padding: 10px 12px !important;
-    min-height: 44px !important;
+  .stTextInput input, .stNumberInput input {
+    font-size: 16px !important;
+    min-height: 46px !important;
   }
-
-  /* Boutons plus grands (touch-friendly) */
   .stButton > button {
     min-height: 44px !important;
-    font-size: 11px !important;
-    padding: 10px 14px !important;
     width: 100% !important;
   }
-
-  /* Cards news */
-  div[style*="border-radius:6px"] {
-    padding: 12px !important;
-  }
-
-  /* Réduire taille police des titres */
-  .stMarkdown h1 { font-size: 1.4rem !important; }
-  .stMarkdown h2 { font-size: 1.2rem !important; }
-  .stMarkdown h3 { font-size: 1rem !important; }
 }
 
-/* ── Mobile (≤ 480px) ───────────────────────────────────────────────────── */
 @media screen and (max-width: 480px) {
-
-  /* Container ultra compact */
-  .block-container {
-    padding: 0.3rem 0.4rem !important;
-  }
-
-  /* Grille de fond réduite */
+  .block-container { padding: 0.3rem 0.4rem !important; }
   .stApp {
-    background-size: 30px 30px, 30px 30px, 100% 100%, 100% 100%, 100% 100% !important;
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px,
+                     100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
   }
-
-  /* Scanlines désactivées (perf mobile) */
   .stApp::before { display: none !important; }
-
-  /* Header sidebar */
-  section[data-testid="stSidebar"] {
-    width: 90vw !important;
-  }
-
-  /* Tabs encore plus compactes */
+  section[data-testid="stSidebar"] { width: 92vw !important; }
+  section[data-testid="stSidebar"]::after { display: none !important; }
   .stTabs [data-baseweb="tab"] {
     font-size: 7px !important;
     padding: 6px 5px !important;
-    letter-spacing: 0px !important;
+    letter-spacing: 0 !important;
   }
-
-  /* Métriques compactes */
-  [data-testid="stMetricValue"] {
-    font-size: 1.3rem !important;
-  }
-  [data-testid="metric-container"] {
-    padding: 8px 10px !important;
-  }
-
-  /* Signal HOLD/BUY/SELL texte réduit */
-  .stMarkdown [style*="font-size:7rem"],
-  .stMarkdown [style*="font-size:6rem"] {
-    font-size: 3.5rem !important;
-  }
-
-  /* Cards compactes */
+  [data-testid="stMetricValue"] { font-size: 1.2rem !important; }
   .msg-ai, .msg-user {
     font-size: 12px !important;
     padding: 10px 12px !important;
   }
-
-  /* Boutons sidebar pleine largeur */
-  .stButton > button {
-    font-size: 10px !important;
-    letter-spacing: 1px !important;
-    padding: 8px 10px !important;
-  }
-
-  /* Inputs touch-friendly */
-  .stTextInput input,
-  .stNumberInput input {
-    font-size: 16px !important; /* Évite zoom iOS */
-    min-height: 48px !important;
-  }
-
-  /* Selectbox */
   .stSelectbox [data-baseweb="select"] > div {
     min-height: 44px !important;
     font-size: 13px !important;
   }
-
-  /* Graphiques scrollables */
   [data-testid="stPlotlyChart"] {
     overflow-x: scroll !important;
     -webkit-overflow-scrolling: touch !important;
   }
-
-  /* News cards */
-  .stMarkdown a {
-    font-size: 12px !important;
-  }
-
-  /* Cacher les décorations lourdes */
-  section[data-testid="stSidebar"]::after {
-    display: none !important;
-  }
 }
 
-/* ── Touch improvements (tous mobiles) ─────────────────────────────────── */
 @media (hover: none) and (pointer: coarse) {
-
-  /* Supprimer hover effects qui bloquent sur touch */
   .stButton > button:hover {
     transform: none !important;
   }
   [data-testid="metric-container"]:hover {
     box-shadow: none !important;
+    transform: none !important;
   }
-
-  /* Zone de tap minimum 44px (standard Apple/Google) */
   .stButton > button,
   .stTabs [data-baseweb="tab"],
-  .stCheckbox label,
-  .stSelectbox [data-baseweb="select"] {
+  .stCheckbox label {
     min-height: 44px !important;
   }
-
-  /* Scrollbar invisible sur mobile */
   ::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
 }
 
@@ -762,17 +830,25 @@ if AUTH_OK:
     if not auth_gate():
         st.stop()
 
-C = dict(bg="#00050d",surface="#020e1c",card="#051525",card2="#071830",
-         border="#0a2240",border2="#0d2d55",
-         accent="#00d4ff",green="#00ff9d",red="#ff2d55",yellow="#ffd60a",
-         muted="#0e3060",text="#6fa8c8",bright="#c8e8ff",
-         orange="#ff6b35",purple="#9b72ff",accent2="#00ffe5")
+C = dict(
+    bg="#030912",    surface="#06111f", card="#071526",  card2="#091a2e",
+    border="#0d2540",border2="#123060",
+    accent="#00c8f0",accent2="#00e8d8", green="#00f59d", red="#ff3060",
+    yellow="#f0c800",orange="#ff7040",  purple="#9060ff",
+    muted="#0e2a50", muted2="#1a3a65",  text="#4a8ab0",  text2="#6aabcc",
+    bright="#b8e0f8",bright2="#d8f0ff",
+)
 
-PLOT = dict(paper_bgcolor=C["bg"], plot_bgcolor="#010c18",
-            font=dict(family="JetBrains Mono",color="#2a5080",size=9),
-            margin=dict(l=52,r=18,t=50,b=36))
-_AX  = dict(gridcolor="#081e36",showgrid=True,zeroline=False,
-            showspikes=True,spikecolor=C["accent"],spikethickness=1)
+PLOT = dict(
+    paper_bgcolor=C["bg"], plot_bgcolor="#040e1a",
+    font=dict(family="JetBrains Mono", color="#2a5580", size=9),
+    margin=dict(l=52, r=18, t=50, b=36)
+)
+_AX = dict(
+    gridcolor="#0a2040", gridwidth=0.5,
+    showgrid=True, zeroline=False,
+    showspikes=True, spikecolor=C["accent"], spikethickness=1
+)
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  MARCHÉS
@@ -2252,10 +2328,22 @@ Posez votre question en langage naturel, je l'analyse en profondeur."""
 #  SIDEBAR
 # ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.markdown(f'<div style="text-align:center;padding:18px 0 14px">'
-                f'<div style="font-family:Syne,sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:{C["accent"]};text-shadow:0 0 24px rgba(0,200,255,.4)">⬡ QTO</div>'
-                f'<div style="font-family:DM Mono,monospace;font-size:8px;color:{C["muted"]};text-transform:uppercase;letter-spacing:2px;margin-top:4px">Quantum Trade Oracle · v4.0</div>'
-                f'</div><hr>',unsafe_allow_html=True)
+    st.markdown(f'''
+    <div style="text-align:center;padding:22px 0 16px;position:relative">
+      <div style="font-family:Orbitron,sans-serif;font-size:20px;font-weight:900;
+        letter-spacing:4px;color:{C["accent"]};
+        text-shadow:0 0 20px rgba(0,200,240,.5),0 0 40px rgba(0,200,240,.2)">
+        ⬡ QTO
+      </div>
+      <div style="font-family:Outfit,sans-serif;font-size:8px;font-weight:500;
+        color:{C["muted2"]};text-transform:uppercase;letter-spacing:3px;margin-top:5px">
+        Quantum Trade Oracle
+      </div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:7px;
+        color:{C["muted"]};letter-spacing:2px;margin-top:2px">v5.0 · AI TRADING</div>
+      <div style="position:absolute;bottom:0;left:20%;right:20%;height:1px;
+        background:linear-gradient(90deg,transparent,rgba(0,200,240,.3),transparent)"></div>
+    </div><hr>''', unsafe_allow_html=True)
     st.markdown('<span class="slbl">Catégorie</span>',unsafe_allow_html=True)
     market_type=st.selectbox("",list(MARKETS.keys()),label_visibility="collapsed")
     st.markdown('<span class="slbl">Symbole</span>',unsafe_allow_html=True)
@@ -2313,10 +2401,28 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════════════════════════
 _hc1,_hc2,_hc3=st.columns([3,1,1])
 with _hc1:
-    st.markdown(f'<div style="padding:6px 0 14px">'
-                f'<div style="font-family:Syne,sans-serif;font-size:26px;font-weight:900;letter-spacing:3px;color:{C["accent"]};text-shadow:0 0 32px rgba(0,200,255,.3)">⬡ QUANTUM TRADE ORACLE</div>'
-                f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};letter-spacing:2px;margin-top:3px">IA TRADING ALGORITHMIQUE · v4.0 · {get_name(symbol)} ({symbol})</div>'
-                f'</div>',unsafe_allow_html=True)
+    st.markdown(f'''
+    <div style="padding:8px 0 16px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:44px;height:44px;border-radius:10px;flex-shrink:0;
+          background:linear-gradient(135deg,rgba(0,200,240,.15),rgba(0,232,216,.08));
+          border:1px solid rgba(0,200,240,.3);
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 0 20px rgba(0,200,240,.15),inset 0 1px 0 rgba(255,255,255,.06);
+          font-size:20px">⬡</div>
+        <div>
+          <div style="font-family:Orbitron,sans-serif;font-size:20px;font-weight:900;
+            letter-spacing:3px;color:{C["accent"]};line-height:1;
+            text-shadow:0 0 24px rgba(0,200,240,.35),0 0 48px rgba(0,200,240,.12)">
+            QUANTUM TRADE ORACLE
+          </div>
+          <div style="font-family:JetBrains Mono,monospace;font-size:9px;
+            color:{C["muted2"]};letter-spacing:2.5px;margin-top:4px">
+            IA TRADING ALGORITHMIQUE · v5.0 · {get_name(symbol)} ({symbol})
+          </div>
+        </div>
+      </div>
+    </div>''', unsafe_allow_html=True)
 with _hc2:
     _hdf=_fetch_yf(symbol,"1mo","1d")
     if not _hdf.empty and len(_hdf)>=2:
