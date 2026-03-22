@@ -3760,7 +3760,7 @@ with t_chat:
         }}
         target.focus();
         transcriptEl.textContent = "✅ " + text.substring(0, 50) + (text.length > 50 ? "…" : "");
-        transcriptEl.style.color = "{C["green"]}";
+        transcriptEl.style.color = "#00f59d";
       }}
 
       // ── TTS: speak AI response ─────────────────────────────────────────
@@ -3769,16 +3769,15 @@ with t_chat:
         synth.cancel();
         // Strip markdown symbols for cleaner speech
         var clean = text
-          .replace(/[*][*](.+?)[*][*]/g, "$1")
-          .replace(/[*](.+?)[*]/g, "$1")
-          .replace(/#{1,6}[ ]/g, "")
-          .replace(/[|=]{2,}/g, ".")
-          .replace(/```[^`]*```/g, "")
-          .replace(/`([^`]+)`/g, "$1")
-          .replace(/\[([^\]]*)\]/g, "$1")
-          .replace(/https?:[^ ]+/g, "")
-          .replace(/\n/g, " ")
-          .replace(/[ ]{2,}/g, " ")
+          .replace(/[*][*](.+?)[*][*]/g, '$1')
+          .replace(/[*](.+?)[*]/g, '$1')
+          .replace(/#+[ ]/g, '')
+          .replace(/[|=]+/g, '.')
+          .replace(/```[^`]*```/g, '')
+          .replace(/`([^`]+)`/g, '$1')
+          .replace(/https?:[^ ]+/g, '')
+          .replace(/\n/g, ' ')
+          .replace(/  +/g, ' ')
           .trim()
           .substring(0, 600); // Limit length for TTS
 
@@ -3786,7 +3785,7 @@ with t_chat:
 
         btn.classList.add("speaking");
         statusEl.textContent = "🔊 Oracle IA parle…";
-        statusEl.style.color = "{C["yellow"]}";
+        statusEl.style.color = "#f0c800";
 
         var utter = new SpeechSynthesisUtterance(clean);
         utter.lang  = "fr-FR";
@@ -3802,16 +3801,16 @@ with t_chat:
         utter.onend = function() {{
           btn.classList.remove("speaking");
           statusEl.textContent = "✅ Oracle IA a répondu";
-          statusEl.style.color = "{C["green"]}";
+          statusEl.style.color = "#00f59d";
           setTimeout(function() {{
             statusEl.textContent = "🎤 Appuyez pour reparler";
-            statusEl.style.color = "{C["muted2"]}";
+            statusEl.style.color = "#1a3a65";
           }}, 2000);
         }};
         utter.onerror = function() {{
           btn.classList.remove("speaking");
           statusEl.textContent = "🎤 Microphone prêt";
-          statusEl.style.color = "{C["muted2"]}";
+          statusEl.style.color = "#1a3a65";
         }};
         synth.speak(utter);
       }}
@@ -3835,7 +3834,7 @@ with t_chat:
         btn.innerHTML = "⏹";
         btn.title = "Cliquez pour arrêter";
         statusEl.textContent = "🔴 Écoute en cours…";
-        statusEl.style.color = "{C["green"]}";
+        statusEl.style.color = "#00f59d";
         transcriptEl.innerHTML = '<div id="qto-voice-bar"><span></span><span></span><span></span><span></span><span></span></div>';
       }};
 
@@ -3851,7 +3850,7 @@ with t_chat:
         var display = (finalText + interim).trim();
         if (display) {{
           transcriptEl.textContent = "🎤 " + display;
-          transcriptEl.style.color = "{C["accent"]}";
+          transcriptEl.style.color = "#00c8f0";
         }}
       }};
 
@@ -3868,9 +3867,9 @@ with t_chat:
           "aborted":         "⏸ Annulé"
         }};
         statusEl.textContent = msgs[e.error] || ("⚠️ Erreur : " + e.error);
-        statusEl.style.color = "{C["red"]}";
+        statusEl.style.color = "#ff3060";
         transcriptEl.textContent = "Appuyez sur le micro pour parler…";
-        transcriptEl.style.color = "{C["muted2"]}";
+        transcriptEl.style.color = "#1a3a65";
       }};
 
       rec.onend = function() {{
@@ -3881,7 +3880,7 @@ with t_chat:
         var text = finalText.trim();
         if (text.length > 1) {{
           statusEl.textContent = "⬡ Envoi à l'Oracle IA…";
-          statusEl.style.color = "{C["accent"]}";
+          statusEl.style.color = "#00c8f0";
           injectToStreamlit(text);
           // Auto-click the send button after 400ms
           setTimeout(function() {{
@@ -3895,14 +3894,14 @@ with t_chat:
               statusEl.textContent = "⬡ Message envoyé !";
             }} else {{
               statusEl.textContent = "✍️ Texte injecté — cliquez Envoyer";
-              statusEl.style.color = "{C["yellow"]}";
+              statusEl.style.color = "#f0c800";
             }}
           }}, 450);
         }} else {{
           statusEl.textContent = "🎤 Microphone prêt";
-          statusEl.style.color = "{C["muted2"]}";
+          statusEl.style.color = "#1a3a65";
           transcriptEl.textContent = "Appuyez sur le micro pour parler…";
-          transcriptEl.style.color = "{C["muted2"]}";
+          transcriptEl.style.color = "#1a3a65";
         }}
       }};
 
