@@ -732,98 +732,261 @@ details summary {
    📱 MOBILE RESPONSIVE
 ══════════════════════════════════════════════════════════════════════ */
 @media screen and (max-width: 768px) {
+
+  /* === LAYOUT === */
   .block-container {
-    padding: 0.5rem 0.6rem !important;
-    max-width: 100% !important;
+    padding: 0.4rem 0.5rem !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
+
+  /* === FORCE ALL COLUMN GROUPS TO STACK ===
+     Streamlit's [data-testid="stHorizontalBlock"] is the flex parent.
+     We flip it to column so child columns stack vertically.         */
+  [data-testid="stHorizontalBlock"] {
+    flex-direction: column !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+  }
+  [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+    /* Override Streamlit's inline flex-basis */
+  }
+
+  /* === SIDEBAR === */
   section[data-testid="stSidebar"] {
     min-width: 0 !important;
     width: 88vw !important;
-    max-width: 340px !important;
+    max-width: 320px !important;
+    backdrop-filter: none !important;
   }
+  section[data-testid="stSidebar"]::after { display: none !important; }
+
+  /* === TABS — horizontal scroll (no wrap = no 2-line tabs) === */
   .stTabs [data-baseweb="tab-list"] {
-    flex-wrap: wrap !important;
-    gap: 3px !important;
-    padding: 4px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 2px !important;
+    padding: 3px !important;
+    -webkit-mask: linear-gradient(90deg,#000 80%,transparent 100%) !important;
+    mask: linear-gradient(90deg,#000 80%,transparent 100%) !important;
   }
+  .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar { display: none !important; }
   .stTabs [data-baseweb="tab"] {
-    font-size: 8px !important;
-    padding: 8px 8px !important;
+    font-size: 8.5px !important;
+    padding: 7px 10px !important;
     letter-spacing: 0.5px !important;
-    min-height: 36px !important;
-    flex: 1 1 auto !important;
-    text-align: center !important;
+    min-height: 38px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
   }
+
+  /* === METRIC CARDS === */
+  [data-testid="stMetricValue"] { font-size: 1.3rem !important; }
   [data-testid="metric-container"] {
     padding: 10px 12px !important;
+    backdrop-filter: none !important;
+    animation: none !important;
   }
-  [data-testid="stMetricValue"] {
-    font-size: 1.4rem !important;
-  }
-  [data-testid="column"] {
-    min-width: 100% !important;
+  [data-testid="metric-container"]::before { animation: none !important; }
+
+  /* === BUTTONS — full-width, touch-safe === */
+  .stButton > button {
+    min-height: 46px !important;
     width: 100% !important;
+    font-size: 10px !important;
+    letter-spacing: 1.5px !important;
+    backdrop-filter: none !important;
   }
-  .js-plotly-plot, .plotly, .plot-container {
-    width: 100% !important;
-    overflow-x: auto !important;
-  }
-  .stTextInput input, .stNumberInput input {
+
+  /* === INPUTS — 16px prevents iOS auto-zoom === */
+  .stTextInput input,
+  .stNumberInput input,
+  .stTextArea textarea {
     font-size: 16px !important;
     min-height: 46px !important;
+    backdrop-filter: none !important;
   }
-  .stButton > button {
-    min-height: 44px !important;
-    width: 100% !important;
+  .stSelectbox [data-baseweb="select"] > div {
+    min-height: 46px !important;
+    font-size: 14px !important;
+    backdrop-filter: none !important;
   }
-}
 
-@media screen and (max-width: 480px) {
-  .block-container { padding: 0.3rem 0.4rem !important; }
+  /* === CHARTS — scrollable === */
+  [data-testid="stPlotlyChart"],
+  .js-plotly-plot, .plotly, .plot-container {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* === BACKGROUND — disable fixed attachment (jank on iOS) === */
   .stApp {
-    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px,
-                     100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
+    background-attachment: scroll !important;
+    background-size:
+      40px 40px, 40px 40px,
+      200px 200px, 200px 200px,
+      100% 100%, 100% 100%, 100% 100%,
+      100% 100%, 100% 100% !important;
   }
-  .stApp::before { display: none !important; }
-  section[data-testid="stSidebar"] { width: 92vw !important; }
-  section[data-testid="stSidebar"]::after { display: none !important; }
-  .stTabs [data-baseweb="tab"] {
-    font-size: 7px !important;
-    padding: 6px 5px !important;
-    letter-spacing: 0 !important;
+
+  /* === MISC COMPONENTS === */
+  .legend-box, .explain-box {
+    padding: 12px 14px !important;
+    backdrop-filter: none !important;
   }
-  [data-testid="stMetricValue"] { font-size: 1.2rem !important; }
   .msg-ai, .msg-user {
     font-size: 12px !important;
     padding: 10px 12px !important;
+    line-height: 1.6 !important;
   }
-  .stSelectbox [data-baseweb="select"] > div {
-    min-height: 44px !important;
-    font-size: 13px !important;
-  }
-  [data-testid="stPlotlyChart"] {
-    overflow-x: scroll !important;
-    -webkit-overflow-scrolling: touch !important;
+  .stAlert { backdrop-filter: none !important; }
+  details { backdrop-filter: none !important; }
+
+  /* === Remove animation stagger on mobile === */
+  [data-testid="column"]:nth-child(n) [data-testid="metric-container"] {
+    animation-delay: 0s !important;
   }
 }
 
+/* === Ultra-compact (≤ 480px) === */
+@media screen and (max-width: 480px) {
+  .block-container { padding: 0.25rem 0.3rem !important; }
+
+  /* Kill scanlines & grid bg on tiny phones */
+  .stApp::before { display: none !important; }
+  .stApp {
+    background-image:
+      radial-gradient(ellipse 90% 60% at 15% 0%, rgba(0,80,160,.08) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 70% at 50% 50%, rgba(0,15,40,.1) 0%, transparent 65%) !important;
+    background-size: 100% 100%, 100% 100% !important;
+  }
+
+  section[data-testid="stSidebar"] { width: 93vw !important; }
+
+  .stTabs [data-baseweb="tab"] {
+    font-size: 7.5px !important;
+    padding: 6px 8px !important;
+    letter-spacing: 0 !important;
+    min-height: 34px !important;
+  }
+
+  [data-testid="stMetricValue"] {
+    font-size: 1.1rem !important;
+    letter-spacing: 0 !important;
+  }
+  [data-testid="metric-container"] label {
+    font-size: 7px !important;
+    letter-spacing: 1.5px !important;
+  }
+  [data-testid="metric-container"] { padding: 8px 10px !important; }
+
+  /* Metric grid: 2 per row on tiny phones via flex wrapping */
+  [data-testid="stHorizontalBlock"]:has([data-testid="metric-container"]) {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  [data-testid="stHorizontalBlock"]:has([data-testid="metric-container"]) > [data-testid="column"] {
+    flex: 1 1 calc(50% - 4px) !important;
+    min-width: calc(50% - 4px) !important;
+    max-width: calc(50% - 4px) !important;
+  }
+
+  .stButton > button {
+    font-size: 9px !important;
+    letter-spacing: 1px !important;
+    min-height: 44px !important;
+    padding: 8px 10px !important;
+  }
+  .stMarkdown h1 { font-size: 1.2rem !important; }
+  .stMarkdown h2 { font-size: 1rem !important; }
+}
+
+/* === Touch devices: remove hover-sticky effects === */
 @media (hover: none) and (pointer: coarse) {
   .stButton > button:hover {
     transform: none !important;
+    letter-spacing: 2px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3) !important;
   }
   [data-testid="metric-container"]:hover {
-    box-shadow: none !important;
     transform: none !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,.3) !important;
+  }
+  .stButton > button:active {
+    opacity: .82 !important;
+    transform: scale(.97) !important;
+  }
+  .stTabs [data-baseweb="tab"]:active {
+    background: rgba(0,200,240,.1) !important;
   }
   .stButton > button,
   .stTabs [data-baseweb="tab"],
-  .stCheckbox label {
+  .stCheckbox label,
+  .stSelectbox [data-baseweb="select"] > div {
     min-height: 44px !important;
   }
   ::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
 }
 
 </style>""", unsafe_allow_html=True)
+
+
+# ── Mobile Runtime Column Stacking ───────────────────────────────────────────
+# CSS alone can't override Streamlit's inline column widths on mobile.
+# This JS observer patches the inline styles directly on every re-render.
+st.markdown('''
+<script>
+(function(){
+  var BREAK = 768;
+  function patch(){
+    if(window.innerWidth > BREAK) return;
+    // Force all horizontal blocks to column layout
+    var blocks = document.querySelectorAll('[data-testid="stHorizontalBlock"]');
+    blocks.forEach(function(blk){
+      blk.style.setProperty('flex-direction','column','important');
+      blk.style.setProperty('gap','6px','important');
+      // patch each child column
+      var cols = blk.querySelectorAll('[data-testid="column"]');
+      cols.forEach(function(col){
+        col.style.setProperty('width','100%','important');
+        col.style.setProperty('min-width','100%','important');
+        col.style.setProperty('max-width','100%','important');
+        col.style.setProperty('flex','1 1 100%','important');
+      });
+      // Special case: metric row on tiny phones — 2 per row
+      if(window.innerWidth <= 480 && blk.querySelector('[data-testid="metric-container"]')){
+        blk.style.setProperty('flex-direction','row','important');
+        blk.style.setProperty('flex-wrap','wrap','important');
+        cols.forEach(function(col){
+          col.style.setProperty('flex','1 1 calc(50% - 4px)','important');
+          col.style.setProperty('min-width','calc(50% - 4px)','important');
+          col.style.setProperty('max-width','calc(50% - 4px)','important');
+        });
+      }
+    });
+  }
+  // Initial run
+  function init(){
+    patch();
+    // Re-patch on Streamlit re-renders via MutationObserver
+    new MutationObserver(patch).observe(document.body,{childList:true,subtree:true});
+    window.addEventListener('resize', patch);
+  }
+  document.readyState==='loading'
+    ? document.addEventListener('DOMContentLoaded',init)
+    : init();
+})();
+</script>
+''', unsafe_allow_html=True)
 
 # ── GATE D'AUTHENTIFICATION ─────────────────────────────────────────────────
 if AUTH_OK:
@@ -894,7 +1057,8 @@ def get_name(t): return TICKER_NAMES.get(t,t)
 for k,v in dict(signal=None,df_raw=None,df_feat=None,sentiment=None,
                 backtest_result=None,signal_history=[],trained=False,
                 status_msg="",news_data=[],scan_data=None,
-                chat_history=[],selected_symbol="BTC-USD").items():
+                chat_history=[],selected_symbol="BTC-USD",
+                voice_input="",tts_enabled=True,last_ai_msg="").items():
     if k not in st.session_state: st.session_state[k]=v
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -903,14 +1067,14 @@ for k,v in dict(signal=None,df_raw=None,df_feat=None,sentiment=None,
 def qtitle(t,sub=""):
     st.markdown(f'<div style="display:flex;align-items:center;gap:10px;margin:10px 0 14px">'
                 f'<span style="font-family:Syne,sans-serif;font-size:11px;font-weight:800;'
-                f'letter-spacing:2.5px;text-transform:uppercase;color:{C["accent"]}">{t}</span>'
+                f'letter-spacing:2.5px;text-transform:uppercase;font-family:Orbitron,sans-serif;color:{C["accent"]}">{t}</span>'
                 f'<div style="flex:1;height:1px;background:linear-gradient(90deg,{C["border"]},transparent)"></div>'
-                f'{"<span style=\\'font-family:DM Mono,monospace;font-size:9px;color:"+C["muted"]+"\\'>"+sub+"</span>" if sub else ""}'
+                f'{"<span style=\\'font-family:JetBrains Mono,monospace;font-size:9px;color:"+C["muted"]+"\\'>"+sub+"</span>" if sub else ""}'
                 f'</div>',unsafe_allow_html=True)
 
 def pbar(label,pct,color,h=5,tooltip=""):
     st.markdown(f'<div style="margin-bottom:9px" title="{tooltip}">'
-                f'<div style="display:flex;justify-content:space-between;font-family:DM Mono,monospace;'
+                f'<div style="display:flex;justify-content:space-between;font-family:JetBrains Mono,monospace;'
                 f'font-size:10px;color:{color};margin-bottom:4px"><span>{label}</span>'
                 f'<span style="font-weight:700">{pct:.1f}%</span></div>'
                 f'<div style="height:{h}px;background:#0a1729;border-radius:3px;overflow:hidden">'
@@ -921,8 +1085,8 @@ def kv(label,val,col=None,tooltip=""):
     c=col or C["bright"]
     st.markdown(f'<div style="display:flex;justify-content:space-between;align-items:center;'
                 f'padding:7px 0;border-bottom:1px solid {C["border"]}" title="{tooltip}">'
-                f'<span style="font-family:DM Mono,monospace;font-size:10px;color:{C["muted"]}">{label}</span>'
-                f'<span style="font-family:DM Mono,monospace;font-size:12px;font-weight:600;color:{c}">{val}</span>'
+                f'<span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]}">{label}</span>'
+                f'<span style="font-family:JetBrains Mono,monospace;font-size:12px;font-weight:600;color:{c}">{val}</span>'
                 f'</div>',unsafe_allow_html=True)
 
 def explain_box(title, content, color=None):
@@ -951,7 +1115,7 @@ def legend_item(color, label, desc="", shape="dot"):
     return (f'<div style="display:flex;align-items:center;gap:10px;padding:5px 0;'
             f'border-bottom:1px solid {C["border"]}">'
             f'{icon}'
-            f'<div><span style="font-family:DM Mono,monospace;font-size:10px;color:{C["bright"]};font-weight:600">{label}</span>'
+            f'<div><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["bright"]};font-weight:600">{label}</span>'
             f'{"<br><span style=\\'font-family:Manrope,sans-serif;font-size:10px;color:"+C["muted"]+"\\'>"+desc+"</span>" if desc else ""}'
             f'</div></div>')
 
@@ -969,13 +1133,13 @@ def signal_hero(action,symbol,score,price=None,chg=None):
                    "HOLD":"Aucun signal clair — rester en dehors du marché"}.get(action,"")
     st.markdown(f'<div style="background:{bg};border:2px solid {br};border-radius:8px;'
                 f'text-align:center;padding:28px 20px;margin-bottom:22px">'
-                f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};'
+                f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};'
                 f'text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">Signal Principal Oracle IA</div>'
                 f'<div style="font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:{C["accent"]};margin-bottom:12px">{name} · {symbol}</div>'
-                f'<div style="font-family:Syne,sans-serif;font-size:82px;font-weight:900;color:{sc};'
+                f'<div style="font-family:Orbitron,sans-serif;font-size:72px;font-weight:900;color:{sc};'
                 f'letter-spacing:8px;line-height:1;text-shadow:0 0 60px {sc}55">{action}</div>'
                 f'<div style="font-family:Manrope,sans-serif;font-size:12px;color:{sc};opacity:.8;margin-top:10px">{action_desc}</div>'
-                f'<div style="font-family:DM Mono,monospace;font-size:10px;color:{C["muted"]};margin-top:10px">{extra}</div>'
+                f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]};margin-top:10px">{extra}</div>'
                 f'</div>',unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1235,7 +1399,7 @@ def _analyze_fallback(df,symbol,capital):
                            "Optimiste (40%)":{"profit":capital*.40,"total":capital*1.40},
                            "Moon 🚀 (100%)":{"profit":capital,"total":capital*2.00}}}
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=900)
 def _scan_markets(symbols):
     if not YF_OK: return pd.DataFrame()
     rows=[]
@@ -1263,7 +1427,7 @@ def run_analysis(symbol,period,capital,include_news,use_finbert,context=""):
            (70,"🔄 Analyse LSTM séquences temporelles…"),(80,"🧠 Transformer — attention multi-tête…"),
            (88,"📰 Scraping news & analyse sentiment…"),(95,"🔮 Calcul signal & gestion du risque…"),(100,"✅ Analyse terminée !")]
     for pct,msg in steps:
-        msg_ph.markdown(f'<div style="font-family:DM Mono,monospace;font-size:11px;color:{C["accent"]};padding:5px 0">{msg}</div>',unsafe_allow_html=True)
+        msg_ph.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:{C["accent"]};padding:5px 0">{msg}</div>',unsafe_allow_html=True)
         prog.progress(pct); time.sleep(0.22)
     oracle=get_oracle(); signal=None
     if oracle and PROJECT_OK:
@@ -1337,9 +1501,9 @@ def render_rsi_legend(current_rsi):
                 + legend_item(C["accent"],"RSI 30–70 (cyan)","Zone neutre — pas de signal extrême","dot")
                 + legend_item(C["muted"],"Ligne 50 (gris)","Seuil de neutralité — au-dessus = tendance haussière","dash")
                 + f'<div style="margin-top:10px;padding:8px 12px;background:rgba(0,0,0,.2);border-radius:4px">'
-                f'<span style="font-family:DM Mono,monospace;font-size:10px;color:{C["muted"]}">Valeur actuelle : </span>'
+                f'<span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]}">Valeur actuelle : </span>'
                 f'<span style="font-family:Syne,sans-serif;font-size:14px;font-weight:800;color:{color}">{current_rsi:.1f}</span>'
-                f'<span style="font-family:DM Mono,monospace;font-size:10px;color:{color};margin-left:8px">{zone}</span>'
+                f'<span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{color};margin-left:8px">{zone}</span>'
                 f'</div></div>',unsafe_allow_html=True)
 
 def render_macd_legend(current_hist):
@@ -1355,9 +1519,9 @@ def render_macd_legend(current_hist):
                 + legend_item(C["green"],"Histogramme vert","MACD > Signal → Momentum HAUSSIER croissant","dot")
                 + legend_item(C["red"],"Histogramme rouge","MACD < Signal → Momentum BAISSIER croissant","dot")
                 + f'<div style="margin-top:10px;padding:8px 12px;background:rgba(0,0,0,.2);border-radius:4px">'
-                f'<span style="font-family:DM Mono,monospace;font-size:10px;color:{C["muted"]}">Histogramme actuel : </span>'
+                f'<span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]}">Histogramme actuel : </span>'
                 f'<span style="font-family:Syne,sans-serif;font-size:13px;font-weight:800;color:{color}">{current_hist:+.5f}</span>'
-                f'<span style="font-family:DM Mono,monospace;font-size:10px;color:{color};margin-left:8px">{interp}</span>'
+                f'<span style="font-family:JetBrains Mono,monospace;font-size:10px;color:{color};margin-left:8px">{interp}</span>'
                 f'</div></div>',unsafe_allow_html=True)
 
 def render_correlation_legend():
@@ -1595,14 +1759,14 @@ def fig_candlestick(df, symbol, sig=None, show_bb=True, show_ema=True):
         ),
         legend=dict(
             orientation="h", x=0, y=1.008,
-            font=dict(family="DM Mono", size=8, color=C["muted"]),
+            font=dict(family="JetBrains Mono", size=8, color=C["muted"]),
             bgcolor="rgba(2,5,9,.0)", borderwidth=0,
             itemsizing="constant",
         ),
         hovermode="x unified",
         hoverlabel=dict(
             bgcolor=C["card"], bordercolor=C["border"],
-            font=dict(family="DM Mono", size=10, color=C["bright"]),
+            font=dict(family="JetBrains Mono", size=10, color=C["bright"]),
         ),
     )
     # Padding interne — override le margin de PLOT
@@ -1614,7 +1778,7 @@ def fig_candlestick(df, symbol, sig=None, show_bb=True, show_ema=True):
         showgrid=True, zeroline=False,
         showspikes=True, spikecolor=C["accent"],
         spikethickness=1, spikedash="solid",
-        tickfont=dict(family="DM Mono", size=8, color=C["muted"]),
+        tickfont=dict(family="JetBrains Mono", size=8, color=C["muted"]),
         linecolor=C["border"],
     )
     fig.update_xaxes(**axis_style)
@@ -1652,7 +1816,7 @@ def fig_candlestick(df, symbol, sig=None, show_bb=True, show_ema=True):
 
     # Titres des sous-graphiques — style uniforme
     for ann in fig.layout.annotations:
-        ann.update(font=dict(family="DM Mono", size=9, color=C["muted"]),
+        ann.update(font=dict(family="JetBrains Mono", size=9, color=C["muted"]),
                    x=0.005, xanchor="left")
 
     return fig
@@ -1671,11 +1835,11 @@ def fig_models(models,ensemble_action):
     fig.add_trace(go.Bar(x=labels,y=probs,name="Prob Bull",
         marker=dict(color=cols,opacity=.85,line=dict(color=cols,width=1)),
         text=[f"{p:.1f}%\n{a}" for p,a in zip(probs,acts)],textposition="outside",
-        textfont=dict(family="DM Mono",size=10,color=C["bright"])),row=1,col=1)
+        textfont=dict(family="JetBrains Mono",size=10,color=C["bright"])),row=1,col=1)
     fig.add_trace(go.Bar(x=labels,y=confs,name="Confiance",
         marker=dict(color=[C["purple"]]*4,opacity=.75,line=dict(color=C["purple"],width=1)),
         text=[f"{c:.1f}%" for c in confs],textposition="outside",
-        textfont=dict(family="DM Mono",size=10,color=C["bright"])),row=1,col=2)
+        textfont=dict(family="JetBrains Mono",size=10,color=C["bright"])),row=1,col=2)
     for y,color,lbl in [(60,C["green"],"  BUY ≥ 60%"),(40,C["red"],"  SELL ≤ 40%"),(50,C["muted"],"  Neutre 50%")]:
         fig.add_hline(y=y,line_color=color,line_dash="dot",line_width=1.2,
                       annotation_text=lbl,annotation_font_color=color,
@@ -1683,7 +1847,7 @@ def fig_models(models,ensemble_action):
     fig.update_layout(**PLOT,height=330,showlegend=False,
         title=dict(text=f"  🤖 Ensemble des 4 Modèles IA · Consensus : {ensemble_action}",
                    font=dict(family="Syne",size=13,color=C["accent"])))
-    fig.update_xaxes(tickfont=dict(family="DM Mono",size=10),gridcolor=C["border"])
+    fig.update_xaxes(tickfont=dict(family="JetBrains Mono",size=10),gridcolor=C["border"])
     fig.update_yaxes(range=[0,118],gridcolor=C["border"],showgrid=True,zeroline=False)
     return fig
 
@@ -1978,8 +2142,8 @@ def fig_heatmap(symbols):
     corr=pd.DataFrame(dfs).corr()
     fig=go.Figure(go.Heatmap(z=corr.values,x=corr.columns,y=corr.index,
         colorscale=[[0,C["red"]],[.5,"#0d1e2e"],[1,C["green"]]],zmid=0,zmin=-1,zmax=1,
-        text=corr.round(2).values,texttemplate="%{text}",textfont=dict(family="DM Mono",size=11),
-        colorbar=dict(tickfont=dict(family="DM Mono",size=9),
+        text=corr.round(2).values,texttemplate="%{text}",textfont=dict(family="JetBrains Mono",size=11),
+        colorbar=dict(tickfont=dict(family="JetBrains Mono",size=9),
                       title=dict(text="Corr.",font=dict(size=10,color=C["muted"])))))
     fig.update_layout(**PLOT,height=360,
         title=dict(text="  🔗 Matrice de Corrélation (3 mois) — vert=ensemble · rouge=opposés",
@@ -2020,7 +2184,7 @@ def fig_scanner_map(df):
                     colorscale=[[0,"#6b0f1a"],[.35,C["red"]],[.5,"#0d1e2e"],[.65,C["green"]],[1,"#004d2c"]],
                     cmid=0,line=dict(width=2,color=C["bg"])),
         texttemplate="<b>%{label}</b><br>%{customdata[1]:+.2f}%",
-        textfont=dict(family="DM Mono",size=11,color="white")))
+        textfont=dict(family="JetBrains Mono",size=11,color="white")))
     fig.update_layout(**PLOT,height=340,
         title=dict(text="  🌍 Market Map — Variation Journalière · Vert=hausse · Rouge=baisse",
                    font=dict(family="Syne",size=13,color=C["accent"])))
@@ -2030,299 +2194,511 @@ def fig_scanner_map(df):
 #  IA AMÉLIORÉE — Analyse contextuelle profonde
 # ══════════════════════════════════════════════════════════════════════════════
 def ai_deep_analysis(question, sig, capital, symbol):
-    """IA améliorée avec analyse contextuelle multi-dimensionnelle."""
-    q = question.lower()
+    """
+    Oracle IA v5 — Moteur d'analyse contextuelle avancé.
+    Routing intelligent multi-intention + contexte live enrichi.
+    """
+    q   = question.lower().strip()
     name = get_name(symbol)
-    ctx = ""
-    deep_context = {}
+    ctx  = ""
+    dc   = {}  # deep_context shorthand
 
+    # ── Build rich live context ───────────────────────────────────────────────
     if sig:
-        r = sig.get("risk_management", {})
-        price = sig.get("price", 0)
-        bull = sig.get("bullish_probability", .5)
-        rsi = sig.get("rsi", 50)
-        stoch = sig.get("stoch", 50)
-        willr = sig.get("willr", -50)
-        atr_pct = sig.get("atr_pct", 0)
+        r      = sig.get("risk_management", {})
+        price  = sig.get("price", 0)
+        bull   = sig.get("bullish_probability", .5)
+        bear   = sig.get("bearish_probability", .5)
+        rsi    = sig.get("rsi", 50)
+        stoch  = sig.get("stoch", 50)
+        willr  = sig.get("willr", -50)
+        atr_p  = sig.get("atr_pct", 0)
         action = sig.get("action", "HOLD")
-        conf = sig.get("ai_confidence", 0)
-        agr = sig.get("models_agreement", 0)
-        score = sig.get("scores", {}).get("composite", 0)
-        tech = sig.get("technical_signals", {})
-        vol_r = sig.get("vol_ratio", 1)
+        conf   = sig.get("ai_confidence", 0)
+        agr    = sig.get("models_agreement", 0)
+        score  = sig.get("scores", {}).get("composite", 0)
+        tech   = sig.get("technical_signals", {})
+        vol_r  = sig.get("vol_ratio", 1)
+        chg    = sig.get("chg_1d", 0)
+        entry  = r.get("entry_price", price)
+        sl     = r.get("stop_loss", 0)
+        tp     = r.get("take_profit", 0)
+        rr     = r.get("risk_reward_ratio", 0)
+        risk_d  = r.get("capital_at_risk", 0)
+        pos_d   = r.get("position_value", 0)
 
-        # Analyse de la tendance globale
-        trend = "HAUSSIÈRE FORTE" if score > 0.3 else "HAUSSIÈRE MODÉRÉE" if score > 0.1 else \
-                "BAISSIÈRE FORTE" if score < -0.3 else "BAISSIÈRE MODÉRÉE" if score < -0.1 else "NEUTRE"
-        risk_level = r.get("risk_level", "MODÉRÉ")
-        entry = r.get("entry_price", price)
-        sl = r.get("stop_loss", 0)
-        tp = r.get("take_profit", 0)
-        rr = r.get("risk_reward_ratio", 0)
-        pos_val = r.get("position_value", 0)
-        risk_amt = r.get("capital_at_risk", 0)
+        trend = ("HAUSSIÈRE FORTE" if score > 0.35 else
+                 "HAUSSIÈRE MODÉRÉE" if score > 0.12 else
+                 "BAISSIÈRE FORTE" if score < -0.35 else
+                 "BAISSIÈRE MODÉRÉE" if score < -0.12 else "NEUTRE / CONSOLIDATION")
 
-        # Évaluation de la qualité du setup
-        setup_quality = 0
-        setup_notes = []
-        if rr >= 3: setup_quality += 30; setup_notes.append("✅ Excellent R/R ≥ 3:1")
-        elif rr >= 2: setup_quality += 20; setup_notes.append("✅ Bon R/R ≥ 2:1")
-        else: setup_notes.append(f"⚠️ R/R faible ({rr:.2f}:1)")
-        if conf >= 0.75: setup_quality += 25; setup_notes.append("✅ Confiance IA très haute")
-        elif conf >= 0.6: setup_quality += 15; setup_notes.append("✅ Confiance IA correcte")
-        else: setup_notes.append("⚠️ Confiance IA modérée")
-        if agr >= 0.75: setup_quality += 25; setup_notes.append("✅ Accord modèles fort")
-        elif agr >= 0.5: setup_quality += 10; setup_notes.append("✅ Accord modèles partiel")
-        else: setup_notes.append("❌ Désaccord entre modèles")
-        if atr_pct < 2: setup_quality += 10; setup_notes.append("✅ Volatilité faible — risque contrôlé")
-        elif atr_pct > 5: setup_notes.append(f"⚠️ Volatilité élevée ({atr_pct:.1f}%)")
-        if vol_r > 1.5: setup_quality += 10; setup_notes.append("✅ Volume élevé confirme le signal")
+        # Setup quality score
+        sq = 0; sn = []
+        if rr >= 3:    sq += 30; sn.append("✅ Excellent R/R ≥ 3:1")
+        elif rr >= 2:  sq += 20; sn.append("✅ Bon R/R ≥ 2:1")
+        else:          sn.append(f"⚠️ R/R faible ({rr:.2f}:1)")
+        if conf >= .75: sq += 25; sn.append("✅ Confiance IA très haute")
+        elif conf >= .6: sq += 15; sn.append("✅ Confiance IA correcte")
+        else:           sn.append("⚠️ Confiance IA modérée")
+        if agr >= .75:  sq += 25; sn.append("✅ Accord modèles fort (≥75%)")
+        elif agr >= .5: sq += 10; sn.append("⚠️ Accord modèles partiel")
+        else:           sn.append("❌ Désaccord entre modèles")
+        if atr_p < 2:   sq += 10; sn.append("✅ Volatilité faible — risque contrôlé")
+        elif atr_p > 5: sn.append(f"⚠️ Volatilité élevée ({atr_p:.1f}%)")
+        if vol_r > 1.5: sq += 10; sn.append("✅ Volume élevé — signal confirmé")
 
-        ctx = (f"\n\n📊 **DONNÉES LIVE — {name} ({symbol})**\n"
-               f"- 💰 Prix : ${price:,.4f}  ({'+' if sig.get('chg_1d',0)>=0 else ''}{sig.get('chg_1d',0):.2f}% 24h)\n"
-               f"- 🎯 Signal IA : **{action}** · Tendance : {trend}\n"
-               f"- 📈 Bull {bull*100:.1f}% · Bear {(1-bull)*100:.1f}% · Confiance {conf*100:.0f}%\n"
-               f"- 📊 RSI {rsi:.1f} · Stoch {stoch:.0f} · ATR {atr_pct:.2f}%\n"
-               f"- 🛡️ Entry ${entry:,.4f} · SL ${sl:,.4f} · TP ${tp:,.4f} · R/R {rr:.2f}:1\n"
-               f"- ⭐ Qualité du setup : {setup_quality}/100")
-        deep_context = {"action":action,"trend":trend,"bull":bull,"conf":conf,"agr":agr,
-                        "rsi":rsi,"stoch":stoch,"atr_pct":atr_pct,"rr":rr,"entry":entry,
-                        "sl":sl,"tp":tp,"pos_val":pos_val,"risk_amt":risk_amt,"setup_quality":setup_quality,
-                        "setup_notes":setup_notes,"price":price,"tech":tech,"vol_r":vol_r,"score":score}
+        ctx = (
+            f"\n\n---\n**📡 DONNÉES LIVE — {name} ({symbol})**\n"
+            f"• Prix : **${price:,.4f}** ({'+' if chg>=0 else ''}{chg:.2f}% 24h)\n"
+            f"• Signal IA : **{action}** | Tendance : **{trend}**\n"
+            f"• 🟢 Bull {bull*100:.1f}% | 🔴 Bear {bear*100:.1f}% | ⚡ Confiance {conf*100:.0f}% | 🤝 Accord {agr*100:.0f}%\n"
+            f"• RSI {rsi:.1f} | Stoch {stoch:.0f} | Williams %R {willr:.0f} | ATR {atr_p:.2f}% | Vol ×{vol_r:.1f}\n"
+            f"• ➜ Entry ${entry:,.4f} | 🛑 SL ${sl:,.4f} | 🎯 TP ${tp:,.4f} | R/R {rr:.2f}:1\n"
+            f"• Setup Quality : **{sq}/100** | Capital risqué : ${risk_d:,.2f}\n---"
+        )
+        dc = dict(action=action, trend=trend, bull=bull, bear=bear, conf=conf, agr=agr,
+                  rsi=rsi, stoch=stoch, atr_p=atr_p, rr=rr, entry=entry, sl=sl, tp=tp,
+                  pos_d=pos_d, risk_d=risk_d, sq=sq, sn=sn, price=price, tech=tech,
+                  vol_r=vol_r, score=score, chg=chg)
 
-    # ── Routeur de questions ──────────────────────────────────────────────────
-    if any(w in q for w in ["matière","commodit","pétrole","or","blé","café","cuivre","gaz","énergie","silver","argent"]):
-        return f"""**📚 Guide Complet — Matières Premières**{ctx}
+    # ── Intent detection ──────────────────────────────────────────────────────
+    def has(*kws): return any(w in q for w in kws)
 
-**⛽ ÉNERGIE** — Facteurs clés : politique OPEC/OPEC+, guerres, dollar américain, saison hivernale
-- Crude Oil WTI : référence américaine. Sensible aux stocks hebdomadaires EIA (publié chaque mercredi)
-- Brent Crude : référence mondiale. Prime géopolitique incluse
-- Natural Gas : très saisonnier — pic demand en hiver/été. Météo = driver principal
+    # ─── SALUTATIONS / PRÉSENTATIONS ─────────────────────────────────────────
+    if has("bonjour","bonsoir","salut","hello","hi ","hey","qui es-tu","qui êtes","présente",
+           "c'est quoi","qu'est-ce que tu","que fais-tu","comment tu fonctionnes"):
+        return f"""**⬡ Bonjour ! Je suis l'Oracle IA de Quantum Trade Oracle.**{ctx}
 
-**🥇 MÉTAUX PRÉCIEUX** — Valeurs refuges classiques
-- Gold : inversement corrélé au dollar. Monte en période d'incertitude, inflation, baisse des taux Fed
-- Silver : hybride industriel + valeur refuge. Plus volatile que l'or (×2-3)
-- Platinum/Palladium : liés à l'industrie automobile (catalyseurs)
+Je suis un moteur d'analyse trading 100% propriétaire — pas d'OpenAI, pas d'abonnement externe, zéro API payante. Je fonctionne entièrement dans votre code.
 
-**🔩 MÉTAUX INDUSTRIELS** — Baromètres économiques
-- Copper : "Docteur Cuivre" — prédit la croissance mondiale. Demande Chine = facteur n°1
-- Aluminum/Nickel/Zinc : liés à l'industrie, construction, batteries (Nickel pour EV)
+**Ce que je fais :**
+- 📊 J'analyse en temps réel les données de marché de **{name}** et de 60+ autres actifs
+- 🤖 Je combine 4 modèles IA (RandomForest, GradientBoost, LSTM, Transformer) pour générer des signaux BUY/SELL/HOLD
+- 📰 J'analyse le sentiment des actualités financières
+- 🛡️ Je calcule votre gestion du risque avec Stop-Loss et Take-Profit précis
+- 💰 Je projette vos profits potentiels avec simulation Monte Carlo
 
-**🌾 CÉRÉALES** — Facteurs : météo, récoltes, La Niña/El Niño, exportations
-- Wheat/Corn/Soybeans : prix explosent en cas de sécheresse ou conflit (ex: Ukraine 2022)
-- Très saisonniers : récoltes printemps/automne = périodes de volatilité
+**Vous pouvez me parler naturellement**, par écrit ou par vocal. Exemples :
+- *"Faut-il acheter {name} maintenant ?"*
+- *"Explique-moi le RSI"*
+- *"Quel est mon risque sur ce trade ?"*
+- *"Comment diversifier mon portefeuille ?"*
 
-**☕ TROPICAUX** — Liés au climat des pays producteurs
-- Coffee : Brésil (n°1) et Vietnam. Gel ou sécheresse → prix +30-50% rapidement
-- Cocoa : Côte d'Ivoire et Ghana. Très volatil en 2024
+Lancez d'abord une **ANALYSE** dans la sidebar, puis posez-moi vos questions !"""
 
-**Stratégie matières premières :** Suivre les COT Reports (positions des commerciaux), calendrier économique OPEC/USDA, et le Dollar Index (DXY)."""
+    # ─── SIGNAL / ACHAT / ENTRÉE ──────────────────────────────────────────────
+    elif has("acheter","buy","entrer","signal","moment","entrée","trade","investir maintenant",
+             "dois-je","faut-il","est-ce le bon","position","long","short","vendre","sell"):
+        if dc:
+            rec = ("✅ CONDITIONS FAVORABLES" if dc["sq"] >= 65 else
+                   "⚠️ CONDITIONS MITIGÉES" if dc["sq"] >= 35 else
+                   "❌ CONDITIONS DÉFAVORABLES")
+            rsi_interp = ("🟢 Zone de survente → favorable à l'achat" if dc["rsi"]<30 else
+                          "🔴 Zone de surachat → risque de correction" if dc["rsi"]>70 else
+                          f"⚪ Zone neutre ({dc['rsi']:.0f}) → pas de signal extrême")
+            vol_interp = "🔥 Volume élevé → confirmation forte" if dc["vol_r"]>1.5 else "⚠️ Volume faible → signal peu fiable"
+            notes_str = "\n".join(dc["sn"])
+            return f"""**🎯 Analyse d'Entrée — {name} ({symbol})**{ctx}
 
-    elif any(w in q for w in ["comment lire","lire le graphique","bougie","chandelier","indicateur","apprendre","explication","légende"]):
-        return f"""**📖 Guide de Lecture des Graphiques & Indicateurs**{ctx}
+## {rec} · Setup Score: {dc["sq"]}/100
 
-**🕯️ GRAPHIQUE EN BOUGIES JAPONAISES**
-Chaque bougie représente une période (jour, heure…)
-- Corps **vert** : clôture > ouverture → les acheteurs ont gagné cette période
-- Corps **rouge** : clôture < ouverture → les vendeurs ont gagné
-- Mèche haute : prix monté puis rejeté → résistance
-- Mèche basse : prix descendu puis rejeté → support
-
-**📊 RSI (0–100)** — Force du mouvement
-- < 30 → Survente → les vendeurs ont exagéré → rebond probable
-- > 70 → Surachat → les acheteurs ont exagéré → correction probable
-- 30–70 → Zone neutre → suivre la tendance
-
-**📈 MACD** — Momentum directionnel
-- Histogramme **vert** qui grandit → momentum haussier s'accélère
-- Histogramme **rouge** qui grandit → momentum baissier s'accélère
-- Croisement MACD > Signal → signal d'achat
-- Croisement MACD < Signal → signal de vente
-
-**📉 BOLLINGER BANDS** — Canal de volatilité
-- Prix touche la bande **inférieure** → survente, rebond probable
-- Prix touche la bande **supérieure** → surachat, résistance
-- Bandes qui se resserrent → explosion de volatilité imminente
-
-**📏 EMA (Moyennes mobiles)**
-- EMA 9 > EMA 20 > EMA 50 → Tendance haussière parfaite, rester long
-- EMA 9 < EMA 20 < EMA 50 → Tendance baissière, éviter les achats
-
-**Règle d'or :** Ne jamais utiliser UN SEUL indicateur. Confirmez avec au moins 3."""
-
-    elif any(w in q for w in ["acheter","buy","entrer","signal","moment","entrée","trade"]):
-        if deep_context:
-            dc = deep_context
-            rec = "✅ CONDITIONS FAVORABLES" if dc["setup_quality"] >= 60 else "⚠️ CONDITIONS MITIGÉES" if dc["setup_quality"] >= 35 else "❌ CONDITIONS DÉFAVORABLES"
-            notes_str = "\n".join(dc["setup_notes"])
-            return f"""**🎯 Analyse d'Entrée — {name}**{ctx}
-
-**{rec} (Score setup: {dc['setup_quality']}/100)**
 {notes_str}
 
-**📋 PLAN DE TRADE RECOMMANDÉ :**
-- 🎯 Signal : **{dc['action']}**
-- ➜ Entrée : **${dc['entry']:,.4f}**
-- 🛑 Stop-Loss : **${dc['sl']:,.4f}** → Perte max : -${dc['risk_amt']:,.2f} (2% du capital)
-- 🎯 Take-Profit : **${dc['tp']:,.4f}** → Gain potentiel : +${dc['pos_val']*(dc['rr']*.02):,.2f}
-- 📏 Risk/Reward : **{dc['rr']:.2f}:1** {'✅ Excellent' if dc['rr']>=3 else '✅ Acceptable' if dc['rr']>=2 else '⚠️ Faible'}
+---
+### 📋 PLAN DE TRADE IA
+| Paramètre | Valeur |
+|-----------|--------|
+| 🎯 Signal | **{dc["action"]}** |
+| ➜ Prix d'entrée | **${dc["entry"]:,.4f}** |
+| 🛑 Stop-Loss | **${dc["sl"]:,.4f}** → Perte max ${dc["risk_d"]:,.2f} |
+| 🎯 Take-Profit | **${dc["tp"]:,.4f}** → Gain potentiel ×{dc["rr"]:.1f} |
+| 📏 Risk/Reward | **{dc["rr"]:.2f}:1** {"✅ Excellent" if dc["rr"]>=3 else "✅ Acceptable" if dc["rr"]>=2 else "⚠️ Faible"} |
 
-**🧠 ANALYSE DES CONDITIONS :**
-- Tendance : {dc['trend']}
-- RSI à {dc['rsi']:.1f} : {'🟢 Survente → favorable achat' if dc['rsi']<30 else '🔴 Surachat → défavorable' if dc['rsi']>70 else '⚪ Neutre'}
-- Volume : {'🔥 Élevé → confirmation forte' if dc['vol_r']>1.5 else '⚠️ Faible → signal peu fiable'}
-- Accord IA : {dc['agr']*100:.0f}% {'✅' if dc['agr']>=.75 else '⚠️'}
+---
+### 🧠 CONDITIONS DE MARCHÉ
+- Tendance : **{dc["trend"]}**
+- RSI {dc["rsi"]:.0f} → {rsi_interp}
+- Volume → {vol_interp}
+- Accord IA : {dc["agr"]*100:.0f}% {"✅" if dc["agr"]>=.75 else "⚠️ Insuffisant"}
+- Confiance : {dc["conf"]*100:.0f}% {"✅" if dc["conf"]>=.65 else "⚠️"}
 
-**⚠️ Checklist avant d'entrer :**
-{'✅' if dc['rr']>=2 else '❌'} R/R ≥ 2:1
-{'✅' if dc['conf']>=.6 else '⚠️'} Confiance IA ≥ 60%
-{'✅' if dc['agr']>=.75 else '⚠️'} Accord modèles ≥ 75%
-✅ Stop-Loss placé AVANT l'entrée
-✅ Ne risquer que 2% du capital"""
-        return f"Lance d'abord une analyse sur {name} pour obtenir un plan de trade précis."
+### ✅ Checklist avant d'entrer
+{"✅" if dc["rr"]>=2 else "❌"} R/R ≥ 2:1
+{"✅" if dc["conf"]>=.6 else "⚠️"} Confiance IA ≥ 60%
+{"✅" if dc["agr"]>=.75 else "⚠️"} Accord modèles ≥ 75%
+{"✅" if dc["action"]!="HOLD" else "⚠️"} Signal directionnel clair ({dc["action"]})
+✅ Toujours placer le Stop-Loss **AVANT** d'entrer
+✅ Risquer **maximum 2%** du capital par trade
 
-    elif any(w in q for w in ["risque","stop","perdre","protéger","capital","perte","gestion"]):
+> ⚠️ *Ce signal est éducatif. Validez avec votre propre analyse avant de trader.*"""
+        return f"**Lancez d'abord une analyse sur {name}** via la barre latérale pour obtenir un plan de trade précis. Je n'ai pas encore de données live pour cet actif."
+
+    # ─── GESTION DU RISQUE ───────────────────────────────────────────────────
+    elif has("risque","stop","perdre","protéger","capital","perte","gestion","risk","drawdown",
+             "position size","taille","combien risquer"):
+        pos_ex = capital * 0.02
         return f"""**🛡️ Guide Complet — Gestion du Risque**{ctx}
 
-**RÈGLE D'OR : Ne jamais risquer plus de 2% par trade**
-Avec ${capital:,.0f} de capital → Maximum ${capital*.02:,.0f} de perte par trade
+## Règle Fondamentale : 2% Maximum par Trade
+Avec votre capital de **${capital:,.0f}** → Risque max par trade : **${pos_ex:,.0f}**
 
-**📐 CALCUL DE LA TAILLE DE POSITION**
+---
+### 📐 Calcul de la Taille de Position
 ```
-Taille = (Capital × 2%) ÷ (Prix d'entrée - Stop Loss)
+Position = (Capital × 2%) ÷ (Prix entrée − Stop Loss)
+Exemple : ${capital:,.0f} × 2% = ${pos_ex:,.0f} à risquer
+Si SL = $50 sous l'entrée → Taille = {pos_ex:.0f} ÷ 50 = {pos_ex/50:.1f} unités
 ```
-Exemple : Capital $10,000 → Risque max $200
-Si Stop Loss = $50 sous l'entrée → Position = $200 ÷ $50 = 4 unités
 
-**📊 NIVEAUX DU TRADE :**
-- **Entry** : Prix auquel vous achetez/vendez
-- **Stop-Loss** : Niveau où vous ACCEPTEZ la perte (discipline absolue)
-- **Take-Profit** : Niveau de prise de bénéfices
+### 🎯 Règle du Risk/Reward (R/R)
+| R/R | Interprétation | Win Rate minimum rentable |
+|-----|---------------|--------------------------|
+| 3:1 | 🟢 Excellent | 25% suffit |
+| 2:1 | ✅ Acceptable | 34% suffit |
+| 1.5:1 | ⚠️ Limite | 40% requis |
+| 1:1 | ❌ À éviter | 51% requis |
 
-**🎯 RÈGLE DU RISK/REWARD**
-- R/R ≥ 3:1 → Excellent (risque $100 pour gagner $300)
-- R/R ≥ 2:1 → Acceptable minimum
-- R/R < 1.5:1 → À éviter
+### 📊 Les 3 Niveaux du Trade
+- **Entry** : Prix d'ouverture de la position — placer un ordre limite
+- **Stop-Loss** : Niveau de perte maximale — **NE JAMAIS DÉPLACER à la baisse**
+- **Take-Profit** : Objectif de sortie bénéficiaire — respect strict
 
-**📈 PSYCHOLOGIE DU RISQUE**
-- Avec R/R 2:1 et Win Rate 40% → vous êtes PROFITABLE
-- Avec R/R 3:1 et Win Rate 33% → vous êtes PROFITABLE
-- Ne jamais déplacer son stop-loss pour "attendre que ça remonte"
+### 🔴 Erreurs Fatales
+1. **Pas de Stop-Loss** → Un seul trade peut ruiner le compte
+2. **Trop grosse position** → Émotions incontrôlables → Mauvaises décisions
+3. **Moyenner à la baisse** → Transformer une petite perte en catastrophe
+4. **FOMO** → Entrer après une forte hausse → toujours acheter les tops
+5. **Revenge trading** → Doubler après une perte → spirale destructrice
 
-**🔴 ERREURS FATALES À ÉVITER**
-1. Pas de stop-loss → Une seule trade peut ruiner le compte
-2. Position trop grande → Émotion → Mauvaises décisions
-3. Moyenne à la baisse → Transformer une petite perte en catastrophe
-4. FOMO (Fear Of Missing Out) → Entrer trop tard, acheter les tops"""
+### 💡 Stratégie de Capital
+- Jamais > 10% du capital en position ouverte simultanément
+- Après 3 pertes consécutives → PAUSE trading (journée ou semaine)
+- Tenue d'un journal de trading obligatoire pour progresser"""
 
-    elif any(w in q for w in ["corrélation","matrice","diversif","portefeuille","portfolio"]):
-        return f"""**🔗 Guide — Matrice de Corrélation & Diversification**{ctx}
+    # ─── INDICATEURS TECHNIQUES ─────────────────────────────────────────────
+    elif has("rsi","macd","bollinger","stoch","ema","sma","atr","williams","indicateur",
+             "technique","analyser","interpréter","lire","chandelier","bougie"):
+        rsi_v = dc.get("rsi", 50) if dc else 50
+        macd_t = dc.get("tech", {}).get("MACD", "Non calculé")
+        return f"""**📊 Guide Indicateurs Techniques**{ctx}
 
-**Qu'est-ce que la corrélation ?**
-Elle mesure si deux actifs bougent dans le même sens (+1) ou des sens opposés (-1).
+### RSI — Relative Strength Index (0–100)
+Mesure la vitesse et l'intensité des mouvements de prix sur 14 périodes.
+- **< 30** → 🟢 Survente : les vendeurs sont épuisés, rebond probable
+- **> 70** → 🔴 Surachat : les acheteurs sont épuisés, correction probable
+- **Divergence RSI/Prix** = signal de retournement fort
+*Valeur actuelle : **{rsi_v:.1f}** → {"🟢 Survente — opportunité" if rsi_v<30 else "🔴 Surachat — prudence" if rsi_v>70 else f"⚪ Neutre ({rsi_v:.0f})"} *
 
-**Comment lire la matrice :**
-- **+0.8 à +1.0 (rouge foncé)** : Très corrélés → vous n'êtes PAS diversifié
-- **+0.3 à +0.7** : Corrélation modérée → diversification partielle
-- **-0.3 à +0.3** : Faiblement corrélés → bonne diversification
-- **-0.8 à -1.0** : Inversement corrélés → couverture naturelle (hedge)
+### MACD — Convergence/Divergence des Moyennes Mobiles
+Différence EMA12 - EMA26. Ligne signal = EMA9 du MACD.
+- **Histogramme vert croissant** → Momentum haussier s'accélère ✅
+- **Histogramme rouge croissant** → Momentum baissier s'accélère ⚠️
+- **Croisement MACD > Signal** → Signal d'achat (Golden Cross MACD)
+- **Croisement MACD < Signal** → Signal de vente (Death Cross MACD)
+*Actuel : {macd_t}*
 
-**Exemples de corrélations typiques :**
-- BTC ↔ ETH : ~0.90 → très corrélés → inutile de tenir les deux
-- Gold ↔ USD : ~-0.70 → inversement corrélés → Gold monte quand dollar baisse
-- SPY ↔ QQQ : ~0.95 → très corrélés
-- Gold ↔ S&P500 : ~0.10 → faiblement corrélés → bon hedge
+### Bollinger Bands — Canal de Volatilité
+Bandes à ±2σ autour de la SMA20 — s'élargissent avec la volatilité.
+- **Prix sous bande inférieure** → Survente extrême → rebond imminent
+- **Prix sur bande supérieure** → Résistance forte → possible retournement
+- **Squeeze (bandes serrées)** → Explosion de volatilité imminente
 
-**Stratégie de diversification optimale :**
-Visez des corrélations < 0.5 entre vos actifs.
-Ex: BTC + Gold + Bonds + Commodités = portefeuille diversifié"""
+### EMA — Exponential Moving Average
+Plus réactive que la SMA car pondère les données récentes davantage.
+- **EMA9 > EMA20 > EMA50** → 🟢 Tendance haussière parfaite — rester long
+- **EMA9 < EMA20 < EMA50** → 🔴 Tendance baissière — éviter les achats
+- **Golden Cross** : EMA9 croise EMA20 vers le haut = entrée long
 
-    elif any(w in q for w in ["monte carlo","simulation","probabilité","scénario"]):
-        return f"""**🎲 Guide — Simulation Monte Carlo**{ctx}
+### Stochastique & Williams %R
+Oscillateurs qui comparent le prix actuel au range récent.
+- Stochastique < 20 → Survente | > 80 → Surachat
+- Williams %R < -80 → Survente | > -20 → Surachat
 
-**Qu'est-ce que Monte Carlo ?**
-On simule 300 trajectoires possibles de votre capital en partant de vos paramètres actuels (volatilité, tendance historique) sur 252 jours de trading (= 1 an).
+### ⭐ Règle des 3 Confirmations
+Ne jamais trader sur UN seul indicateur. Attendez la confluence de **minimum 3 signaux** dans la même direction."""
 
-**Comment lire les lignes :**
-- **Ligne CYAN (médiane)** : Résultat le plus probable — 50% des scénarios finissent au-dessus
-- **Ligne VERTE (75e percentile)** : Scénario optimiste modéré
-- **Ligne JAUNE (25e percentile)** : Scénario pessimiste modéré
-- **Zone verte transparente** : Fourchette des 90% de scénarios probables
+    # ─── MATIÈRES PREMIÈRES ──────────────────────────────────────────────────
+    elif has("matière","commodit","pétrole","or","blé","café","cuivre","gaz","énergie",
+             "silver","argent","cocoa","cacao","coton","sucre","maïs"):
+        return f"""**🌍 Guide Complet — Matières Premières**{ctx}
 
-**La probabilité de gain P(gain) :**
-C'est le % de simulations où vous finissez avec plus que votre capital initial.
-- P(gain) > 65% → Stratégie favorable statistiquement
-- P(gain) < 40% → Stratégie défavorable — revoir la gestion du risque
+### ⛽ ÉNERGIE — Les Drivers Clés
+**Pétrole WTI & Brent** : Sensible aux décisions OPEC+, stocks EIA (chaque mercredi), géopolitique Moyen-Orient, force du dollar.
+**Natural Gas** : Très saisonnier — pic en hiver (chauffage) et été (climatisation). Les prévisions météo = driver n°1.
 
-**Limites de Monte Carlo :**
-Les simulations se basent sur la volatilité passée. Elles ne prédisent pas les crises (COVID, FTX, 2008) qui peuvent invalider les modèles."""
+### 🥇 MÉTAUX PRÉCIEUX — Valeurs Refuge
+**Or** : Inversement corrélé au dollar et aux taux réels. Monte en période d'incertitude, inflation, baisse de taux Fed.
+**Argent** : Hybride refuge + industriel. 2-3× plus volatile que l'or. Suit l'or mais amplifie.
+**Platine/Palladium** : Liés aux catalyseurs automobiles. Très sensibles à la demande auto et aux mines d'Afrique du Sud.
 
-    elif any(w in q for w in ["million","profit","riche","gagner","combien","argent","investir"]):
+### 🔩 MÉTAUX INDUSTRIELS — Baromètres Économiques
+**Cuivre** : "Docteur Cuivre" — prédit la croissance mondiale. Chine = premier consommateur (55% de la demande).
+**Nickel** : Lié aux batteries EV — forte volatilité depuis 2022. Indonésie = premier producteur.
+**Aluminium** : Très énergivore à produire. Prix électricité Europe = driver important.
+
+### 🌾 CÉRÉALES — Facteurs Météo & Géopolitiques
+**Blé, Maïs, Soja** : Prix explosent en cas de sécheresse, inondations, El Niño, ou conflits (Ukraine = grenier du monde).
+Calendrier clé : rapports USDA (mensuels) — souvent très volatils à leur publication.
+
+### ☕ TROPICAUX — Liés aux Pays Producteurs
+**Café** : Brésil (Arabica) + Vietnam (Robusta). Gel dans l'État de São Paulo = +30-50% en quelques jours.
+**Cacao** : Côte d'Ivoire + Ghana. Saison des pluies critique d'oct à mars.
+
+### 📈 Stratégie Matières Premières
+Suivre : COT Report (positions des commerciaux), Dollar Index (DXY), calendrier OPEC/USDA, données météo."""
+
+    # ─── PROJECTIONS / PROFITS / ARGENT ─────────────────────────────────────
+    elif has("million","profit","riche","gagner","combien","argent","projection","croissance",
+             "rendement","doubler","objectif financier"):
         return f"""**💰 Simulation de Croissance — Capital ${capital:,.0f}**{ctx}
 
-| Scénario | Performance | 6 mois | 1 an | 3 ans | 5 ans |
-|----------|-------------|--------|------|-------|-------|
-| Conservateur | +15%/an | ${capital*1.075:,.0f} | ${capital*1.15:,.0f} | ${capital*(1.15**3):,.0f} | ${capital*(1.15**5):,.0f} |
-| Modéré | +30%/an | ${capital*1.15:,.0f} | ${capital*1.30:,.0f} | ${capital*(1.30**3):,.0f} | ${capital*(1.30**5):,.0f} |
-| Agressif | +60%/an | ${capital*1.30:,.0f} | ${capital*1.60:,.0f} | ${capital*(1.60**3):,.0f} | ${capital*(1.60**5):,.0f} |
-| Crypto Bull | +150%/an | ${capital*1.75:,.0f} | ${capital*2.50:,.0f} | ${capital*(2.50**3):,.0f} | ${capital*(2.50**5):,.0f} |
+### Projections Composées Annuelles
+| Scénario | Perf/an | 1 an | 3 ans | 5 ans | 10 ans |
+|----------|---------|------|-------|-------|--------|
+| Conservateur | +15% | ${capital*1.15:,.0f} | ${capital*(1.15**3):,.0f} | ${capital*(1.15**5):,.0f} | ${capital*(1.15**10):,.0f} |
+| Modéré | +30% | ${capital*1.30:,.0f} | ${capital*(1.30**3):,.0f} | ${capital*(1.30**5):,.0f} | ${capital*(1.30**10):,.0f} |
+| Agressif | +60% | ${capital*1.60:,.0f} | ${capital*(1.60**3):,.0f} | ${capital*(1.60**5):,.0f} | — |
+| Crypto Bull | +150% | ${capital*2.50:,.0f} | ${capital*(2.50**3):,.0f} | — | — |
 
-**📌 Contexte sur ces chiffres :**
-- +15%/an : Performance historique moyenne du S&P 500
-- +30%/an : Possible avec une bonne stratégie actions/crypto — très exigeant
-- +60%/an et plus : Possible en crypto bull market, mais avec des drawdowns de -50% ou plus
+### Contexte Réaliste
+- **+15%/an** : Performance historique du S&P 500 sur 50 ans
+- **+30%/an** : Possible avec stratégie active — très exigeant en discipline
+- **+60%/an** : Niveau hedge fund top-tier. Accompagné de drawdowns -40% ou plus
+- **+150%/an** : Possible en crypto bull market — mais pertes potentielles -80% en bear
 
-**⚠️ Réalité du trading :** 70-80% des traders particuliers perdent de l'argent. La régularité et la discipline > les performances exceptionnelles.
+### ⚠️ Réalité du Trading Particulier
+70-80% des traders retail perdent de l'argent sur 1 an.
+Les 20% qui gagnent appliquent 3 règles sans exception :
+1. **Gestion du risque stricte** (jamais > 2% par trade)
+2. **Journal de trading** (analyser chaque trade a posteriori)
+3. **Patience** (attendre uniquement les meilleures configurations)
 
-**Règle des 2% + R/R 2:1 :** Avec 50% de trades gagnants, vous doublez votre capital en ~18 mois."""
+**Avec R/R 2:1 et 50% de win rate → vous doublez le capital en ~18 mois.**"""
 
-    elif any(w in q for w in ["rsi","macd","bollinger","stoch","ema","indicateur","technique"]):
-        rsi_val = deep_context.get("rsi", 50) if deep_context else 50
-        return f"""**📊 Analyse Technique Détaillée**{ctx}
+    # ─── MONTE CARLO / SIMULATION ────────────────────────────────────────────
+    elif has("monte carlo","simulation","probabilité","scénario","trajectoire","p(gain)"):
+        return f"""**🎲 Guide — Simulation Monte Carlo**{ctx}
 
-**RSI — Relative Strength Index (0–100)**
-Mesure la force des hausses vs baisses sur 14 périodes.
-- < 30 = Survente : momentum vendeur épuisé, rebond probable
-- > 70 = Surachat : momentum acheteur épuisé, correction probable
-- Divergence RSI/Prix = signal fort (ex: prix fait un nouveau high mais RSI non → retournement)
-*Valeur actuelle : {rsi_val:.1f} → {"🟢 Zone de survente" if rsi_val<30 else "🔴 Zone de surachat" if rsi_val>70 else "⚪ Zone neutre"}*
+### Qu'est-ce que Monte Carlo ?
+On simule **300 trajectoires possibles** de votre capital sur 252 jours (1 an de trading), en partant de la volatilité historique de l'actif. Chaque trajectoire représente un "futur possible".
 
-**MACD — Convergence/Divergence des Moyennes Mobiles**
-Différence entre EMA12 et EMA26. Signal = EMA9 du MACD.
-- Croisement MACD > Signal + Histogramme devient vert = BUY fort
-- Croisement MACD < Signal + Histogramme devient rouge = SELL fort
-- MACD au-dessus de 0 = tendance haussière générale
+### Comment lire les lignes
+| Ligne | Signification |
+|-------|---------------|
+| **Cyan (médiane)** | Résultat le plus probable — 50% des scénarios finissent au-dessus |
+| **Verte (P75)** | Scénario optimiste modéré — 25% font mieux |
+| **Jaune (P25)** | Scénario pessimiste modéré — 25% font moins bien |
+| **Zone verte** | Fourchette des 90% de scénarios probables |
 
-**BOLLINGER BANDS — Bandes de volatilité**
-Canal à 2 écarts-types autour de la SMA20.
-- Squeeze (bandes serrées) = explosion de volatilité imminente
-- Prix rebondit sur bande basse = opportunité long en tendance haussière
-- %B = 0 → bande inférieure · %B = 1 → bande supérieure
+### Interpréter P(Gain)
+- **P(gain) > 65%** → Stratégie statistiquement favorable ✅
+- **P(gain) 50-65%** → Avantage statistique faible → affiner la stratégie
+- **P(gain) < 50%** → Les probabilités jouent contre vous → revoir tout
 
-**EMA (Exponential Moving Average)**
-Plus réactive que la SMA car pondère davantage les données récentes.
-- Golden Cross : EMA9 croise EMA20 vers le haut = signal haussier
-- Death Cross : EMA9 croise EMA20 vers le bas = signal baissier
+### Limites importantes
+Monte Carlo se base sur la **volatilité passée**. Elle ne prédit pas les crises (COVID 2020, FTX 2022, 2008). En période de stress de marché, la volatilité réelle peut être 3-5× supérieure à l'estimation historique."""
 
-**STOCHASTIQUE (0–100)**
-Compare le prix de clôture au range sur 14 périodes.
-- < 20 = Survente · > 80 = Surachat (similaire RSI mais plus volatile)"""
+    # ─── CORRÉLATION / DIVERSIFICATION ──────────────────────────────────────
+    elif has("corrélation","matrice","diversif","portefeuille","portfolio","hedge","couverture"):
+        return f"""**🔗 Guide — Corrélation & Diversification**{ctx}
 
+### Qu'est-ce que la Corrélation ?
+Score entre **-1** (opposés parfaits) et **+1** (identiques parfaits).
+
+| Score | Signification | Action |
+|-------|---------------|--------|
+| +0.8 à +1.0 | 🔴 Très corrélés | Choisir un seul des deux |
+| +0.3 à +0.8 | 🟡 Corrélation modérée | Diversification partielle |
+| -0.3 à +0.3 | 🟢 Faiblement corrélés | Bonne diversification |
+| -0.8 à -1.0 | 💙 Inversément corrélés | Hedge naturel excellent |
+
+### Corrélations typiques
+- **BTC ↔ ETH** : ~0.90 → très corrélés → inutile de tenir les deux
+- **Gold ↔ USD** : ~-0.70 → inversément corrélés → Gold hedge dollar
+- **SPY ↔ QQQ** : ~0.95 → quasi identiques
+- **Gold ↔ S&P 500** : ~0.10 → faiblement corrélés → bon hedge actions
+- **Pétrole ↔ Airlines** : ~-0.60 → corrélation négative
+
+### Portefeuille Diversifié Idéal
+Visez des corrélations **< 0.5** entre vos actifs.
+Exemple : BTC 30% + Gold 20% + S&P500 ETF 30% + Obligations 20%
+→ Corrélation moyenne < 0.3 → vrai portefeuille diversifié"""
+
+    # ─── ANALYSE NEWS / SENTIMENT ───────────────────────────────────────────
+    elif has("news","actualité","sentiment","presse","article","information","event","événement"):
+        return f"""**📰 Analyse des News & Sentiment**{ctx}
+
+### Le Score SSGM (Sentiment Signal Graph Model)
+Score entre **-1** (bearish extrême) et **+1** (bullish extrême), calculé en analysant la densité de mots positifs vs négatifs dans les titres et descriptions des articles.
+
+### Interprétation
+- **> +0.3** → 🟢 Sentiment très positif — flux acheteur dans la presse
+- **+0.1 à +0.3** → 🟢 Sentiment positif — légère pression haussière
+- **-0.1 à +0.1** → ⚪ Neutre — laisser les indicateurs techniques décider
+- **-0.1 à -0.3** → 🔴 Sentiment négatif — prudence sur les longs
+- **< -0.3** → 🔴 Sentiment très négatif — éviter les positions longues
+
+### Sources analysées
+Yahoo Finance · Google News EN/FR · CoinDesk (crypto) · Investing.com (matières premières)
+
+### Limites du sentiment
+Le sentiment est un **indicateur contrarien** aux extrêmes :
+- Sentiment trop bullish (euphorie) → souvent un top de marché
+- Sentiment trop bearish (panique) → souvent un bottom de marché
+**Utilisez toujours le sentiment EN COMBINAISON avec les indicateurs techniques.**"""
+
+    # ─── BACKTEST / PERFORMANCE ─────────────────────────────────────────────
+    elif has("backtest","historique","performance","sharpe","drawdown","win rate","profit factor","cagr"):
+        return f"""**📊 Guide — Métriques de Performance**{ctx}
+
+### Sharpe Ratio — Rendement Ajusté au Risque
+Mesure combien de rendement vous obtenez par unité de risque pris.
+- **> 2.0** → 🟢 Excellent — niveau hedge fund
+- **1.0–2.0** → ✅ Bon — acceptable pour stratégie active
+- **0.5–1.0** → ⚠️ Médiocre — revoir la stratégie
+- **< 0.5** → ❌ Mauvais — trop de risque pour le rendement obtenu
+
+### Profit Factor
+Ratio Gains bruts / Pertes brutes.
+- **> 2.0** → Excellent : pour $1 perdu vous gagnez $2+
+- **1.5–2.0** → Bon : stratégie profitable solide
+- **1.0–1.5** → Marginal : améliorable
+- **< 1.0** → Stratégie perdante
+
+### Maximum Drawdown
+Perte maximale depuis le dernier sommet du capital.
+- **< 10%** → Stratégie très conservative
+- **10–20%** → Acceptable pour stratégie active
+- **20–35%** → Élevé mais tolérable avec bon rendement
+- **> 35%** → Psychologiquement très difficile à tenir
+
+### Win Rate — Ne Suffit Pas Seul !
+Avec R/R 2:1, un win rate de **34%** suffit à être rentable.
+La plupart des grands traders ont des win rates de 40-55%."""
+
+    # ─── CRYPTO SPÉCIFIQUE ──────────────────────────────────────────────────
+    elif has("bitcoin","btc","ethereum","eth","crypto","altcoin","defi","web3","blockchain",
+             "halving","bull run","bear market","solana","binance"):
+        return f"""**₿ Guide Crypto — Quantum Trade Oracle**{ctx}
+
+### Spécificités du Marché Crypto
+Le marché crypto fonctionne **24h/24, 7j/7** — contrairement aux marchés traditionnels. Cela implique :
+- Volatilité 3-10× supérieure aux actions
+- Gaps moins fréquents (marché jamais fermé)
+- Sentiment Twitter/Reddit = driver majeur (Fear & Greed Index)
+
+### Cycles de Marché Crypto
+**Bull Market** (exemple 2020-2021) : BTC ×10, altcoins ×50-100 possible
+**Bear Market** (exemple 2022) : BTC -75%, altcoins -90-95% possible
+**Halving BTC** (tous les ~4 ans) : réduction de 50% des nouvelles pièces créées → historiquement = début de bull run 12-18 mois après
+
+### Corrélations Crypto
+- **BTC ↔ ETH** : 0.85-0.95 → très liés
+- **BTC ↔ Altcoins** : 0.70-0.90 → BTC mène, alts amplifient
+- **Crypto ↔ S&P500** : +0.4 à +0.6 en période de stress → corrélation monte en crise
+
+### Gestion du Risque en Crypto
+Réduire les tailles de position de 30-50% vs actions classiques car la volatilité est 3-5× supérieure.
+Ne jamais allouer > 5-10% du patrimoine total en crypto.
+
+### Outils Clés
+Fear & Greed Index · Glassnode (on-chain) · CoinGlass (liquidations) · Messari"""
+
+    # ─── FOREX SPÉCIFIQUE ────────────────────────────────────────────────────
+    elif has("forex","eur","usd","gbp","jpy","devise","change","dollar","euro","livre","yen"):
+        return f"""**💱 Guide Forex — Marchés des Changes**{ctx}
+
+### Sessions de Trading Forex
+| Session | Heures UTC | Caractéristiques |
+|---------|-----------|-----------------|
+| Asie (Tokyo) | 00:00–09:00 | Faible volatilité, JPY actif |
+| Londres | 08:00–17:00 | 🔥 Volatilité max, EUR/GBP actifs |
+| New York | 13:00–22:00 | 🔥 Volatilité max, USD actif |
+| Chevauchement LON-NY | 13:00–17:00 | 🔥🔥 Pic de liquidité journalier |
+
+### Drivers Fondamentaux
+- **Taux directeurs** : Fed, BCE, BoJ, BoE → différentiels de taux = moteur principal
+- **Inflation** (CPI, PCE) : Inflation haute → banque centrale monte les taux → devise s'apprécie
+- **PIB, emploi** (NFP) : Économie forte → devise forte
+- **Géopolitique** : Crises → refuge vers USD, CHF, JPY
+
+### Gestion du Risque Forex
+Les paires majeures (EUR/USD, GBP/USD) : levier recommandé 1:5 à 1:10 maximum.
+Stop-Loss exprimé en pips : 1 pip = 0.0001 pour plupart des paires (0.01 pour JPY).
+
+### Analyse Macro Obligatoire
+Toujours consulter le calendrier économique avant de trader :
+NFP (1er vendredi du mois) · CPI · Décisions Fed/BCE · PIB trimestriel"""
+
+    # ─── RAPPORT COMPLET ─────────────────────────────────────────────────────
+    elif has("rapport","report","résumé","synthèse","analyse complète","tout","bilan"):
+        if dc:
+            ema_sig = dc["tech"].get("EMA", "—")
+            rsi_sig = dc["tech"].get("RSI", "—")
+            macd_sig = dc["tech"].get("MACD", "—")
+            bb_sig = dc["tech"].get("BOLLINGER", "—")
+            return f"""**📋 RAPPORT COMPLET — {name} ({symbol})**{ctx}
+
+---
+## 🎯 Signal Global : {dc["action"]} ({dc["sq"]}/100)
+Tendance : **{dc["trend"]}**
+
+## 📊 Indicateurs Techniques
+- **EMA** : {ema_sig}
+- **RSI** ({dc["rsi"]:.0f}) : {rsi_sig}
+- **MACD** : {macd_sig}
+- **Bollinger** : {bb_sig}
+
+## 🤖 Probabilités IA
+- 🟢 Haussier : **{dc["bull"]*100:.1f}%** | 🔴 Baissier : **{dc["bear"]*100:.1f}%**
+- ⚡ Confiance : {dc["conf"]*100:.0f}% | 🤝 Accord : {dc["agr"]*100:.0f}%
+
+## 🛡️ Gestion du Risque
+- Entry : ${dc["entry"]:,.4f} → SL : ${dc["sl"]:,.4f} → TP : ${dc["tp"]:,.4f}
+- R/R : **{dc["rr"]:.2f}:1** | Capital risqué : ${dc["risk_d"]:,.2f} (2%)
+- Niveau de risque : {dc["sq"]}% setup quality
+
+## 💡 Recommandation
+{"**TRADE FAVORABLE** — Les conditions sont réunies pour entrer. Respectez strictement le SL." if dc["sq"]>=65 else "**ATTENDRE** — Les conditions ne sont pas optimales. Patienter pour une meilleure configuration." if dc["sq"]>=35 else "**NE PAS TRADER** — Trop de signaux contradictoires. Rester en cash."}
+
+> ⚠️ *Outil éducatif uniquement — pas un conseil financier.*"""
+        return f"Lancez d'abord une analyse sur {name} pour générer le rapport complet."
+
+    # ─── DÉFAUT — AIDE GÉNÉRALE ───────────────────────────────────────────────
     else:
-        setup_str = f"\n\n⭐ **Setup actuel : {deep_context.get('setup_quality',0)}/100** — {deep_context.get('action','HOLD')} sur {name}" if deep_context else f"\n\nClique sur **ANALYSER** pour obtenir un signal sur {name}."
-        return f"""**⬡ Oracle IA — Quantum Trade Oracle v4**{ctx}{setup_str}
+        setup_str = (f"\n\n⭐ **Setup actuel : {dc['sq']}/100** — Signal **{dc['action']}** sur {name} | "
+                     f"RSI {dc['rsi']:.0f} | Conf {dc['conf']*100:.0f}%"
+                     if dc else f"\n\n💡 *Lancez une **ANALYSE** sur {name} pour que je dispose des données live.*")
+        return f"""**⬡ Oracle IA — Quantum Trade Oracle v5**{ctx}{setup_str}
 
-Je peux vous analyser en détail :
-- 📈 **Signal & plan de trade** → *"Faut-il acheter {name} ?"*
-- 📊 **Indicateurs techniques** → *"Explique le RSI et le MACD"*
-- 🛡️ **Gestion du risque** → *"Comment protéger mon capital ?"*
-- 🔗 **Matrice de corrélation** → *"Comment diversifier ?"*
-- 🎲 **Monte Carlo** → *"Quelles sont mes chances de profit ?"*
-- 🌍 **Matières premières** → *"Comment trader le pétrole ou l'or ?"*
-- 💰 **Projections** → *"Combien puis-je gagner avec ${capital:,.0f} ?"*
-- 📖 **Tutoriel graphiques** → *"Comment lire les bougies ?"*
+Je suis prêt à vous analyser en profondeur. Exemples de questions :
 
-Posez votre question en langage naturel, je l'analyse en profondeur."""
+**🎯 Trading Direct**
+- *"Faut-il acheter {name} maintenant ?"*
+- *"Quel est le plan de trade optimal ?"*
+- *"Quand prendre mes bénéfices ?"*
+
+**📊 Analyse Technique**
+- *"Explique le RSI et le MACD"*
+- *"Comment lire les bougies japonaises ?"*
+- *"Qu'est-ce qu'un Golden Cross ?"*
+
+**🛡️ Gestion du Risque**
+- *"Comment protéger mon capital ?"*
+- *"Calcule ma taille de position"*
+- *"Qu'est-ce que le Profit Factor ?"*
+
+**💰 Projections**
+- *"Combien puis-je gagner avec ${capital:,.0f} ?"*
+- *"Montre-moi les scénarios Monte Carlo"*
+
+**🌍 Marchés Spécifiques**
+- *"Explique le marché du pétrole"*
+- *"Comment fonctionne le Forex ?"*
+- *"Qu'est-ce que le halving Bitcoin ?"*
+
+Parlez-moi librement — par écrit ou par vocal 🎤"""
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  SIDEBAR
@@ -2357,7 +2733,7 @@ with st.sidebar:
         _custom=st.text_input("",placeholder="Custom…",label_visibility="collapsed")
     if _custom: symbol=_custom.upper()
     st.session_state.selected_symbol=symbol
-    st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["accent"]};text-align:center;padding:3px 0 8px">{get_name(symbol)}</div>',unsafe_allow_html=True)
+    st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["accent"]};text-align:center;padding:3px 0 8px">{get_name(symbol)}</div>',unsafe_allow_html=True)
     st.markdown('<span class="slbl">Période / Intervalle</span>',unsafe_allow_html=True)
     _c3,_c4=st.columns(2)
     with _c3: period=st.selectbox("",["6mo","1y","2y","3y"],index=1,label_visibility="collapsed")
@@ -2385,7 +2761,7 @@ with st.sidebar:
         show_heat=st.checkbox("Heatmap corrélation",True)
         show_legends=st.checkbox("Afficher les légendes",True)
     st.markdown("<hr>",unsafe_allow_html=True)
-    st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🏆 Top Commodités</div>',unsafe_allow_html=True)
+    st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🏆 Top Commodités</div>',unsafe_allow_html=True)
     _tc1,_tc2=st.columns(2)
     for _i,_sym in enumerate(TOP_COMMODITIES[:6]):
         with [_tc1,_tc2][_i%2]:
@@ -2393,8 +2769,8 @@ with st.sidebar:
                 st.session_state.selected_symbol=_sym; st.rerun()
     st.markdown("<hr>",unsafe_allow_html=True)
     if st.session_state.status_msg:
-        st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};text-align:center;line-height:1.6">{st.session_state.status_msg}</div>',unsafe_allow_html=True)
-    st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:8px;color:#0e2236;text-align:center;padding-top:12px;line-height:1.8">⚠ OUTIL ÉDUCATIF UNIQUEMENT<br>Pas un conseil financier · v4.0</div>',unsafe_allow_html=True)
+        st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};text-align:center;line-height:1.6">{st.session_state.status_msg}</div>',unsafe_allow_html=True)
+    st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:8px;color:#0e2236;text-align:center;padding-top:12px;line-height:1.8">⚠ OUTIL ÉDUCATIF UNIQUEMENT<br>Pas un conseil financier · v5.0</div>',unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  HEADER
@@ -2429,21 +2805,21 @@ with _hc2:
         _lp=float(_hdf["close"].iloc[-1]); _pp=float(_hdf["close"].iloc[-2])
         _hchg=(_lp-_pp)/_pp*100; _hc=C["green"] if _hchg>=0 else C["red"]
         st.markdown(f'<div style="text-align:right;padding-top:6px">'
-                    f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]}">{get_name(symbol)}</div>'
-                    f'<div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;color:{C["accent"]}">${_lp:,.2f}</div>'
-                    f'<div style="font-family:DM Mono,monospace;font-size:11px;color:{_hc}">{_hchg:+.2f}%</div>'
+                    f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]}">{get_name(symbol)}</div>'
+                    f'<div style="font-family:Orbitron,sans-serif;font-size:18px;font-weight:700;color:{C["accent"]}">${_lp:,.2f}</div>'
+                    f'<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:{_hc}">{_hchg:+.2f}%</div>'
                     f'</div>',unsafe_allow_html=True)
     elif not _hdf.empty and len(_hdf)==1:
         _lp=float(_hdf["close"].iloc[-1])
         st.markdown(f'<div style="text-align:right;padding-top:6px">'
-                    f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]}">{get_name(symbol)}</div>'
-                    f'<div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;color:{C["accent"]}">${_lp:,.2f}</div>'
+                    f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]}">{get_name(symbol)}</div>'
+                    f'<div style="font-family:Orbitron,sans-serif;font-size:18px;font-weight:700;color:{C["accent"]}">${_lp:,.2f}</div>'
                     f'</div>',unsafe_allow_html=True)
 with _hc3:
     st.markdown(f'<div style="text-align:right;padding-top:6px">'
-                f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]}">UTC</div>'
-                f'<div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:{C["accent"]}">{datetime.utcnow().strftime("%H:%M:%S")}</div>'
-                f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]}">{datetime.utcnow().strftime("%d/%m/%Y")}</div>'
+                f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]}">UTC</div>'
+                f'<div style="font-family:Orbitron,sans-serif;font-size:16px;font-weight:700;color:{C["accent"]}">{datetime.utcnow().strftime("%H:%M:%S")}</div>'
+                f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]}">{datetime.utcnow().strftime("%d/%m/%Y")}</div>'
                 f'</div>',unsafe_allow_html=True)
 st.markdown(f'<div style="height:1px;background:linear-gradient(90deg,transparent,{C["border"]},transparent);margin-bottom:14px"></div>',unsafe_allow_html=True)
 
@@ -2486,8 +2862,8 @@ with t_sig:
     if not sig:
         st.markdown(f'<div style="text-align:center;padding:90px 20px">'
                     f'<div style="font-family:Syne,sans-serif;font-size:72px;color:{C["border"]}">⬡</div>'
-                    f'<div style="font-family:DM Mono,monospace;font-size:13px;color:{C["muted"]};margin-top:18px;letter-spacing:2.5px">SÉLECTIONNE UN ACTIF → CLIQUE « ANALYSER »</div>'
-                    f'<div style="font-family:DM Mono,monospace;font-size:10px;color:{C["muted"]};margin-top:8px;opacity:.6">10 catégories · 60+ actifs · Crypto · Actions · Forex · Matières premières</div>'
+                    f'<div style="font-family:JetBrains Mono,monospace;font-size:13px;color:{C["muted"]};margin-top:18px;letter-spacing:2.5px">SÉLECTIONNE UN ACTIF → CLIQUE « ANALYSER »</div>'
+                    f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["muted"]};margin-top:8px;opacity:.6">10 catégories · 60+ actifs · Crypto · Actions · Forex · Matières premières</div>'
                     f'</div>',unsafe_allow_html=True)
     else:
         action=sig.get("action","HOLD"); scores=sig.get("scores",{})
@@ -2518,7 +2894,7 @@ with t_sig:
             _ssgm=(sent or {}).get("ssgm_score",0)
             pbar("📰 Sentiment des news",(_ssgm+1)/2*100,C["purple"],tooltip="Tonalité des articles de presse")
             if show_legends:
-                st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};margin-top:6px;line-height:1.7">'
+                st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};margin-top:6px;line-height:1.7">'
                             f'Signal BUY si : Bull > 62% ET Accord ≥ 75%<br>'
                             f'Signal SELL si : Bear > 62% ET Accord ≥ 75%<br>'
                             f'Signal HOLD si : conditions insuffisantes</div>',unsafe_allow_html=True)
@@ -2532,8 +2908,8 @@ with t_sig:
                     _kc=C["green"] if _kind=="bull" else C["red"] if _kind=="bear" else C["yellow"]
                     st.markdown(f'<div style="background:{C["card"]};border:1px solid {C["border"]};border-left:3px solid {_kc};'
                                 f'border-radius:3px;padding:8px 12px;margin-bottom:6px">'
-                                f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;margin-bottom:3px">{k}</div>'
-                                f'<div style="font-family:DM Mono,monospace;font-size:10px;color:{_kc};line-height:1.5">{v}</div>'
+                                f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;margin-bottom:3px">{k}</div>'
+                                f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{_kc};line-height:1.5">{v}</div>'
                                 f'</div>',unsafe_allow_html=True)
 
         # Métriques additionnelles
@@ -2611,11 +2987,11 @@ with t_chart:
                     if high_corr:
                         for i,j,v in high_corr[:3]:
                             col_n=C["red"] if v>0 else C["green"]
-                            st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:11px;color:{col_n};padding:4px 0">'
+                            st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:{col_n};padding:4px 0">'
                                         f'⚠️ {corr.index[i]} ↔ {corr.columns[j]} : {v:.2f} — Très corrélés, pas de diversification</div>',unsafe_allow_html=True)
                     if low_corr:
                         for i,j,v in low_corr[:3]:
-                            st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:11px;color:{C["green"]};padding:4px 0">'
+                            st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:{C["green"]};padding:4px 0">'
                                         f'✅ {corr.index[i]} ↔ {corr.columns[j]} : {v:.2f} — Bonne diversification</div>',unsafe_allow_html=True)
 
 # ── MODÈLES IA ───────────────────────────────────────────────────────────────
@@ -2640,10 +3016,10 @@ with t_models:
                 _col=C["green"] if _act=="BUY" else C["red"] if _act=="SELL" else C["muted"]
                 with _mcols[_i]:
                     st.markdown(f'<div style="background:{C["card"]};border:1px solid {C["border"]};border-top:3px solid {_col};border-radius:4px;padding:14px;margin-bottom:10px">'
-                                f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">{_ic} {_nm}</div>'
+                                f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">{_ic} {_nm}</div>'
                                 f'<div style="font-family:Syne,sans-serif;font-size:28px;font-weight:900;color:{_col};margin-bottom:6px">{_act}</div>'
-                                f'<div style="font-family:DM Mono,monospace;font-size:8px;color:{C["accent"]};margin-bottom:6px">Poids : {_w} · {_typ}</div>'
-                                f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};line-height:1.5;margin-bottom:10px">{_desc}</div>'
+                                f'<div style="font-family:JetBrains Mono,monospace;font-size:8px;color:{C["accent"]};margin-bottom:6px">Poids : {_w} · {_typ}</div>'
+                                f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};line-height:1.5;margin-bottom:10px">{_desc}</div>'
                                 f'</div>',unsafe_allow_html=True)
                     pbar("Bull",m["bullish_prob"]*100,C["green"])
                     pbar("Bear",m["bearish_prob"]*100,C["red"])
@@ -2695,7 +3071,7 @@ with t_risk:
                 (_r.get("atr",0) > 0,f"ATR calculé  ({_r.get('atr',0):.4f})","Volatilité mesurée")]:
                 _icon="✅"; _tc=C["green"]
                 if not _ok: _icon="❌"; _tc=C["red"]
-                st.markdown(f'<div style="font-family:DM Mono,monospace;font-size:11px;color:{_tc};padding:5px 0" title="{_tip}">{_icon} {_txt}</div>',unsafe_allow_html=True)
+                st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:{_tc};padding:5px 0" title="{_tip}">{_icon} {_txt}</div>',unsafe_allow_html=True)
 
 # ── PROFIT ───────────────────────────────────────────────────────────────────
 with t_profit:
@@ -2711,9 +3087,9 @@ with t_profit:
         for _pci,(lbl,v) in enumerate(_proj.items()):
             with _pcols[_pci]:
                 st.markdown(f'<div style="background:{C["card"]};border:1px solid {C["border"]};border-top:3px solid {_gcs[_pci]};border-radius:4px;padding:14px;text-align:center">'
-                            f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">{lbl}</div>'
+                            f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">{lbl}</div>'
                             f'<div style="font-family:Syne,sans-serif;font-size:28px;font-weight:900;color:{_gcs[_pci]};line-height:1">+${v["profit"]:,.0f}</div>'
-                            f'<div style="font-family:DM Mono,monospace;font-size:10px;color:{C["accent"]};margin-top:6px">Total : ${v["total"]:,.0f}</div>'
+                            f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{C["accent"]};margin-top:6px">Total : ${v["total"]:,.0f}</div>'
                             f'</div>',unsafe_allow_html=True)
         # ── PRÉVISION DE PRIX ──────────────────────────────────────────────────
         st.markdown("<br>",unsafe_allow_html=True)
@@ -2863,10 +3239,10 @@ with t_news:
         _sv=_sd.get("ssgm_score",0); _sc2=C["green"] if _sv>.1 else C["red"] if _sv<-.1 else C["yellow"]
         with _s1:
             st.markdown(f'<div style="background:{C["card"]};border:1px solid {C["border"]};border-top:3px solid {_sc2};border-radius:4px;padding:16px;text-align:center">'
-                        f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};margin-bottom:6px">SSGM SCORE</div>'
+                        f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};margin-bottom:6px">SSGM SCORE</div>'
                         f'<div style="font-family:Syne,sans-serif;font-size:38px;font-weight:900;color:{_sc2}">{("+" if _sv>0 else "")}{_sv:.3f}</div>'
-                        f'<div style="font-family:DM Mono,monospace;font-size:10px;color:{_sc2};letter-spacing:2px;margin-top:5px">{_sd.get("label","—")}</div>'
-                        f'<div style="font-family:DM Mono,monospace;font-size:9px;color:{C["muted"]};margin-top:5px">{_sd.get("n_articles",len(_arts))} articles · {datetime.utcnow().strftime("%H:%M")} UTC</div>'
+                        f'<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{_sc2};letter-spacing:2px;margin-top:5px">{_sd.get("label","—")}</div>'
+                        f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};margin-top:5px">{_sd.get("n_articles",len(_arts))} articles · {datetime.utcnow().strftime("%H:%M")} UTC</div>'
                         f'</div>',unsafe_allow_html=True)
         with _s2:
             pbar("🟢 Bullish",_sd.get("bull_pct",0),C["green"])
@@ -3032,7 +3408,7 @@ with t_scan:
             for _,row in _scan_df.nlargest(5,"Variation %").iterrows():
                 _n=row.get("Nom",row["Symbole"])
                 st.markdown(f'<div style="display:flex;justify-content:space-between;padding:8px 12px;'
-                            f'border-bottom:1px solid {C["border"]};font-family:DM Mono,monospace;font-size:11px">'
+                            f'border-bottom:1px solid {C["border"]};font-family:JetBrains Mono,monospace;font-size:11px">'
                             f'<span style="color:{C["accent"]};font-weight:600">{_n}</span>'
                             f'<span style="color:{C["muted"]}">{row["Symbole"]}</span>'
                             f'<span style="color:{C["text"]}">${row["Prix"]:,.4f}</span>'
@@ -3043,7 +3419,7 @@ with t_scan:
             for _,row in _scan_df.nsmallest(5,"Variation %").iterrows():
                 _n=row.get("Nom",row["Symbole"])
                 st.markdown(f'<div style="display:flex;justify-content:space-between;padding:8px 12px;'
-                            f'border-bottom:1px solid {C["border"]};font-family:DM Mono,monospace;font-size:11px">'
+                            f'border-bottom:1px solid {C["border"]};font-family:JetBrains Mono,monospace;font-size:11px">'
                             f'<span style="color:{C["accent"]};font-weight:600">{_n}</span>'
                             f'<span style="color:{C["muted"]}">{row["Symbole"]}</span>'
                             f'<span style="color:{C["text"]}">${row["Prix"]:,.4f}</span>'
@@ -3054,22 +3430,54 @@ with t_scan:
     else:
         st.markdown(f'<div style="text-align:center;background:{C["card"]};border:1px solid {C["border"]};border-radius:4px;padding:50px 20px">'
                     f'<div style="font-family:Syne,sans-serif;font-size:48px;color:{C["border"]}">📡</div>'
-                    f'<div style="font-family:DM Mono,monospace;font-size:11px;color:{C["muted"]};margin-top:12px">Clique sur un bouton de catégorie ou SCANNER TOUS LES MARCHÉS</div>'
+                    f'<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:{C["muted"]};margin-top:12px">Clique sur un bouton de catégorie ou SCANNER TOUS LES MARCHÉS</div>'
                     f'</div>',unsafe_allow_html=True)
 
 # ── IA ORACLE GPT-4o ─────────────────────────────────────────────────────────
 with t_chat:
     _sname_chat = get_name(symbol)
 
-    # Status GPT-4o
-    # Statut du moteur IA
-    st.markdown(f'<div style="background:rgba(0,255,170,.05);border:1px solid rgba(0,255,170,.2);border-radius:6px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px"><span style="font-size:18px">⬡</span><div><span style="font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;color:#00ff9d;letter-spacing:2px;text-transform:uppercase">MOTEUR IA PROPRIÉTAIRE ACTIF</span><br><span style="font-family:JetBrains Mono,monospace;font-size:9px;color:#0e3060">100% votre code · Zéro API · Zéro abonnement · Fonctionne hors ligne</span></div></div>', unsafe_allow_html=True)
+    # ── Voice Input Handler — triggered by JS postMessage ────────────────────
+    _voice_in = st.session_state.get("voice_input", "")
+    if _voice_in:
+        st.session_state.voice_input = ""
+        st.session_state.chat_history.append({"role":"user","content":f"🎤 {_voice_in}"})
+        with st.spinner("⬡ Oracle IA analyse…"):
+            _rep = ai_deep_analysis(_voice_in, sig, capital, symbol)
+        st.session_state.chat_history.append({"role":"assistant","content":_rep})
+        st.session_state.last_ai_msg = _rep
+        st.rerun()
 
-    qtitle("⬡ Oracle IA Propriétaire","100% Votre Code · Zéro API")
+    # ── Status bar ───────────────────────────────────────────────────────────
+    st.markdown(f'''
+    <div style="background:linear-gradient(135deg,rgba(0,245,157,.06),rgba(0,200,240,.04));
+        border:1px solid rgba(0,245,157,.2);border-radius:8px;
+        padding:12px 16px;margin-bottom:14px;
+        display:flex;align-items:center;gap:12px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;
+        background:linear-gradient(90deg,transparent,rgba(0,245,157,.4),transparent)"></div>
+      <div style="width:32px;height:32px;border-radius:8px;
+        background:rgba(0,245,157,.1);border:1px solid rgba(0,245,157,.3);
+        display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">⬡</div>
+      <div style="flex:1">
+        <div style="font-family:Orbitron,sans-serif;font-size:10px;font-weight:700;
+          color:#00f59d;letter-spacing:2px;text-transform:uppercase">
+          MOTEUR IA PROPRIÉTAIRE ACTIF
+        </div>
+        <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted2"]};margin-top:2px">
+          100% votre code · Zéro API · Zéro abonnement · Voix activée 🎤
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:JetBrains Mono,monospace;font-size:8px;color:{C["muted2"]}">v5.0</div>
+        <div id="voice-status" style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["green"]}">● PRÊT</div>
+      </div>
+    </div>
+    ''', unsafe_allow_html=True)
 
-    # Boutons actions rapides
+    # ── Quick action buttons ──────────────────────────────────────────────────
     _ba1,_ba2,_ba3=st.columns(3)
-    with _ba1: _btn_report=st.button("📋  GÉNÉRER RAPPORT",use_container_width=True,key="btn_report")
+    with _ba1: _btn_report=st.button("📋  RAPPORT COMPLET",use_container_width=True,key="btn_report")
     with _ba2: _btn_news_ai=st.button("📰  ANALYSER LES NEWS",use_container_width=True,key="btn_news_ai")
     with _ba3: _btn_risk=st.button("🛡️  CONSEIL RISQUE",use_container_width=True,key="btn_risk_ai")
 
@@ -3080,6 +3488,7 @@ with t_chat:
                 _rep2 = generate_report(sig,df,news,capital) if (GPT_OK and is_configured()) else ai_deep_analysis(f"Rapport complet sur {_sname_chat}",sig,capital,symbol)
             st.session_state.chat_history.append({"role":"user","content":f"📋 Rapport complet — {_sname_chat}"})
             st.session_state.chat_history.append({"role":"assistant","content":_rep2})
+            st.session_state.last_ai_msg = _rep2
             st.rerun()
 
     if _btn_news_ai:
@@ -3089,6 +3498,7 @@ with t_chat:
                 _rep2 = analyze_news_gpt(news,symbol,sig) if (GPT_OK and is_configured()) else ai_deep_analysis(f"Analyse les news sur {_sname_chat}",sig,capital,symbol)
             st.session_state.chat_history.append({"role":"user","content":f"📰 Analyse news — {_sname_chat}"})
             st.session_state.chat_history.append({"role":"assistant","content":_rep2})
+            st.session_state.last_ai_msg = _rep2
             st.rerun()
 
     if _btn_risk:
@@ -3098,43 +3508,431 @@ with t_chat:
                 _rep2 = risk_advice_gpt(sig,capital) if (GPT_OK and is_configured()) else ai_deep_analysis(f"Conseils risque pour {_sname_chat}",sig,capital,symbol)
             st.session_state.chat_history.append({"role":"user","content":f"🛡️ Conseil risque — {_sname_chat}"})
             st.session_state.chat_history.append({"role":"assistant","content":_rep2})
+            st.session_state.last_ai_msg = _rep2
             st.rerun()
 
     st.markdown("<div style='height:8px'></div>",unsafe_allow_html=True)
 
-    # Suggestions
-    _suggs=[f"Analyse complète de {_sname_chat}",f"Plan de trade pour ${capital:,.0f}",
-            "Quels indicateurs confirment le signal ?","Comment protéger mon capital ?",
-            "Compare signal et tendance long terme","Quand prendre mes bénéfices ?"]
+    # ── Quick suggestions ─────────────────────────────────────────────────────
+    _suggs=[f"Bonjour, présente-toi",f"Faut-il acheter {_sname_chat} ?",
+            "Comment protéger mon capital ?","Explique le RSI et le MACD",
+            f"Rapport complet sur {_sname_chat}","Projections de profit"]
     _scc1,_scc2,_scc3=st.columns(3); _chosen=None
     for _i,(_col,_sg) in enumerate(zip([_scc1,_scc1,_scc2,_scc2,_scc3,_scc3],_suggs)):
         with _col:
-            if st.button(_sg[:40]+"…" if len(_sg)>40 else _sg,key=f"sg{_i}",use_container_width=True): _chosen=_sg
+            if st.button(_sg[:38]+"…" if len(_sg)>38 else _sg,key=f"sg{_i}",use_container_width=True):
+                _chosen=_sg
     st.markdown("<div style='height:8px'></div>",unsafe_allow_html=True)
 
-    # Historique
-    for _msg in st.session_state.chat_history:
+    # ── Chat history ──────────────────────────────────────────────────────────
+    _last_ai_for_tts = ""
+    for _idx_msg, _msg in enumerate(st.session_state.chat_history):
         if _msg["role"]=="user":
             st.markdown(f'<div class="lbl-user">VOUS</div><div class="msg-user">{_msg["content"]}</div>',unsafe_allow_html=True)
         else:
             _c=_msg["content"].replace("\n","<br>")
-            st.markdown(f'<div class="lbl-ai">⬡ GPT-4o</div><div class="msg-ai">{_c}</div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="lbl-ai">⬡ ORACLE IA</div><div class="msg-ai" id="ai-msg-{_idx_msg}">{_c}</div>',unsafe_allow_html=True)
+            _last_ai_for_tts = _msg["content"]
 
-    # Input
-    _ui=st.text_area("",placeholder=f"Posez votre question — L'Oracle IA analyse vos données {_sname_chat} en temps réel…",height=95,label_visibility="collapsed",key="chat_in_v4")
+    # ── Voice + Text input area ───────────────────────────────────────────────
+    _ui=st.text_area("",placeholder=f"Parlez ou tapez votre question — L'Oracle IA analyse {_sname_chat} en temps réel… 🎤",
+                     height=90,label_visibility="collapsed",key="chat_in_v5")
     if _chosen: _ui=_chosen
-    _cb1,_cb2=st.columns([4,1])
-    with _cb1: _send_btn=st.button("⬡  ENVOYER À L'ORACLE IA",use_container_width=True)
+
+    # ── Send + Voice + Clear buttons ──────────────────────────────────────────
+    _cb1,_cb2,_cb3=st.columns([3,1,1])
+    with _cb1: _send_btn=st.button("⬡  ENVOYER À L'ORACLE",use_container_width=True)
     with _cb2:
-        if st.button("🗑  EFFACER",use_container_width=True): st.session_state.chat_history=[]; st.rerun()
+        _tts_on = st.session_state.get("tts_enabled", True)
+        _tts_lbl = "🔊 VOIX ON" if _tts_on else "🔇 VOIX OFF"
+        if st.button(_tts_lbl, use_container_width=True, key="tts_toggle"):
+            st.session_state.tts_enabled = not _tts_on
+            st.rerun()
+    with _cb3:
+        if st.button("🗑 EFFACER",use_container_width=True):
+            st.session_state.chat_history=[]
+            st.session_state.last_ai_msg=""
+            st.rerun()
+
     if _send_btn and _ui.strip():
         st.session_state.chat_history.append({"role":"user","content":_ui})
         with st.spinner("⬡ Oracle IA analyse…"):
-            _ctx={"signal":sig,"capital":capital} if sig else {}
-            _hist=[{"role":m["role"],"content":m["content"]} for m in st.session_state.chat_history[:-1]]
-            _rep = ask_gpt(_ui,_ctx,_hist) if (GPT_OK and is_configured()) else ai_deep_analysis(_ui,sig,capital,symbol)
+            _ctx2={"signal":sig,"capital":capital} if sig else {}
+            _hist2=[{"role":m["role"],"content":m["content"]} for m in st.session_state.chat_history[:-1]]
+            _rep = ask_gpt(_ui,_ctx2,_hist2) if (GPT_OK and is_configured()) else ai_deep_analysis(_ui,sig,capital,symbol)
         st.session_state.chat_history.append({"role":"assistant","content":_rep})
+        st.session_state.last_ai_msg = _rep
         st.rerun()
+
+    # ── VOICE INTERFACE — Web Speech API ─────────────────────────────────────
+    _tts_enabled_js = str(st.session_state.get("tts_enabled", True)).lower()
+    _last_msg_js = (_last_ai_for_tts
+                    .replace("\\","").replace("`","").replace("'","\'")
+                    .replace('"','\"')
+                    [:800])  # limit TTS length
+
+    st.markdown(f'''
+    <!-- QUANTUM VOICE INTERFACE v5 -->
+    <style>
+    #qto-voice-wrapper {{
+      margin: 10px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }}
+    #qto-mic-btn {{
+      position: relative;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,200,240,.4);
+      background: linear-gradient(135deg,rgba(0,200,240,.1),rgba(0,245,157,.06));
+      color: {C["accent"]};
+      font-size: 22px;
+      cursor: pointer;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 15px rgba(0,200,240,.15),inset 0 1px 0 rgba(255,255,255,.06);
+      flex-shrink: 0;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }}
+    #qto-mic-btn:hover {{
+      border-color: {C["accent"]};
+      box-shadow: 0 0 25px rgba(0,200,240,.35), 0 0 50px rgba(0,200,240,.12);
+      transform: scale(1.06);
+    }}
+    #qto-mic-btn.listening {{
+      border-color: {C["green"]};
+      background: linear-gradient(135deg,rgba(0,245,157,.2),rgba(0,200,240,.1));
+      box-shadow: 0 0 30px rgba(0,245,157,.5), 0 0 60px rgba(0,245,157,.2);
+      animation: mic-pulse 1.2s ease-in-out infinite;
+    }}
+    #qto-mic-btn.speaking {{
+      border-color: {C["yellow"]};
+      background: linear-gradient(135deg,rgba(240,200,0,.15),rgba(0,200,240,.05));
+      box-shadow: 0 0 25px rgba(240,200,0,.4);
+      animation: speak-pulse 0.8s ease-in-out infinite;
+    }}
+    @keyframes mic-pulse {{
+      0%,100% {{ box-shadow: 0 0 20px rgba(0,245,157,.4),0 0 40px rgba(0,245,157,.15); transform: scale(1); }}
+      50% {{ box-shadow: 0 0 35px rgba(0,245,157,.7),0 0 70px rgba(0,245,157,.25); transform: scale(1.08); }}
+    }}
+    @keyframes speak-pulse {{
+      0%,100% {{ box-shadow: 0 0 20px rgba(240,200,0,.3); }}
+      50% {{ box-shadow: 0 0 35px rgba(240,200,0,.6); }}
+    }}
+    #qto-voice-status {{
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      color: {C["muted2"]};
+      letter-spacing: 1px;
+      flex: 1;
+      min-width: 120px;
+    }}
+    #qto-voice-transcript {{
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: {C["accent"]};
+      flex: 1;
+      min-width: 180px;
+      background: rgba(0,200,240,.04);
+      border: 1px solid rgba(0,200,240,.15);
+      border-radius: 6px;
+      padding: 8px 12px;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+    #qto-voice-bar {{
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 24px;
+    }}
+    #qto-voice-bar span {{
+      display: inline-block;
+      width: 3px;
+      background: {C["green"]};
+      border-radius: 2px;
+      animation: bar-bounce 0.6s ease-in-out infinite;
+    }}
+    #qto-voice-bar span:nth-child(1){{animation-delay:.0s;height:8px}}
+    #qto-voice-bar span:nth-child(2){{animation-delay:.1s;height:16px}}
+    #qto-voice-bar span:nth-child(3){{animation-delay:.2s;height:12px}}
+    #qto-voice-bar span:nth-child(4){{animation-delay:.3s;height:20px}}
+    #qto-voice-bar span:nth-child(5){{animation-delay:.4s;height:10px}}
+    @keyframes bar-bounce {{
+      0%,100% {{ transform: scaleY(1); opacity:.6; }}
+      50% {{ transform: scaleY(1.8); opacity:1; }}
+    }}
+    #qto-no-support {{
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9px;
+      color: {C["muted2"]};
+      background: rgba(255,48,96,.06);
+      border: 1px solid rgba(255,48,96,.2);
+      border-radius: 6px;
+      padding: 6px 12px;
+    }}
+    @media (max-width: 480px) {{
+      #qto-mic-btn {{ width: 52px; height: 52px; font-size: 20px; }}
+      #qto-voice-transcript {{ font-size: 10px; padding: 6px 10px; }}
+    }}
+    </style>
+
+    <div id="qto-voice-wrapper">
+      <button id="qto-mic-btn" title="Appuyez pour parler">🎤</button>
+      <div id="qto-voice-transcript">
+        <span id="qto-transcript-text" style="color:{C["muted2"]}">Appuyez sur le micro pour parler…</span>
+      </div>
+    </div>
+    <div id="qto-voice-status">🔇 Microphone prêt</div>
+    <div id="qto-no-support" style="display:none">
+      ⚠️ Reconnaissance vocale non disponible sur ce navigateur. Utilisez Chrome ou Edge.
+    </div>
+
+    <script>
+    (function() {{
+      var btn          = document.getElementById("qto-mic-btn");
+      var statusEl     = document.getElementById("qto-voice-status");
+      var transcriptEl = document.getElementById("qto-transcript-text");
+      var noSupportEl  = document.getElementById("qto-no-support");
+      var wrapper      = document.getElementById("qto-voice-wrapper");
+
+      var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      var synth     = window.speechSynthesis;
+
+      // ── TTS enabled flag from Python ──────────────────────────────────
+      var TTS_ENABLED = {_tts_enabled_js};
+
+      // ── Check browser support ─────────────────────────────────────────
+      if (!SpeechRec) {{
+        btn.style.display = "none";
+        noSupportEl.style.display = "block";
+        return;
+      }}
+
+      // ── Speech Recognition setup ──────────────────────────────────────
+      var rec = new SpeechRec();
+      rec.lang         = "fr-FR";
+      rec.interimResults = true;
+      rec.continuous   = false;
+      rec.maxAlternatives = 1;
+
+      var listening = false;
+      var finalText = "";
+
+      // ── Inject text into Streamlit textarea ───────────────────────────
+      function injectToStreamlit(text) {{
+        // Find the textarea by key or placeholder
+        var areas = document.querySelectorAll("textarea");
+        var target = null;
+        areas.forEach(function(a) {{
+          if (a.placeholder && a.placeholder.includes("Parlez ou tapez")) target = a;
+        }});
+        if (!target && areas.length) target = areas[areas.length - 1];
+        if (!target) return;
+
+        // React-compatible setter
+        var setter = Object.getOwnPropertyDescriptor(
+          window.HTMLTextAreaElement.prototype, "value"
+        );
+        if (setter && setter.set) {{
+          setter.set.call(target, text);
+          target.dispatchEvent(new Event("input", {{ bubbles: true }}));
+          target.dispatchEvent(new Event("change", {{ bubbles: true }}));
+        }}
+        target.focus();
+        transcriptEl.textContent = "✅ " + text.substring(0, 50) + (text.length > 50 ? "…" : "");
+        transcriptEl.style.color = "{C["green"]}";
+      }}
+
+      // ── TTS: speak AI response ─────────────────────────────────────────
+      function speakText(text) {{
+        if (!TTS_ENABLED || !synth) return;
+        synth.cancel();
+        // Strip markdown symbols for cleaner speech
+        var clean = text
+          .replace(/\*\*(.+?)\*\*/g, "$1")
+          .replace(/\*(.+?)\*/g, "$1")
+          .replace(/#{1,6}\s/g, "")
+          .replace(/[\|\-\=]{2,}/g, ".")
+          .replace(/```[\s\S]*?```/g, "")
+          .replace(/`([^`]+)`/g, "$1")
+          .replace(/\[.*?\]/g, "")
+          .replace(/\(.*?\)/g, "")
+          .replace(/https?:\/\/\S+/g, "")
+          .replace(/\n/g, " ")
+          .replace(/\s{{2,}}/g, " ")
+          .trim()
+          .substring(0, 600); // Limit length for TTS
+
+        if (!clean) return;
+
+        btn.classList.add("speaking");
+        statusEl.textContent = "🔊 Oracle IA parle…";
+        statusEl.style.color = "{C["yellow"]}";
+
+        var utter = new SpeechSynthesisUtterance(clean);
+        utter.lang  = "fr-FR";
+        utter.rate  = 1.05;
+        utter.pitch = 0.95;
+        utter.volume = 0.92;
+
+        // Try to find a French voice
+        var voices = synth.getVoices();
+        var frVoice = voices.find(v => v.lang.startsWith("fr"));
+        if (frVoice) utter.voice = frVoice;
+
+        utter.onend = function() {{
+          btn.classList.remove("speaking");
+          statusEl.textContent = "✅ Oracle IA a répondu";
+          statusEl.style.color = "{C["green"]}";
+          setTimeout(function() {{
+            statusEl.textContent = "🎤 Appuyez pour reparler";
+            statusEl.style.color = "{C["muted2"]}";
+          }}, 2000);
+        }};
+        utter.onerror = function() {{
+          btn.classList.remove("speaking");
+          statusEl.textContent = "🎤 Microphone prêt";
+          statusEl.style.color = "{C["muted2"]}";
+        }};
+        synth.speak(utter);
+      }}
+
+      // ── Auto-speak last AI message on page load ────────────────────────
+      var lastMsg = {repr(_last_msg_js)};
+      var hasSpoken = sessionStorage.getItem("qto-last-spoken");
+      if (lastMsg && lastMsg !== hasSpoken && TTS_ENABLED) {{
+        // Small delay to let page render
+        setTimeout(function() {{
+          sessionStorage.setItem("qto-last-spoken", lastMsg);
+          speakText(lastMsg);
+        }}, 800);
+      }}
+
+      // ── Recognition events ─────────────────────────────────────────────
+      rec.onstart = function() {{
+        listening = true;
+        finalText = "";
+        btn.classList.add("listening");
+        btn.innerHTML = "⏹";
+        btn.title = "Cliquez pour arrêter";
+        statusEl.textContent = "🔴 Écoute en cours…";
+        statusEl.style.color = "{C["green"]}";
+        transcriptEl.innerHTML = '<div id="qto-voice-bar"><span></span><span></span><span></span><span></span><span></span></div>';
+      }};
+
+      rec.onresult = function(e) {{
+        var interim = "";
+        for (var i = e.resultIndex; i < e.results.length; i++) {{
+          if (e.results[i].isFinal) {{
+            finalText += e.results[i][0].transcript + " ";
+          }} else {{
+            interim += e.results[i][0].transcript;
+          }}
+        }}
+        var display = (finalText + interim).trim();
+        if (display) {{
+          transcriptEl.textContent = "🎤 " + display;
+          transcriptEl.style.color = "{C["accent"]}";
+        }}
+      }};
+
+      rec.onerror = function(e) {{
+        listening = false;
+        btn.classList.remove("listening");
+        btn.innerHTML = "🎤";
+        btn.title = "Appuyez pour parler";
+        var msgs = {{
+          "no-speech":       "⚠️ Aucun son détecté — réessayez",
+          "audio-capture":   "⚠️ Microphone non accessible",
+          "not-allowed":     "🚫 Accès micro refusé — autorisez dans le navigateur",
+          "network":         "⚠️ Problème réseau",
+          "aborted":         "⏸ Annulé"
+        }};
+        statusEl.textContent = msgs[e.error] || ("⚠️ Erreur : " + e.error);
+        statusEl.style.color = "{C["red"]}";
+        transcriptEl.textContent = "Appuyez sur le micro pour parler…";
+        transcriptEl.style.color = "{C["muted2"]}";
+      }};
+
+      rec.onend = function() {{
+        listening = false;
+        btn.classList.remove("listening");
+        btn.innerHTML = "🎤";
+        btn.title = "Appuyez pour parler";
+        var text = finalText.trim();
+        if (text.length > 1) {{
+          statusEl.textContent = "⬡ Envoi à l'Oracle IA…";
+          statusEl.style.color = "{C["accent"]}";
+          injectToStreamlit(text);
+          // Auto-click the send button after 400ms
+          setTimeout(function() {{
+            var btns = document.querySelectorAll("button");
+            var sendBtn = null;
+            btns.forEach(function(b) {{
+              if (b.textContent && b.textContent.trim().includes("ENVOYER")) sendBtn = b;
+            }});
+            if (sendBtn) {{
+              sendBtn.click();
+              statusEl.textContent = "⬡ Message envoyé !";
+            }} else {{
+              statusEl.textContent = "✍️ Texte injecté — cliquez Envoyer";
+              statusEl.style.color = "{C["yellow"]}";
+            }}
+          }}, 450);
+        }} else {{
+          statusEl.textContent = "🎤 Microphone prêt";
+          statusEl.style.color = "{C["muted2"]}";
+          transcriptEl.textContent = "Appuyez sur le micro pour parler…";
+          transcriptEl.style.color = "{C["muted2"]}";
+        }}
+      }};
+
+      // ── Button click handler ───────────────────────────────────────────
+      btn.addEventListener("click", function(e) {{
+        e.preventDefault();
+        if (listening) {{
+          rec.stop();
+        }} else {{
+          synth && synth.cancel(); // stop TTS if speaking
+          try {{
+            rec.start();
+          }} catch(err) {{
+            // If already started, stop and restart
+            rec.abort();
+            setTimeout(function() {{ rec.start(); }}, 200);
+          }}
+        }}
+      }});
+
+      // ── Voices change handler ──────────────────────────────────────────
+      if (synth && synth.onvoiceschanged !== undefined) {{
+        synth.onvoiceschanged = function() {{}}; // trigger voice list load
+      }}
+
+      // ── Watch for TTS toggle changes via DOM ───────────────────────────
+      new MutationObserver(function() {{
+        // Re-read TTS state from button label
+        var ttsBtn = null;
+        document.querySelectorAll("button").forEach(function(b) {{
+          if (b.textContent && (b.textContent.includes("VOIX ON") || b.textContent.includes("VOIX OFF"))) {{
+            ttsBtn = b;
+          }}
+        }});
+        if (ttsBtn) {{
+          TTS_ENABLED = ttsBtn.textContent.includes("ON");
+          if (!TTS_ENABLED) {{ synth && synth.cancel(); }}
+        }}
+      }}).observe(document.body, {{childList: true, subtree: true}});
+
+    }})();
+    </script>
+    ''', unsafe_allow_html=True)
 
 
 # ── BACKTEST ─────────────────────────────────────────────────────────────────
