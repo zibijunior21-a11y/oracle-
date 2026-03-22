@@ -74,7 +74,7 @@ st.markdown("""
    Fonts: Orbitron (display) · Outfit (body) · JetBrains Mono (data)
 ═══════════════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Outfit:wght@200;300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,300&family=Syne:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Outfit:wght@200;300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,300&family=Syne:wght@700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=Manrope:wght@300;400;500;600&display=swap');
 
 /* ── Design Tokens ───────────────────────────────────────────────────────── */
 :root {
@@ -728,35 +728,41 @@ details summary {
 [data-testid="column"]:nth-child(5) [data-testid="metric-container"] { animation-delay: .25s; }
 [data-testid="column"]:nth-child(6) [data-testid="metric-container"] { animation-delay: .30s; }
 
-/* ══════════════════════════════════════════════════════════════════════
-   📱 MOBILE RESPONSIVE
-══════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   📱 MOBILE RESPONSIVE v5.1 — Quantum Trade Oracle
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Viewport & touch base ──────────────────────────────────────── */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
 @media screen and (max-width: 768px) {
 
-  /* === LAYOUT === */
   .block-container {
     padding: 0.4rem 0.5rem !important;
     max-width: 100vw !important;
     overflow-x: hidden !important;
   }
 
-  /* === FORCE ALL COLUMN GROUPS TO STACK ===
-     Streamlit's [data-testid="stHorizontalBlock"] is the flex parent.
-     We flip it to column so child columns stack vertically.         */
+  /* COLUMN STACKING — targets Streamlit's flex parent */
   [data-testid="stHorizontalBlock"] {
     flex-direction: column !important;
     gap: 6px !important;
     flex-wrap: nowrap !important;
+    width: 100% !important;
   }
-  [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+  [data-testid="stHorizontalBlock"] > [data-testid="column"],
+  [data-testid="stHorizontalBlock"] > div[class] {
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
     flex: 1 1 100% !important;
-    /* Override Streamlit's inline flex-basis */
   }
 
-  /* === SIDEBAR === */
+  /* SIDEBAR */
   section[data-testid="stSidebar"] {
     min-width: 0 !important;
     width: 88vw !important;
@@ -765,7 +771,7 @@ details summary {
   }
   section[data-testid="stSidebar"]::after { display: none !important; }
 
-  /* === TABS — horizontal scroll (no wrap = no 2-line tabs) === */
+  /* TABS — horizontal scroll, no wrap */
   .stTabs [data-baseweb="tab-list"] {
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
@@ -774,21 +780,21 @@ details summary {
     scrollbar-width: none !important;
     gap: 2px !important;
     padding: 3px !important;
-    -webkit-mask: linear-gradient(90deg,#000 80%,transparent 100%) !important;
-    mask: linear-gradient(90deg,#000 80%,transparent 100%) !important;
+    -webkit-mask: linear-gradient(90deg,#000 78%,transparent 100%) !important;
+    mask: linear-gradient(90deg,#000 78%,transparent 100%) !important;
   }
   .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar { display: none !important; }
   .stTabs [data-baseweb="tab"] {
-    font-size: 8.5px !important;
-    padding: 7px 10px !important;
-    letter-spacing: 0.5px !important;
+    font-size: 8px !important;
+    padding: 7px 9px !important;
+    letter-spacing: 0.3px !important;
     min-height: 38px !important;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
   }
 
-  /* === METRIC CARDS === */
-  [data-testid="stMetricValue"] { font-size: 1.3rem !important; }
+  /* METRIC CARDS */
+  [data-testid="stMetricValue"] { font-size: 1.25rem !important; }
   [data-testid="metric-container"] {
     padding: 10px 12px !important;
     backdrop-filter: none !important;
@@ -796,16 +802,17 @@ details summary {
   }
   [data-testid="metric-container"]::before { animation: none !important; }
 
-  /* === BUTTONS — full-width, touch-safe === */
+  /* BUTTONS */
   .stButton > button {
     min-height: 46px !important;
     width: 100% !important;
     font-size: 10px !important;
     letter-spacing: 1.5px !important;
     backdrop-filter: none !important;
+    touch-action: manipulation !important;
   }
 
-  /* === INPUTS — 16px prevents iOS auto-zoom === */
+  /* INPUTS — 16px prevents iOS zoom */
   .stTextInput input,
   .stNumberInput input,
   .stTextArea textarea {
@@ -819,7 +826,7 @@ details summary {
     backdrop-filter: none !important;
   }
 
-  /* === CHARTS — scrollable === */
+  /* CHARTS */
   [data-testid="stPlotlyChart"],
   .js-plotly-plot, .plotly, .plot-container {
     width: 100% !important;
@@ -828,7 +835,7 @@ details summary {
     -webkit-overflow-scrolling: touch !important;
   }
 
-  /* === BACKGROUND — disable fixed attachment (jank on iOS) === */
+  /* BACKGROUND perf */
   .stApp {
     background-attachment: scroll !important;
     background-size:
@@ -838,7 +845,7 @@ details summary {
       100% 100%, 100% 100% !important;
   }
 
-  /* === MISC COMPONENTS === */
+  /* COMPONENTS */
   .legend-box, .explain-box {
     padding: 12px 14px !important;
     backdrop-filter: none !important;
@@ -848,53 +855,55 @@ details summary {
     padding: 10px 12px !important;
     line-height: 1.6 !important;
   }
-  .stAlert { backdrop-filter: none !important; }
-  details { backdrop-filter: none !important; }
+  .stAlert, details { backdrop-filter: none !important; }
+  #qto-voice-wrapper { flex-wrap: wrap !important; }
+  #qto-voice-transcript { min-width: 120px !important; font-size: 10px !important; }
 
-  /* === Remove animation stagger on mobile === */
+  /* Kill animation stagger */
   [data-testid="column"]:nth-child(n) [data-testid="metric-container"] {
     animation-delay: 0s !important;
   }
 }
 
-/* === Ultra-compact (≤ 480px) === */
+/* === ≤ 480px ultra compact === */
 @media screen and (max-width: 480px) {
   .block-container { padding: 0.25rem 0.3rem !important; }
 
-  /* Kill scanlines & grid bg on tiny phones */
   .stApp::before { display: none !important; }
   .stApp {
     background-image:
-      radial-gradient(ellipse 90% 60% at 15% 0%, rgba(0,80,160,.08) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 70% at 50% 50%, rgba(0,15,40,.1) 0%, transparent 65%) !important;
+      radial-gradient(ellipse 90% 60% at 15% 0%, rgba(0,80,160,.07) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 70% at 50% 50%, rgba(0,15,40,.09) 0%, transparent 65%) !important;
     background-size: 100% 100%, 100% 100% !important;
   }
 
   section[data-testid="stSidebar"] { width: 93vw !important; }
 
   .stTabs [data-baseweb="tab"] {
-    font-size: 7.5px !important;
-    padding: 6px 8px !important;
+    font-size: 7px !important;
+    padding: 6px 7px !important;
     letter-spacing: 0 !important;
     min-height: 34px !important;
   }
 
   [data-testid="stMetricValue"] {
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
     letter-spacing: 0 !important;
   }
+  [data-testid="metric-container"] { padding: 8px 10px !important; }
   [data-testid="metric-container"] label {
     font-size: 7px !important;
-    letter-spacing: 1.5px !important;
+    letter-spacing: 1px !important;
   }
-  [data-testid="metric-container"] { padding: 8px 10px !important; }
 
-  /* Metric grid: 2 per row on tiny phones via flex wrapping */
+  /* Metric cards 2-per-row on tiny screens */
   [data-testid="stHorizontalBlock"]:has([data-testid="metric-container"]) {
     flex-direction: row !important;
     flex-wrap: wrap !important;
+    gap: 4px !important;
   }
-  [data-testid="stHorizontalBlock"]:has([data-testid="metric-container"]) > [data-testid="column"] {
+  [data-testid="stHorizontalBlock"]:has([data-testid="metric-container"])
+    > [data-testid="column"] {
     flex: 1 1 calc(50% - 4px) !important;
     min-width: calc(50% - 4px) !important;
     max-width: calc(50% - 4px) !important;
@@ -904,13 +913,13 @@ details summary {
     font-size: 9px !important;
     letter-spacing: 1px !important;
     min-height: 44px !important;
-    padding: 8px 10px !important;
+    padding: 8px !important;
   }
-  .stMarkdown h1 { font-size: 1.2rem !important; }
-  .stMarkdown h2 { font-size: 1rem !important; }
+
+  #qto-mic-btn { width: 48px !important; height: 48px !important; font-size: 18px !important; }
 }
 
-/* === Touch devices: remove hover-sticky effects === */
+/* === Touch: remove hover-sticky effects === */
 @media (hover: none) and (pointer: coarse) {
   .stButton > button:hover {
     transform: none !important;
@@ -933,6 +942,7 @@ details summary {
   .stCheckbox label,
   .stSelectbox [data-baseweb="select"] > div {
     min-height: 44px !important;
+    cursor: pointer !important;
   }
   ::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
 }
@@ -946,43 +956,44 @@ details summary {
 st.markdown('''
 <script>
 (function(){
-  var BREAK = 768;
-  function patch(){
-    if(window.innerWidth > BREAK) return;
-    // Force all horizontal blocks to column layout
-    var blocks = document.querySelectorAll('[data-testid="stHorizontalBlock"]');
-    blocks.forEach(function(blk){
-      blk.style.setProperty('flex-direction','column','important');
-      blk.style.setProperty('gap','6px','important');
-      // patch each child column
-      var cols = blk.querySelectorAll('[data-testid="column"]');
-      cols.forEach(function(col){
-        col.style.setProperty('width','100%','important');
-        col.style.setProperty('min-width','100%','important');
-        col.style.setProperty('max-width','100%','important');
-        col.style.setProperty('flex','1 1 100%','important');
-      });
-      // Special case: metric row on tiny phones — 2 per row
-      if(window.innerWidth <= 480 && blk.querySelector('[data-testid="metric-container"]')){
-        blk.style.setProperty('flex-direction','row','important');
-        blk.style.setProperty('flex-wrap','wrap','important');
-        cols.forEach(function(col){
-          col.style.setProperty('flex','1 1 calc(50% - 4px)','important');
-          col.style.setProperty('min-width','calc(50% - 4px)','important');
-          col.style.setProperty('max-width','calc(50% - 4px)','important');
+  var BREAK=768, SMALL=480, timer;
+
+  function patch() {
+    var w = window.innerWidth;
+    if (w > BREAK) return;
+
+    document.querySelectorAll('[data-testid="stHorizontalBlock"]').forEach(function(blk) {
+      var isMetric = !!blk.querySelector('[data-testid="metric-container"]');
+
+      if (w <= SMALL && isMetric) {
+        // 2-col grid for KPI cards on tiny phones
+        blk.style.cssText += ';flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;';
+        blk.querySelectorAll('[data-testid="column"]').forEach(function(c) {
+          c.style.cssText += ';flex:1 1 calc(50% - 4px)!important;min-width:calc(50% - 4px)!important;max-width:calc(50% - 4px)!important;';
+        });
+      } else {
+        // Stack all other rows vertically
+        blk.style.cssText += ';flex-direction:column!important;gap:6px!important;flex-wrap:nowrap!important;width:100%!important;';
+        blk.querySelectorAll('[data-testid="column"],:scope>div').forEach(function(c) {
+          c.style.cssText += ';width:100%!important;min-width:100%!important;max-width:100%!important;flex:1 1 100%!important;';
         });
       }
     });
+    // Prevent horizontal scroll on main
+    var bc = document.querySelector('.block-container');
+    if (bc) bc.style.setProperty('overflow-x','hidden','important');
   }
-  // Initial run
-  function init(){
+
+  function debounce() { clearTimeout(timer); timer = setTimeout(patch, 50); }
+
+  function init() {
     patch();
-    // Re-patch on Streamlit re-renders via MutationObserver
-    new MutationObserver(patch).observe(document.body,{childList:true,subtree:true});
-    window.addEventListener('resize', patch);
+    new MutationObserver(debounce).observe(document.body, {childList:true, subtree:true});
+    window.addEventListener('resize', debounce, {passive:true});
   }
+
   document.readyState==='loading'
-    ? document.addEventListener('DOMContentLoaded',init)
+    ? document.addEventListener('DOMContentLoaded', init)
     : init();
 })();
 </script>
@@ -3566,10 +3577,13 @@ with t_chat:
 
     # ── VOICE INTERFACE — Web Speech API ─────────────────────────────────────
     _tts_enabled_js = str(st.session_state.get("tts_enabled", True)).lower()
-    _last_msg_js = (_last_ai_for_tts
-                    .replace("\\","").replace("`","").replace("'","\'")
-                    .replace('"','\"')
-                    [:800])  # limit TTS length
+    # Clean AI message for safe JS embedding
+    _last_msg_js = (
+        _last_ai_for_tts[:800]
+        .replace("\\", " ").replace("`", " ")
+        .replace("'", " ").replace('"', " ")
+        .replace("\n", " ").replace("<br>", " ")
+    )  # limit TTS length
 
     st.markdown(f'''
     <!-- QUANTUM VOICE INTERFACE v5 -->
@@ -3755,17 +3769,16 @@ with t_chat:
         synth.cancel();
         // Strip markdown symbols for cleaner speech
         var clean = text
-          .replace(/\*\*(.+?)\*\*/g, "$1")
-          .replace(/\*(.+?)\*/g, "$1")
-          .replace(/#{1,6}\s/g, "")
-          .replace(/[\|\-\=]{2,}/g, ".")
-          .replace(/```[\s\S]*?```/g, "")
+          .replace(/[*][*](.+?)[*][*]/g, "$1")
+          .replace(/[*](.+?)[*]/g, "$1")
+          .replace(/#{1,6}[ ]/g, "")
+          .replace(/[|=]{2,}/g, ".")
+          .replace(/```[^`]*```/g, "")
           .replace(/`([^`]+)`/g, "$1")
-          .replace(/\[.*?\]/g, "")
-          .replace(/\(.*?\)/g, "")
-          .replace(/https?:\/\/\S+/g, "")
+          .replace(/\[([^\]]*)\]/g, "$1")
+          .replace(/https?:[^ ]+/g, "")
           .replace(/\n/g, " ")
-          .replace(/\s{{2,}}/g, " ")
+          .replace(/[ ]{2,}/g, " ")
           .trim()
           .substring(0, 600); // Limit length for TTS
 
