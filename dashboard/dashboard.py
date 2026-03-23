@@ -916,7 +916,6 @@ html {
     padding: 8px !important;
   }
 
-  #qto-mic-btn { width: 48px !important; height: 48px !important; font-size: 18px !important; }
 }
 
 /* === Touch: remove hover-sticky effects === */
@@ -1069,7 +1068,7 @@ for k,v in dict(signal=None,df_raw=None,df_feat=None,sentiment=None,
                 backtest_result=None,signal_history=[],trained=False,
                 status_msg="",news_data=[],scan_data=None,
                 chat_history=[],selected_symbol="BTC-USD",
-                voice_input="",tts_enabled=True,last_ai_msg="").items():
+                ).items():
     if k not in st.session_state: st.session_state[k]=v
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -2708,7 +2707,7 @@ Je suis prêt à vous analyser en profondeur. Exemples de questions :
 - *"Comment fonctionne le Forex ?"*
 - *"Qu'est-ce que le halving Bitcoin ?"*
 
-Parlez-moi librement — par écrit ou par vocal 🎤"""
+Parlez-moi librement """
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -3448,17 +3447,6 @@ with t_scan:
 with t_chat:
     _sname_chat = get_name(symbol)
 
-    # ── Voice Input Handler — triggered by JS postMessage ────────────────────
-    _voice_in = st.session_state.get("voice_input", "")
-    if _voice_in:
-        st.session_state.voice_input = ""
-        st.session_state.chat_history.append({"role":"user","content":f"🎤 {_voice_in}"})
-        with st.spinner("⬡ Oracle IA analyse…"):
-            _rep = ai_deep_analysis(_voice_in, sig, capital, symbol)
-        st.session_state.chat_history.append({"role":"assistant","content":_rep})
-        st.session_state.last_ai_msg = _rep
-        st.rerun()
-
     # ── Status bar ───────────────────────────────────────────────────────────
     st.markdown(f'''
     <div style="background:linear-gradient(135deg,rgba(0,245,157,.06),rgba(0,200,240,.04));
@@ -3476,7 +3464,7 @@ with t_chat:
           MOTEUR IA PROPRIÉTAIRE ACTIF
         </div>
         <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted2"]};margin-top:2px">
-          100% votre code · Zéro API · Zéro abonnement · Voix activée 🎤
+          100% votre code · Zéro API · Zéro abonnement
         </div>
       </div>
       <div style="text-align:right">
@@ -3499,7 +3487,6 @@ with t_chat:
                 _rep2 = generate_report(sig,df,news,capital) if (GPT_OK and is_configured()) else ai_deep_analysis(f"Rapport complet sur {_sname_chat}",sig,capital,symbol)
             st.session_state.chat_history.append({"role":"user","content":f"📋 Rapport complet — {_sname_chat}"})
             st.session_state.chat_history.append({"role":"assistant","content":_rep2})
-            st.session_state.last_ai_msg = _rep2
             st.rerun()
 
     if _btn_news_ai:
@@ -3509,7 +3496,6 @@ with t_chat:
                 _rep2 = analyze_news_gpt(news,symbol,sig) if (GPT_OK and is_configured()) else ai_deep_analysis(f"Analyse les news sur {_sname_chat}",sig,capital,symbol)
             st.session_state.chat_history.append({"role":"user","content":f"📰 Analyse news — {_sname_chat}"})
             st.session_state.chat_history.append({"role":"assistant","content":_rep2})
-            st.session_state.last_ai_msg = _rep2
             st.rerun()
 
     if _btn_risk:
@@ -3519,7 +3505,6 @@ with t_chat:
                 _rep2 = risk_advice_gpt(sig,capital) if (GPT_OK and is_configured()) else ai_deep_analysis(f"Conseils risque pour {_sname_chat}",sig,capital,symbol)
             st.session_state.chat_history.append({"role":"user","content":f"🛡️ Conseil risque — {_sname_chat}"})
             st.session_state.chat_history.append({"role":"assistant","content":_rep2})
-            st.session_state.last_ai_msg = _rep2
             st.rerun()
 
     st.markdown("<div style='height:8px'></div>",unsafe_allow_html=True)
@@ -3536,33 +3521,24 @@ with t_chat:
     st.markdown("<div style='height:8px'></div>",unsafe_allow_html=True)
 
     # ── Chat history ──────────────────────────────────────────────────────────
-    _last_ai_for_tts = ""
     for _idx_msg, _msg in enumerate(st.session_state.chat_history):
         if _msg["role"]=="user":
             st.markdown(f'<div class="lbl-user">VOUS</div><div class="msg-user">{_msg["content"]}</div>',unsafe_allow_html=True)
         else:
             _c=_msg["content"].replace("\n","<br>")
             st.markdown(f'<div class="lbl-ai">⬡ ORACLE IA</div><div class="msg-ai" id="ai-msg-{_idx_msg}">{_c}</div>',unsafe_allow_html=True)
-            _last_ai_for_tts = _msg["content"]
 
     # ── Voice + Text input area ───────────────────────────────────────────────
-    _ui=st.text_area("",placeholder=f"Parlez ou tapez votre question — L'Oracle IA analyse {_sname_chat} en temps réel… 🎤",
+    _ui=st.text_area("",placeholder=f"Tapez votre question — L'Oracle IA analyse {_sname_chat} en temps réel…",
                      height=90,label_visibility="collapsed",key="chat_in_v5")
     if _chosen: _ui=_chosen
 
-    # ── Send + Voice + Clear buttons ──────────────────────────────────────────
-    _cb1,_cb2,_cb3=st.columns([3,1,1])
+    # ── Send + Clear buttons ──────────────────────────────────────────────────
+    _cb1,_cb2=st.columns([4,1])
     with _cb1: _send_btn=st.button("⬡  ENVOYER À L'ORACLE",use_container_width=True)
     with _cb2:
-        _tts_on = st.session_state.get("tts_enabled", True)
-        _tts_lbl = "🔊 VOIX ON" if _tts_on else "🔇 VOIX OFF"
-        if st.button(_tts_lbl, use_container_width=True, key="tts_toggle"):
-            st.session_state.tts_enabled = not _tts_on
-            st.rerun()
-    with _cb3:
         if st.button("🗑 EFFACER",use_container_width=True):
             st.session_state.chat_history=[]
-            st.session_state.last_ai_msg=""
             st.rerun()
 
     if _send_btn and _ui.strip():
@@ -3572,377 +3548,8 @@ with t_chat:
             _hist2=[{"role":m["role"],"content":m["content"]} for m in st.session_state.chat_history[:-1]]
             _rep = ask_gpt(_ui,_ctx2,_hist2) if (GPT_OK and is_configured()) else ai_deep_analysis(_ui,sig,capital,symbol)
         st.session_state.chat_history.append({"role":"assistant","content":_rep})
-        st.session_state.last_ai_msg = _rep
         st.rerun()
 
-    # ── VOICE INTERFACE — Web Speech API ─────────────────────────────────────
-    _tts_enabled_js = str(st.session_state.get("tts_enabled", True)).lower()
-    # Clean AI message for safe JS embedding
-    _last_msg_js = (
-        _last_ai_for_tts[:800]
-        .replace("\\", " ").replace("`", " ")
-        .replace("'", " ").replace('"', " ")
-        .replace("\n", " ").replace("<br>", " ")
-    )  # limit TTS length
-
-    st.markdown(f'''
-    <!-- QUANTUM VOICE INTERFACE v5 -->
-    <style>
-    #qto-voice-wrapper {{
-      margin: 10px 0 6px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }}
-    #qto-mic-btn {{
-      position: relative;
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      border: 2px solid rgba(0,200,240,.4);
-      background: linear-gradient(135deg,rgba(0,200,240,.1),rgba(0,245,157,.06));
-      color: {C["accent"]};
-      font-size: 22px;
-      cursor: pointer;
-      transition: all .3s cubic-bezier(.4,0,.2,1);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 15px rgba(0,200,240,.15),inset 0 1px 0 rgba(255,255,255,.06);
-      flex-shrink: 0;
-      outline: none;
-      -webkit-tap-highlight-color: transparent;
-    }}
-    #qto-mic-btn:hover {{
-      border-color: {C["accent"]};
-      box-shadow: 0 0 25px rgba(0,200,240,.35), 0 0 50px rgba(0,200,240,.12);
-      transform: scale(1.06);
-    }}
-    #qto-mic-btn.listening {{
-      border-color: {C["green"]};
-      background: linear-gradient(135deg,rgba(0,245,157,.2),rgba(0,200,240,.1));
-      box-shadow: 0 0 30px rgba(0,245,157,.5), 0 0 60px rgba(0,245,157,.2);
-      animation: mic-pulse 1.2s ease-in-out infinite;
-    }}
-    #qto-mic-btn.speaking {{
-      border-color: {C["yellow"]};
-      background: linear-gradient(135deg,rgba(240,200,0,.15),rgba(0,200,240,.05));
-      box-shadow: 0 0 25px rgba(240,200,0,.4);
-      animation: speak-pulse 0.8s ease-in-out infinite;
-    }}
-    @keyframes mic-pulse {{
-      0%,100% {{ box-shadow: 0 0 20px rgba(0,245,157,.4),0 0 40px rgba(0,245,157,.15); transform: scale(1); }}
-      50% {{ box-shadow: 0 0 35px rgba(0,245,157,.7),0 0 70px rgba(0,245,157,.25); transform: scale(1.08); }}
-    }}
-    @keyframes speak-pulse {{
-      0%,100% {{ box-shadow: 0 0 20px rgba(240,200,0,.3); }}
-      50% {{ box-shadow: 0 0 35px rgba(240,200,0,.6); }}
-    }}
-    #qto-voice-status {{
-      font-family: "JetBrains Mono", monospace;
-      font-size: 10px;
-      color: {C["muted2"]};
-      letter-spacing: 1px;
-      flex: 1;
-      min-width: 120px;
-    }}
-    #qto-voice-transcript {{
-      font-family: "JetBrains Mono", monospace;
-      font-size: 11px;
-      color: {C["accent"]};
-      flex: 1;
-      min-width: 180px;
-      background: rgba(0,200,240,.04);
-      border: 1px solid rgba(0,200,240,.15);
-      border-radius: 6px;
-      padding: 8px 12px;
-      min-height: 36px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }}
-    #qto-voice-bar {{
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      height: 24px;
-    }}
-    #qto-voice-bar span {{
-      display: inline-block;
-      width: 3px;
-      background: {C["green"]};
-      border-radius: 2px;
-      animation: bar-bounce 0.6s ease-in-out infinite;
-    }}
-    #qto-voice-bar span:nth-child(1){{animation-delay:.0s;height:8px}}
-    #qto-voice-bar span:nth-child(2){{animation-delay:.1s;height:16px}}
-    #qto-voice-bar span:nth-child(3){{animation-delay:.2s;height:12px}}
-    #qto-voice-bar span:nth-child(4){{animation-delay:.3s;height:20px}}
-    #qto-voice-bar span:nth-child(5){{animation-delay:.4s;height:10px}}
-    @keyframes bar-bounce {{
-      0%,100% {{ transform: scaleY(1); opacity:.6; }}
-      50% {{ transform: scaleY(1.8); opacity:1; }}
-    }}
-    #qto-no-support {{
-      font-family: "JetBrains Mono", monospace;
-      font-size: 9px;
-      color: {C["muted2"]};
-      background: rgba(255,48,96,.06);
-      border: 1px solid rgba(255,48,96,.2);
-      border-radius: 6px;
-      padding: 6px 12px;
-    }}
-    @media (max-width: 480px) {{
-      #qto-mic-btn {{ width: 52px; height: 52px; font-size: 20px; }}
-      #qto-voice-transcript {{ font-size: 10px; padding: 6px 10px; }}
-    }}
-    </style>
-
-    <div id="qto-voice-wrapper">
-      <button id="qto-mic-btn" title="Appuyez pour parler">🎤</button>
-      <div id="qto-voice-transcript">
-        <span id="qto-transcript-text" style="color:{C["muted2"]}">Appuyez sur le micro pour parler…</span>
-      </div>
-    </div>
-    <div id="qto-voice-status">🔇 Microphone prêt</div>
-    <div id="qto-no-support" style="display:none">
-      ⚠️ Reconnaissance vocale non disponible sur ce navigateur. Utilisez Chrome ou Edge.
-    </div>
-
-    <script>
-    (function() {{
-      var btn          = document.getElementById("qto-mic-btn");
-      var statusEl     = document.getElementById("qto-voice-status");
-      var transcriptEl = document.getElementById("qto-transcript-text");
-      var noSupportEl  = document.getElementById("qto-no-support");
-      var wrapper      = document.getElementById("qto-voice-wrapper");
-
-      var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      var synth     = window.speechSynthesis;
-
-      // ── TTS enabled flag from Python ──────────────────────────────────
-      var TTS_ENABLED = {_tts_enabled_js};
-
-      // ── Check browser support ─────────────────────────────────────────
-      if (!SpeechRec) {{
-        btn.style.display = "none";
-        noSupportEl.style.display = "block";
-        return;
-      }}
-
-      // ── Speech Recognition setup ──────────────────────────────────────
-      var rec = new SpeechRec();
-      rec.lang         = "fr-FR";
-      rec.interimResults = true;
-      rec.continuous   = false;
-      rec.maxAlternatives = 1;
-
-      var listening = false;
-      var finalText = "";
-
-      // ── Inject text into Streamlit textarea ───────────────────────────
-      function injectToStreamlit(text) {{
-        // Find the textarea by key or placeholder
-        var areas = document.querySelectorAll("textarea");
-        var target = null;
-        areas.forEach(function(a) {{
-          if (a.placeholder && a.placeholder.includes("Parlez ou tapez")) target = a;
-        }});
-        if (!target && areas.length) target = areas[areas.length - 1];
-        if (!target) return;
-
-        // React-compatible setter
-        var setter = Object.getOwnPropertyDescriptor(
-          window.HTMLTextAreaElement.prototype, "value"
-        );
-        if (setter && setter.set) {{
-          setter.set.call(target, text);
-          target.dispatchEvent(new Event("input", {{ bubbles: true }}));
-          target.dispatchEvent(new Event("change", {{ bubbles: true }}));
-        }}
-        target.focus();
-        transcriptEl.textContent = "✅ " + text.substring(0, 50) + (text.length > 50 ? "…" : "");
-        transcriptEl.style.color = "#00f59d";
-      }}
-
-      // ── TTS: speak AI response ─────────────────────────────────────────
-      function speakText(text) {{
-        if (!TTS_ENABLED || !synth) return;
-        synth.cancel();
-        // Strip markdown symbols for cleaner speech
-        var clean = text
-          .replace(/[*][*](.+?)[*][*]/g, '$1')
-          .replace(/[*](.+?)[*]/g, '$1')
-          .replace(/#+[ ]/g, '')
-          .replace(/[|=]+/g, '.')
-          .replace(/https?:[^ ]+/g, '')
-          .replace(/\n/g, ' ')
-          .replace(/  +/g, ' ')
-          .trim()
-          .substring(0, 600); // Limit length for TTS
-
-        if (!clean) return;
-
-        btn.classList.add("speaking");
-        statusEl.textContent = "🔊 Oracle IA parle…";
-        statusEl.style.color = "#f0c800";
-
-        var utter = new SpeechSynthesisUtterance(clean);
-        utter.lang  = "fr-FR";
-        utter.rate  = 1.05;
-        utter.pitch = 0.95;
-        utter.volume = 0.92;
-
-        // Try to find a French voice
-        var voices = synth.getVoices();
-        var frVoice = voices.find(v => v.lang.startsWith("fr"));
-        if (frVoice) utter.voice = frVoice;
-
-        utter.onend = function() {{
-          btn.classList.remove("speaking");
-          statusEl.textContent = "✅ Oracle IA a répondu";
-          statusEl.style.color = "#00f59d";
-          setTimeout(function() {{
-            statusEl.textContent = "🎤 Appuyez pour reparler";
-            statusEl.style.color = "#1a3a65";
-          }}, 2000);
-        }};
-        utter.onerror = function() {{
-          btn.classList.remove("speaking");
-          statusEl.textContent = "🎤 Microphone prêt";
-          statusEl.style.color = "#1a3a65";
-        }};
-        synth.speak(utter);
-      }}
-
-      // ── Auto-speak last AI message on page load ────────────────────────
-      var lastMsg = {repr(_last_msg_js)};
-      var hasSpoken = sessionStorage.getItem("qto-last-spoken");
-      if (lastMsg && lastMsg !== hasSpoken && TTS_ENABLED) {{
-        // Small delay to let page render
-        setTimeout(function() {{
-          sessionStorage.setItem("qto-last-spoken", lastMsg);
-          speakText(lastMsg);
-        }}, 800);
-      }}
-
-      // ── Recognition events ─────────────────────────────────────────────
-      rec.onstart = function() {{
-        listening = true;
-        finalText = "";
-        btn.classList.add("listening");
-        btn.innerHTML = "⏹";
-        btn.title = "Cliquez pour arrêter";
-        statusEl.textContent = "🔴 Écoute en cours…";
-        statusEl.style.color = "#00f59d";
-        transcriptEl.innerHTML = '<div id="qto-voice-bar"><span></span><span></span><span></span><span></span><span></span></div>';
-      }};
-
-      rec.onresult = function(e) {{
-        var interim = "";
-        for (var i = e.resultIndex; i < e.results.length; i++) {{
-          if (e.results[i].isFinal) {{
-            finalText += e.results[i][0].transcript + " ";
-          }} else {{
-            interim += e.results[i][0].transcript;
-          }}
-        }}
-        var display = (finalText + interim).trim();
-        if (display) {{
-          transcriptEl.textContent = "🎤 " + display;
-          transcriptEl.style.color = "#00c8f0";
-        }}
-      }};
-
-      rec.onerror = function(e) {{
-        listening = false;
-        btn.classList.remove("listening");
-        btn.innerHTML = "🎤";
-        btn.title = "Appuyez pour parler";
-        var msgs = {{
-          "no-speech":       "⚠️ Aucun son détecté — réessayez",
-          "audio-capture":   "⚠️ Microphone non accessible",
-          "not-allowed":     "🚫 Accès micro refusé — autorisez dans le navigateur",
-          "network":         "⚠️ Problème réseau",
-          "aborted":         "⏸ Annulé"
-        }};
-        statusEl.textContent = msgs[e.error] || ("⚠️ Erreur : " + e.error);
-        statusEl.style.color = "#ff3060";
-        transcriptEl.textContent = "Appuyez sur le micro pour parler…";
-        transcriptEl.style.color = "#1a3a65";
-      }};
-
-      rec.onend = function() {{
-        listening = false;
-        btn.classList.remove("listening");
-        btn.innerHTML = "🎤";
-        btn.title = "Appuyez pour parler";
-        var text = finalText.trim();
-        if (text.length > 1) {{
-          statusEl.textContent = "⬡ Envoi à l'Oracle IA…";
-          statusEl.style.color = "#00c8f0";
-          injectToStreamlit(text);
-          // Auto-click the send button after 400ms
-          setTimeout(function() {{
-            var btns = document.querySelectorAll("button");
-            var sendBtn = null;
-            btns.forEach(function(b) {{
-              if (b.textContent && b.textContent.trim().includes("ENVOYER")) sendBtn = b;
-            }});
-            if (sendBtn) {{
-              sendBtn.click();
-              statusEl.textContent = "⬡ Message envoyé !";
-            }} else {{
-              statusEl.textContent = "✍️ Texte injecté — cliquez Envoyer";
-              statusEl.style.color = "#f0c800";
-            }}
-          }}, 450);
-        }} else {{
-          statusEl.textContent = "🎤 Microphone prêt";
-          statusEl.style.color = "#1a3a65";
-          transcriptEl.textContent = "Appuyez sur le micro pour parler…";
-          transcriptEl.style.color = "#1a3a65";
-        }}
-      }};
-
-      // ── Button click handler ───────────────────────────────────────────
-      btn.addEventListener("click", function(e) {{
-        e.preventDefault();
-        if (listening) {{
-          rec.stop();
-        }} else {{
-          synth && synth.cancel(); // stop TTS if speaking
-          try {{
-            rec.start();
-          }} catch(err) {{
-            // If already started, stop and restart
-            rec.abort();
-            setTimeout(function() {{ rec.start(); }}, 200);
-          }}
-        }}
-      }});
-
-      // ── Voices change handler ──────────────────────────────────────────
-      if (synth && synth.onvoiceschanged !== undefined) {{
-        synth.onvoiceschanged = function() {{}}; // trigger voice list load
-      }}
-
-      // ── Watch for TTS toggle changes via DOM ───────────────────────────
-      new MutationObserver(function() {{
-        // Re-read TTS state from button label
-        var ttsBtn = null;
-        document.querySelectorAll("button").forEach(function(b) {{
-          if (b.textContent && (b.textContent.includes("VOIX ON") || b.textContent.includes("VOIX OFF"))) {{
-            ttsBtn = b;
-          }}
-        }});
-        if (ttsBtn) {{
-          TTS_ENABLED = ttsBtn.textContent.includes("ON");
-          if (!TTS_ENABLED) {{ synth && synth.cancel(); }}
-        }}
-      }}).observe(document.body, {{childList: true, subtree: true}});
-
-    }})();
-    </script>
-    ''', unsafe_allow_html=True)
 
 
 # ── BACKTEST ─────────────────────────────────────────────────────────────────
