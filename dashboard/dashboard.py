@@ -632,40 +632,119 @@ details summary {
   border-radius: 3px 0 0 3px;
 }
 
-/* Chat messages */
+/* ── CHAT — Style ChatGPT Moderne ────────────────────────────────────── */
+.chat-container {
+  max-width: 860px;
+  margin: 0 auto;
+}
+.msg-row-user {
+  display: flex;
+  justify-content: flex-end;
+  margin: 12px 0;
+  gap: 10px;
+  align-items: flex-start;
+}
+.msg-row-ai {
+  display: flex;
+  justify-content: flex-start;
+  margin: 12px 0;
+  gap: 10px;
+  align-items: flex-start;
+}
+.msg-avatar-user {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #000;
+  flex-shrink: 0;
+  font-family: 'Outfit', sans-serif;
+  order: 2;
+}
+.msg-avatar-ai {
+  width: 30px; height: 30px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(0,245,157,.15), rgba(0,200,240,.1));
+  border: 1px solid rgba(0,245,157,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
 .msg-user {
-  background: linear-gradient(135deg, rgba(0,200,240,.08), rgba(0,200,240,.04));
+  background: rgba(0,200,240,.1);
   border: 1px solid rgba(0,200,240,.2);
-  border-radius: 10px 10px 0 10px;
-  padding: 13px 18px;
-  margin: 8px 0;
-  font-size: 13px;
-  color: var(--bright);
-  text-align: right;
-  box-shadow: 0 2px 15px rgba(0,200,240,.06);
+  border-radius: 18px 18px 4px 18px;
+  padding: 12px 16px;
+  max-width: 75%;
+  font-size: 13.5px;
+  color: var(--bright2);
+  line-height: 1.6;
+  font-family: 'Outfit', sans-serif;
 }
 .msg-ai {
-  background: linear-gradient(135deg, rgba(0,245,157,.04), rgba(0,232,216,.02));
-  border: 1px solid rgba(0,245,157,.15);
-  border-radius: 10px 10px 10px 0;
-  padding: 15px 20px;
-  margin: 4px 0 12px;
-  font-size: 13px;
-  color: #90e8cc;
-  line-height: 1.9;
-  box-shadow: 0 2px 15px rgba(0,245,157,.04);
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 18px 18px 18px 4px;
+  padding: 14px 18px;
+  max-width: 85%;
+  font-size: 13.5px;
+  color: #d4f0e8;
+  line-height: 1.85;
+  font-family: 'Outfit', sans-serif;
 }
-.lbl-user {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px; color: var(--accent);
-  text-align: right; margin-bottom: 3px;
-  letter-spacing: 2px; text-transform: uppercase;
+.msg-ai h2, .msg-ai h3 {
+  color: var(--accent) !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 11px !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  margin: 14px 0 6px !important;
+  padding-bottom: 4px !important;
+  border-bottom: 1px solid rgba(0,200,240,.12) !important;
 }
-.lbl-ai {
+.msg-ai strong { color: var(--bright2) !important; }
+.msg-ai code {
+  background: rgba(0,200,240,.08) !important;
+  border: 1px solid rgba(0,200,240,.15) !important;
+  border-radius: 4px !important;
+  padding: 1px 6px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  color: var(--accent) !important;
+}
+.msg-ai pre {
+  background: rgba(0,0,0,.3) !important;
+  border: 1px solid rgba(0,200,240,.12) !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  overflow-x: auto !important;
+}
+.msg-ai table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: 8px 0 !important;
+  font-size: 12px !important;
+}
+.msg-ai td, .msg-ai th {
+  border: 1px solid rgba(0,200,240,.12) !important;
+  padding: 6px 10px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+.msg-ai th {
+  background: rgba(0,200,240,.08) !important;
+  color: var(--accent) !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+.lbl-user { display: none; }
+.lbl-ai { display: none; }
+.msg-time {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px; color: var(--green);
-  margin-bottom: 3px;
-  letter-spacing: 2px; text-transform: uppercase;
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 4px;
+  text-align: right;
 }
 
 /* Score badge */
@@ -1027,16 +1106,97 @@ _AX = dict(
 #  MARCHÉS
 # ══════════════════════════════════════════════════════════════════════════════
 MARKETS = {
-    "🪙 Crypto":             ["BTC-USD","ETH-USD","SOL-USD","BNB-USD","XRP-USD","DOGE-USD","ADA-USD","AVAX-USD"],
-    "📈 Actions":            ["AAPL","TSLA","NVDA","MSFT","AMZN","META","GOOGL","NFLX"],
-    "📊 ETF":                ["SPY","QQQ","GLD","TLT","VTI","IWM","XLK","ARKK"],
-    "💱 Forex":              ["EURUSD=X","GBPUSD=X","USDJPY=X","AUDUSD=X","GBPJPY=X","USDCHF=X","USDCAD=X","AUDJPY=X"],
-    "⛽ Énergie":            ["CL=F","BZ=F","NG=F","HO=F","RB=F"],
-    "🥇 Métaux précieux":    ["GC=F","SI=F","PL=F","PA=F"],
-    "🔩 Métaux industriels": ["HG=F","ALI=F","NI=F","ZN=F","PB=F"],
-    "🌾 Céréales":           ["ZW=F","ZC=F","ZS=F","ZO=F","ZR=F"],
-    "☕ Produits tropicaux": ["KC=F","CC=F","SB=F","CT=F","OJ=F"],
-    "🐄 Élevage":            ["LE=F","HE=F","GF=F"],
+    # ── CRYPTO — Top 80 par capitalisation ──────────────────────────────────
+    "🪙 Crypto Top 20": [
+        "BTC-USD","ETH-USD","BNB-USD","XRP-USD","SOL-USD","ADA-USD",
+        "DOGE-USD","AVAX-USD","SHIB-USD","DOT-USD","MATIC-USD","LTC-USD",
+        "TRX-USD","LINK-USD","UNI-USD","ATOM-USD","XLM-USD","BCH-USD",
+        "XMR-USD","ETC-USD",
+    ],
+    "🔥 Crypto DeFi & L2": [
+        "NEAR-USD","APT-USD","ARB-USD","OP-USD","FIL-USD","HBAR-USD",
+        "VET-USD","ICP-USD","ALGO-USD","QNT-USD","AAVE-USD","MKR-USD",
+        "CRV-USD","COMP-USD","SNX-USD","YFI-USD","SUSHI-USD","1INCH-USD",
+        "CAKE-USD","UMA-USD",
+    ],
+    "🎮 Crypto Gaming & NFT": [
+        "SAND-USD","MANA-USD","AXS-USD","ENJ-USD","GALA-USD","CHZ-USD",
+        "THETA-USD","FLOW-USD","IMX-USD","BLUR-USD","LOOKS-USD","X2Y2-USD",
+    ],
+    "⚡ Crypto Infra & Web3": [
+        "GRT-USD","FET-USD","OCEAN-USD","BAND-USD","API3-USD","RLC-USD",
+        "LPT-USD","RNDR-USD","HNT-USD","STORJ-USD","AR-USD","SC-USD",
+    ],
+    "🏦 Crypto Exchange & Pay": [
+        "FTT-USD","CRO-USD","GT-USD","KCS-USD","OKB-USD","MX-USD",
+        "ZEC-USD","DASH-USD","WAVES-USD","BTT-USD","HOT-USD","QTUM-USD",
+    ],
+    # ── FOREX — Toutes paires majeures, mineures et exotiques ───────────────
+    "💱 Forex Majeures": [
+        "EURUSD=X","GBPUSD=X","USDJPY=X","USDCHF=X","USDCAD=X",
+        "AUDUSD=X","NZDUSD=X","EURGBP=X","EURJPY=X","GBPJPY=X",
+    ],
+    "💱 Forex Mineures": [
+        "EURCHF=X","EURCAD=X","EURAUD=X","EURNZD=X","GBPCHF=X",
+        "GBPCAD=X","GBPAUD=X","GBPNZD=X","AUDCAD=X","AUDCHF=X",
+        "AUDJPY=X","AUDNZD=X","CADCHF=X","CADJPY=X","CHFJPY=X",
+        "NZDCAD=X","NZDCHF=X","NZDJPY=X",
+    ],
+    "🌍 Forex Exotiques": [
+        "USDMXN=X","USDBRL=X","USDZAR=X","USDNOK=X","USDSEK=X",
+        "USDDKK=X","USDPLN=X","USDHUF=X","USDCZK=X","USDSGD=X",
+        "USDHKD=X","USDTRY=X","USDILS=X","USDTHB=X","USDTWD=X",
+        "USDKRW=X","USDCNH=X","USDMYR=X","USDIDR=X","USDPHP=X",
+    ],
+    # ── ACTIONS — US, Europe, Tech ──────────────────────────────────────────
+    "📈 Actions US Tech": [
+        "AAPL","MSFT","NVDA","GOOGL","META","AMZN","TSLA","NFLX",
+        "AMD","INTC","QCOM","ORCL","CRM","ADBE","PYPL","UBER",
+        "SNAP","SPOT","TWLO","SHOP",
+    ],
+    "🏦 Actions US Finance": [
+        "JPM","BAC","WFC","GS","MS","C","BRK-B","V","MA","AXP",
+        "BLK","SCHW","USB","PNC","TFC","COF","DFS","SYF","ALLY","SOFI",
+    ],
+    "💊 Actions US Healthcare": [
+        "JNJ","PFE","MRK","ABBV","UNH","CVS","MCK","ABT","LLY","BMY",
+        "AMGN","GILD","REGN","VRTX","BIIB","ILMN","ZTS","DXCM","ISRG","SYK",
+    ],
+    "🏭 Actions US Industrie": [
+        "BA","CAT","MMM","GE","HON","RTX","LMT","NOC","DE","EMR",
+        "ETN","ITW","PH","ROK","CMI","GNRC","XYL","FTV","IEX","AME",
+    ],
+    # ── ETF ─────────────────────────────────────────────────────────────────
+    "📊 ETF US & Sectoriels": [
+        "SPY","QQQ","VTI","IWM","DIA","GLD","SLV","TLT","HYG","LQD",
+        "XLK","XLF","XLE","XLV","XLI","XLY","XLP","XLRE","XLB","XLU",
+        "ARKK","ARKG","ARKW","BOTZ","ROBO","FINX","CIBR","HACK","CLOU","SKYY",
+    ],
+    # ── MATIÈRES PREMIÈRES ──────────────────────────────────────────────────
+    "⛽ Énergie": [
+        "CL=F","BZ=F","NG=F","HO=F","RB=F","UGA","USO","BOIL",
+    ],
+    "🥇 Métaux précieux": [
+        "GC=F","SI=F","PL=F","PA=F","HG=F","ALI=F",
+    ],
+    "🔩 Métaux industriels": [
+        "HG=F","ZN=F","PB=F","NI=F","ALI=F",
+    ],
+    "🌾 Céréales & Oléagineux": [
+        "ZW=F","ZC=F","ZS=F","ZO=F","ZR=F","SM=F","BO=F",
+    ],
+    "☕ Tropicaux & Softs": [
+        "KC=F","CC=F","SB=F","CT=F","OJ=F","LBS=F",
+    ],
+    "🐄 Élevage": [
+        "LE=F","HE=F","GF=F",
+    ],
+    # ── INDICES ─────────────────────────────────────────────────────────────
+    "📉 Indices Mondiaux": [
+        "^GSPC","^NDX","^DJI","^RUT","^VIX",
+        "^FTSE","^GDAXI","^FCHI","^N225","^HSI",
+        "^BSESN","EWZ","FXI","EWJ","EWG",
+    ],
 }
 
 TICKER_NAMES = {
@@ -1056,6 +1216,77 @@ TICKER_NAMES = {
     "KC=F":"Coffee","CC=F":"Cocoa","SB=F":"Sugar","CT=F":"Cotton","OJ=F":"Orange Juice",
     "LE=F":"Live Cattle","HE=F":"Lean Hogs","GF=F":"Feeder Cattle",
 }
+
+TOP_COMMODITIES = ["GC=F","CL=F","BZ=F","NG=F","SI=F","HG=F","KC=F","ZW=F","ZC=F","ZS=F"]
+# ── Noms étendus ──────────────────────────────────────────────────────────────
+TICKER_NAMES.update({
+    # Crypto DeFi
+    "NEAR-USD":"NEAR Protocol","APT-USD":"Aptos","ARB-USD":"Arbitrum","OP-USD":"Optimism",
+    "FIL-USD":"Filecoin","HBAR-USD":"Hedera","VET-USD":"VeChain","ICP-USD":"Internet Computer",
+    "ALGO-USD":"Algorand","QNT-USD":"Quant","AAVE-USD":"Aave","MKR-USD":"Maker",
+    "CRV-USD":"Curve","COMP-USD":"Compound","SNX-USD":"Synthetix","YFI-USD":"Yearn Finance",
+    "SUSHI-USD":"SushiSwap","1INCH-USD":"1inch","CAKE-USD":"PancakeSwap","UMA-USD":"UMA",
+    # Crypto Gaming
+    "SAND-USD":"The Sandbox","MANA-USD":"Decentraland","AXS-USD":"Axie Infinity",
+    "ENJ-USD":"Enjin","GALA-USD":"Gala","CHZ-USD":"Chiliz","THETA-USD":"Theta",
+    "FLOW-USD":"Flow","IMX-USD":"Immutable X","BLUR-USD":"Blur","LOOKS-USD":"LooksRare",
+    "X2Y2-USD":"X2Y2",
+    # Crypto Infra
+    "GRT-USD":"The Graph","FET-USD":"Fetch.ai","OCEAN-USD":"Ocean Protocol",
+    "BAND-USD":"Band Protocol","API3-USD":"API3","RLC-USD":"iExec RLC",
+    "LPT-USD":"Livepeer","RNDR-USD":"Render","HNT-USD":"Helium",
+    "STORJ-USD":"Storj","AR-USD":"Arweave","SC-USD":"Siacoin",
+    # Crypto Exchange
+    "FTT-USD":"FTX Token","CRO-USD":"Cronos","GT-USD":"Gate Token",
+    "KCS-USD":"KuCoin Token","OKB-USD":"OKB","MX-USD":"MX Token",
+    "ZEC-USD":"Zcash","DASH-USD":"Dash","WAVES-USD":"Waves",
+    "BTT-USD":"BitTorrent","HOT-USD":"Holo","QTUM-USD":"Qtum",
+    "SHIB-USD":"Shiba Inu","DOT-USD":"Polkadot","MATIC-USD":"Polygon",
+    "LTC-USD":"Litecoin","TRX-USD":"TRON","LINK-USD":"Chainlink",
+    "UNI-USD":"Uniswap","ATOM-USD":"Cosmos","XLM-USD":"Stellar",
+    "BCH-USD":"Bitcoin Cash","XMR-USD":"Monero","ETC-USD":"Ethereum Classic",
+    # Forex Mineures
+    "EURCHF=X":"EUR/CHF","EURCAD=X":"EUR/CAD","EURAUD=X":"EUR/AUD","EURNZD=X":"EUR/NZD",
+    "GBPCHF=X":"GBP/CHF","GBPCAD=X":"GBP/CAD","GBPAUD=X":"GBP/AUD","GBPNZD=X":"GBP/NZD",
+    "AUDCAD=X":"AUD/CAD","AUDCHF=X":"AUD/CHF","AUDNZD=X":"AUD/NZD",
+    "CADCHF=X":"CAD/CHF","CADJPY=X":"CAD/JPY","CHFJPY=X":"CHF/JPY",
+    "NZDCAD=X":"NZD/CAD","NZDCHF=X":"NZD/CHF","NZDJPY=X":"NZD/JPY",
+    # Forex Exotiques
+    "USDMXN=X":"USD/MXN","USDBRL=X":"USD/BRL","USDZAR=X":"USD/ZAR",
+    "USDNOK=X":"USD/NOK","USDSEK=X":"USD/SEK","USDDKK=X":"USD/DKK",
+    "USDPLN=X":"USD/PLN","USDHUF=X":"USD/HUF","USDCZK=X":"USD/CZK",
+    "USDSGD=X":"USD/SGD","USDHKD=X":"USD/HKD","USDTRY=X":"USD/TRY",
+    "USDILS=X":"USD/ILS","USDTHB=X":"USD/THB","USDTWD=X":"USD/TWD",
+    "USDKRW=X":"USD/KRW","USDCNH=X":"USD/CNH","USDMYR=X":"USD/MYR",
+    "USDIDR=X":"USD/IDR","USDPHP=X":"USD/PHP",
+    # Actions
+    "AMD":"AMD","INTC":"Intel","QCOM":"Qualcomm","ORCL":"Oracle","CRM":"Salesforce",
+    "ADBE":"Adobe","PYPL":"PayPal","UBER":"Uber","SNAP":"Snap","SPOT":"Spotify",
+    "TWLO":"Twilio","SHOP":"Shopify",
+    "JPM":"JPMorgan","BAC":"Bank of America","WFC":"Wells Fargo","GS":"Goldman Sachs",
+    "MS":"Morgan Stanley","C":"Citigroup","BRK-B":"Berkshire B","V":"Visa","MA":"Mastercard",
+    "AXP":"American Express","BLK":"BlackRock","SCHW":"Charles Schwab",
+    "JNJ":"Johnson & Johnson","PFE":"Pfizer","MRK":"Merck","ABBV":"AbbVie",
+    "UNH":"UnitedHealth","LLY":"Eli Lilly","BMY":"Bristol-Myers","AMGN":"Amgen",
+    "GILD":"Gilead","REGN":"Regeneron","VRTX":"Vertex","BIIB":"Biogen",
+    "BA":"Boeing","CAT":"Caterpillar","MMM":"3M","GE":"General Electric",
+    "HON":"Honeywell","RTX":"Raytheon","LMT":"Lockheed Martin","NOC":"Northrop",
+    # ETF sectoriels
+    "XLE":"Energy ETF","XLV":"Health ETF","XLI":"Industrial ETF",
+    "XLY":"Consumer Discret. ETF","XLP":"Consumer Staples ETF","XLRE":"Real Estate ETF",
+    "XLB":"Materials ETF","XLU":"Utilities ETF",
+    "ARKK":"ARK Innovation","ARKG":"ARK Genomic","ARKW":"ARK Internet",
+    "BOTZ":"Global Robotics ETF","ROBO":"Robo Global ETF","FINX":"FinTech ETF",
+    "CIBR":"Cybersecurity ETF","HACK":"Cybersecurity ETF","CLOU":"Cloud ETF","SKYY":"Cloud ETF",
+    "SLV":"Silver ETF","HYG":"High Yield Bond","LQD":"Corp Bond","DIA":"Dow Jones ETF",
+    # Commodités extra
+    "SM=F":"Soybean Meal","BO=F":"Soybean Oil","LBS=F":"Lumber",
+    "UGA":"Gasoline ETF","USO":"Oil ETF","BOIL":"Natural Gas ETF",
+    # Indices
+    "^GSPC":"S&P 500","^NDX":"Nasdaq 100","^DJI":"Dow Jones","^RUT":"Russell 2000","^VIX":"VIX",
+    "^FTSE":"FTSE 100","^GDAXI":"DAX","^FCHI":"CAC 40","^N225":"Nikkei 225","^HSI":"Hang Seng",
+    "^BSESN":"Sensex India","EWZ":"Brésil ETF","FXI":"Chine ETF","EWJ":"Japon ETF","EWG":"Allemagne ETF",
+})
 
 TOP_COMMODITIES = ["GC=F","CL=F","BZ=F","NG=F","SI=F","HG=F","KC=F","ZW=F","ZC=F","ZS=F"]
 
@@ -1163,6 +1394,10 @@ def get_oracle():
 
 @st.cache_data(ttl=300)
 def _fetch_yf(symbol,period="6mo",interval="1d"):
+    # Auto-adjust period based on interval limitations
+    _period_map = {"1m":"7d","2m":"60d","5m":"60d","15m":"60d","30m":"60d","4h":"730d","2h":"730d"}
+    if interval in _period_map and period not in ["1d","5d","7d","60d"]:
+        period = _period_map[interval]
     if not YF_OK: return pd.DataFrame()
     try:
         df=yf.Ticker(symbol).history(period=period,interval=interval,auto_adjust=True)
@@ -2740,14 +2975,16 @@ with st.sidebar:
         symbol=st.selectbox("",options=sym_opts,index=_idx,
                             format_func=lambda s:f"{get_name(s)} ({s})",label_visibility="collapsed")
     with _sc2:
-        _custom=st.text_input("",placeholder="Custom…",label_visibility="collapsed")
-    if _custom: symbol=_custom.upper()
+        _custom=st.text_input("",placeholder="AAPL, ETH…",label_visibility="collapsed",
+                              help="Entrez n'importe quel ticker Yahoo Finance")
+    if _custom.strip(): symbol=_custom.strip().upper()
     st.session_state.selected_symbol=symbol
     st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["accent"]};text-align:center;padding:3px 0 8px">{get_name(symbol)}</div>',unsafe_allow_html=True)
     st.markdown('<span class="slbl">Période / Intervalle</span>',unsafe_allow_html=True)
     _c3,_c4=st.columns(2)
     with _c3: period=st.selectbox("",["6mo","1y","2y","3y"],index=1,label_visibility="collapsed")
-    with _c4: interval=st.selectbox("",["1d","1h","1wk"],index=0,label_visibility="collapsed")
+    with _c4: interval=st.selectbox("",["1d","4h","2h","1h","30m","15m","5m","1m","1wk","1mo"],index=0,label_visibility="collapsed")
+    # Note: 1m/5m disponibles sur 7j, 30m/1h sur 60j
     st.markdown('<span class="slbl">Capital ($)</span>',unsafe_allow_html=True)
     capital=st.number_input("",min_value=100,max_value=10_000_000,value=10000,step=500,label_visibility="collapsed")
     st.markdown('<span class="slbl">Contexte (optionnel)</span>',unsafe_allow_html=True)
@@ -2771,11 +3008,12 @@ with st.sidebar:
         show_heat=st.checkbox("Heatmap corrélation",True)
         show_legends=st.checkbox("Afficher les légendes",True)
     st.markdown("<hr>",unsafe_allow_html=True)
-    st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🏆 Top Commodités</div>',unsafe_allow_html=True)
+    st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🔥 Accès rapide</div>',unsafe_allow_html=True)
+    _quick = ["BTC-USD","ETH-USD","GC=F","CL=F","EURUSD=X","AAPL","NVDA","SPY"]
     _tc1,_tc2=st.columns(2)
-    for _i,_sym in enumerate(TOP_COMMODITIES[:6]):
+    for _i,_sym in enumerate(_quick):
         with [_tc1,_tc2][_i%2]:
-            if st.button(get_name(_sym),key=f"tc_{_sym}",use_container_width=True):
+            if st.button(get_name(_sym)[:12],key=f"tc_{_sym}",use_container_width=True):
                 st.session_state.selected_symbol=_sym; st.rerun()
     st.markdown("<hr>",unsafe_allow_html=True)
     if st.session_state.status_msg:
@@ -3464,7 +3702,7 @@ with t_chat:
           MOTEUR IA PROPRIÉTAIRE ACTIF
         </div>
         <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{C["muted2"]};margin-top:2px">
-          100% votre code · Zéro API · Zéro abonnement
+          100% votre code · Zéro API externe · Zéro abonnement
         </div>
       </div>
       <div style="text-align:right">
@@ -3521,12 +3759,36 @@ with t_chat:
     st.markdown("<div style='height:8px'></div>",unsafe_allow_html=True)
 
     # ── Chat history ──────────────────────────────────────────────────────────
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     for _idx_msg, _msg in enumerate(st.session_state.chat_history):
         if _msg["role"]=="user":
-            st.markdown(f'<div class="lbl-user">VOUS</div><div class="msg-user">{_msg["content"]}</div>',unsafe_allow_html=True)
+            st.markdown(f'''<div class="msg-row-user">
+              <div class="msg-user">{_msg["content"].replace(chr(10),"<br>")}</div>
+              <div class="msg-avatar-user">V</div>
+            </div>''', unsafe_allow_html=True)
         else:
-            _c=_msg["content"].replace("\n","<br>")
-            st.markdown(f'<div class="lbl-ai">⬡ ORACLE IA</div><div class="msg-ai" id="ai-msg-{_idx_msg}">{_c}</div>',unsafe_allow_html=True)
+            try:
+                import markdown as _md
+                _html = _md.markdown(_msg["content"], extensions=["tables","fenced_code"])
+            except Exception:
+                # Fallback: manual markdown-to-HTML conversion
+                _txt = _msg["content"]
+                _txt = _txt.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+                # Bold **text**
+                import re as _re
+                _txt = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', _txt)
+                # Headers ## 
+                _txt = _re.sub(r'(?m)^#{1,3}\s+(.+)$', r'<h3>\1</h3>', _txt)
+                # Inline code
+                _txt = _re.sub(r'`([^`]+)`', r'<code>\1</code>', _txt)
+                # Line breaks
+                _txt = _txt.replace("\n", "<br>")
+                _html = _txt
+            st.markdown(f'''<div class="msg-row-ai">
+              <div class="msg-avatar-ai">⬡</div>
+              <div class="msg-ai" id="ai-msg-{_idx_msg}">{_html}</div>
+            </div>''', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # ── Voice + Text input area ───────────────────────────────────────────────
     _ui=st.text_area("",placeholder=f"Tapez votre question — L'Oracle IA analyse {_sname_chat} en temps réel…",
