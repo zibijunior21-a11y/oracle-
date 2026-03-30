@@ -61,6 +61,11 @@ try:
     SCRAPE_OK = True
 except ImportError:
     SCRAPE_OK = False
+import smtplib, threading
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import formatdate
+_scheduler_active = [False]
 
 # ══════════════════════════════════════════════════════════════════════════════
 st.set_page_config(page_title="⬡ Quantum Trade Oracle", page_icon="⬡",
@@ -1299,6 +1304,9 @@ for k,v in dict(signal=None,df_raw=None,df_feat=None,sentiment=None,
                 backtest_result=None,signal_history=[],trained=False,
                 status_msg="",news_data=[],scan_data=None,
                 chat_history=[],selected_symbol="BTC-USD",
+                notif_email="",notif_smtp_host="smtp.gmail.com",notif_smtp_port=587,
+                notif_smtp_user="",notif_smtp_pass="",notif_enabled=False,
+                notif_interval=60,notif_last_sent=None,notif_log=[],
                 ).items():
     if k not in st.session_state: st.session_state[k]=v
 
@@ -1661,6 +1669,205 @@ def _scan_markets(symbols):
                          "Volume":int(vol)})
         except Exception: pass
     return pd.DataFrame(rows) if rows else pd.DataFrame()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  EMAIL NOTIFICATIONS + PRO FEATURES
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _build_email_html(sig, symbol, capital):
+    if not sig: return ""
+    action = sig.get("action","HOLD"); price = sig.get("price",0)
+    chg = sig.get("chg_1d",0); conf = sig.get("ai_confidence",0)
+    rsi = sig.get("rsi",50); bull = sig.get("bullish_probability",.5)
+    r = sig.get("risk_management",{}); sl = r.get("stop_loss",0)
+    tp = r.get("take_profit",0); rr = r.get("risk_reward_ratio",0)
+    risk_a = r.get("capital_at_risk",0); name = get_name(symbol)
+    now_s = datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC")
+    ac = "#00f59d" if action=="BUY" else "#ff3060" if action=="SELL" else "#1a3a65"
+    rows = "".join([
+        f'<tr><td style="padding:8px 14px;border-bottom:1px solid #0d2540;color:#4a8ab0;font-family:Courier New,monospace;font-size:12px">{lbl}</td>'
+        f'<td style="padding:8px 14px;border-bottom:1px solid #0d2540;color:#b8e0f8;font-family:Courier New,monospace;font-size:12px;font-weight:bold">{val}</td></tr>'
+        for lbl,val in [
+            ("Prix actuel", f"${price:,.4f} ({chg:+.2f}% 24h)"),
+            ("Signal IA", action), ("Prob. Bull", f"{bull*100:.1f}%"),
+            ("Confiance IA", f"{conf*100:.0f}%"), ("RSI", f"{rsi:.1f}"),
+            ("Stop-Loss", f"${sl:,.4f}"), ("Take-Profit", f"${tp:,.4f}"),
+            ("R/R", f"{rr:.2f}:1"), ("Capital risque", f"${risk_a:,.2f}"),
+        ]
+    ])
+    desc = ("Signal d achat — Momentum haussier confirme" if action=="BUY"
+            else "Signal de vente — Pression baissiere confirmee" if action=="SELL"
+            else "Attendre — Pas de signal clair")
+    return (
+        f'<!DOCTYPE html><html><body style="margin:0;background:#030912;font-family:Arial">'
+        f'<div style="max-width:600px;margin:0 auto">'
+        f'<div style="background:linear-gradient(135deg,#040d18,#071526);border-bottom:2px solid #00c8f0;padding:28px;text-align:center">'
+        f'<div style="font-size:28px;letter-spacing:8px;color:#00c8f0;font-weight:900">&#9107; QTO</div>'
+        f'<div style="color:#1a3a65;font-size:10px;letter-spacing:3px;text-transform:uppercase">QUANTUM TRADE ORACLE - SIGNAL AUTOMATIQUE</div>'
+        f'<div style="color:#0e2a50;font-size:10px;margin-top:4px">{now_s}</div></div>'
+        f'<div style="background:#071526;padding:30px;text-align:center;border-bottom:1px solid #0d2540">'
+        f'<div style="color:#4a8ab0;font-size:10px;letter-spacing:2px;margin-bottom:8px">{name} - {symbol}</div>'
+        f'<div style="font-size:72px;font-weight:900;color:{ac};letter-spacing:8px;line-height:1">{action}</div>'
+        f'<div style="color:{ac};font-size:11px;margin-top:8px;opacity:.8">{desc}</div></div>'
+        f'<div style="padding:20px"><table style="width:100%;border-collapse:collapse;background:#071526;border:1px solid #0d2540;border-radius:8px">{rows}</table></div>'
+        f'<div style="padding:0 20px 16px"><div style="background:rgba(255,48,96,.06);border:1px solid rgba(255,48,96,.2);border-radius:6px;padding:10px;color:#ff3060;font-size:10px;font-family:Courier New">Outil educatif uniquement - Pas un conseil financier - Toujours utiliser un Stop-Loss</div></div>'
+        f'<div style="background:#040d18;padding:14px;text-align:center;border-top:1px solid #0d2540">'
+        f'<div style="color:#0e2a50;font-size:9px">Quantum Trade Oracle - {now_s}</div></div>'
+        f'</div></body></html>'
+    )
+
+
+def send_signal_email(to_addr, smtp_host, smtp_port, smtp_user, smtp_pass, sig, symbol, capital, extra=""):
+    if not all([to_addr, smtp_host, smtp_user, smtp_pass]):
+        return False, "Configuration SMTP incomplete"
+    try:
+        html = _build_email_html(sig, symbol, capital)
+        if not html: return False, "Signal vide"
+        act = sig.get("action","HOLD") if sig else "HOLD"
+        pr = sig.get("price",0) if sig else 0
+        nm = get_name(symbol)
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"QTO - {act} sur {nm} - ${pr:,.2f}"
+        msg["From"] = f"Quantum Trade Oracle <{smtp_user}>"
+        msg["To"] = to_addr
+        msg["Date"] = formatdate(localtime=True)
+        plain = f"QTO Signal\n{nm} ({symbol})\nSignal: {act}\nPrix: ${pr:,.4f}\n\nOutil educatif uniquement."
+        msg.attach(MIMEText(plain, "plain"))
+        msg.attach(MIMEText(html, "html"))
+        with smtplib.SMTP(smtp_host, int(smtp_port), timeout=15) as srv:
+            srv.ehlo(); srv.starttls(); srv.login(smtp_user, smtp_pass)
+            srv.sendmail(smtp_user, to_addr, msg.as_string())
+        return True, f"Email envoye a {to_addr}"
+    except Exception as e:
+        return False, str(e)
+
+
+def _email_loop(symbol, capital):
+    if not st.session_state.get("notif_enabled"):
+        _scheduler_active[0] = False; return
+    try:
+        sig = st.session_state.get("signal")
+        to  = st.session_state.get("notif_email","")
+        host = st.session_state.get("notif_smtp_host","smtp.gmail.com")
+        port = st.session_state.get("notif_smtp_port",587)
+        user = st.session_state.get("notif_smtp_user","")
+        psw  = st.session_state.get("notif_smtp_pass","")
+        ivs  = int(st.session_state.get("notif_interval",60))
+        if sig and to:
+            ok, msg = send_signal_email(to, host, port, user, psw, sig, symbol, capital)
+            lg = st.session_state.get("notif_log",[])
+            lg.insert(0, {"ts": datetime.utcnow().strftime("%H:%M"), "ok": ok,
+                          "msg": msg, "signal": sig.get("action","?"), "symbol": symbol})
+            st.session_state["notif_log"] = lg[:50]
+            st.session_state["notif_last_sent"] = datetime.utcnow().strftime("%H:%M UTC")
+        if st.session_state.get("notif_enabled"):
+            t = threading.Timer(ivs*60, _email_loop, args=[symbol, capital])
+            t.daemon = True; t.start()
+        else:
+            _scheduler_active[0] = False
+    except Exception:
+        _scheduler_active[0] = False
+
+
+def start_notif_scheduler(symbol, capital):
+    if not _scheduler_active[0]:
+        _scheduler_active[0] = True
+        threading.Timer(5, _email_loop, args=[symbol, capital]).start()
+
+
+@st.cache_data(ttl=300)
+def compute_smart_money(df, symbol):
+    if df is None or df.empty or len(df) < 20: return {}
+    try:
+        closes = df["close"].values; volumes = df["volume"].values if "volume" in df.columns else np.ones(len(closes))
+        highs = df["high"].values; lows = df["low"].values
+        ranges = highs - lows + 1e-9
+        mf_mult = ((closes - lows) - (highs - closes)) / ranges
+        mf_vol = mf_mult * volumes
+        pos_mf = float(np.sum(mf_vol[mf_vol > 0])); neg_mf = float(np.sum(mf_vol[mf_vol < 0]))
+        vol_r = float(volumes[-1]) / max(float(np.mean(volumes[-20:])), 1)
+        smi = float(np.clip((pos_mf / (abs(neg_mf) + 1)) - 1, -1, 1))
+        p5d = ((float(closes[-1]) - float(closes[-5])) / float(closes[-5]) * 100) if len(closes) >= 5 else 0
+        smi5 = float(np.sum(mf_vol[-5:])) / (abs(float(np.sum(mf_vol[-20:]))) + 1)
+        div = p5d > 0 and smi5 < -0.1
+        label = "ACCUMULATION" if smi > 0.1 else "DISTRIBUTION" if smi < -0.1 else "NEUTRE"
+        return {"smi": round(smi,4), "label": label, "vol_ratio": round(vol_r,2),
+                "divergence": div, "p5d": round(p5d,2),
+                "div_label": "DIVERGENCE detectee — prix monte mais smart money vend",
+                "interp": f"Smart Money : {'accumulation institutionnelle' if smi>0 else 'distribution institutionnelle'}. Volume x{vol_r:.1f} vs moy. {'Divergence!' if div else ''}"}
+    except: return {}
+
+
+@st.cache_data(ttl=300)
+def compute_fear_greed(df, symbol):
+    if df is None or df.empty or len(df) < 14: return {}
+    try:
+        last = df.iloc[-1]
+        rsi = float(last.get("rsi",50)); bb_pct = float(last.get("bb_pct_b",.5))
+        stoch = float(last.get("stoch_k",50)); vol_r = float(last.get("vol_ratio",1))
+        atr_p = float(last.get("atr_pct",2))
+        p5d = ((float(df["close"].iloc[-1]) - float(df["close"].iloc[-5])) / float(df["close"].iloc[-5]) * 100) if len(df) >= 5 else 0
+        c_rsi = rsi; c_mom = min(max((p5d+5)/10*100,0),100); c_bb = bb_pct*100
+        c_stch = stoch; c_vol = min(vol_r/2*100,100); c_voli = 100-min(atr_p/8*100,100)
+        score = float(np.clip(c_rsi*.25+c_mom*.20+c_bb*.20+c_stch*.15+c_vol*.10+c_voli*.10, 0, 100))
+        if score >= 75: label, col = "GREED EXTREME", "#ff3060"
+        elif score >= 55: label, col = "GREED", "#ff7040"
+        elif score >= 45: label, col = "NEUTRE", "#1a3a65"
+        elif score >= 25: label, col = "FEAR", "#f0c800"
+        else: label, col = "FEAR EXTREME", "#00f59d"
+        sig = ("BUY (fear extreme = opportunite)" if score < 25 else "SELL (greed extreme = sommet)" if score > 75 else "HOLD (zone neutre)")
+        return {"score": round(score,1), "label": label, "color": col, "signal": sig,
+                "components": {"RSI": round(c_rsi,1), "Momentum": round(c_mom,1), "Bollinger": round(c_bb,1),
+                                "Stochastique": round(c_stch,1), "Volume": round(c_vol,1), "Volatilite": round(c_voli,1)}}
+    except: return {}
+
+
+@st.cache_data(ttl=600)
+def compute_multi_tf(symbol):
+    if not YF_OK: return {}
+    results = {}
+    for tf, period in [("1h","60d"),("4h","730d"),("1d","1y"),("1wk","5y")]:
+        try:
+            df2 = _fetch_yf(symbol, period, tf)
+            if df2 is None or df2.empty or len(df2) < 20: continue
+            last2 = df2.iloc[-1]
+            rsi2 = float(last2.get("rsi",50)); macd2 = float(last2.get("macd_hist",0))
+            bb2 = float(last2.get("bb_pct_b",.5)); e9_2 = float(last2.get("ema_9",last2["close"]))
+            e20_2 = float(last2.get("ema_20",last2["close"]))
+            sc2 = 0
+            if rsi2 < 30: sc2 += 1
+            elif rsi2 > 70: sc2 -= 1
+            sc2 += (1 if macd2 > 0 else -1)
+            if bb2 < 0.2: sc2 += 1
+            elif bb2 > 0.8: sc2 -= 1
+            sc2 += (0.5 if e9_2 > e20_2 else -0.5)
+            sig2 = "BUY" if sc2 >= 2 else "SELL" if sc2 <= -2 else "HOLD"
+            results[tf] = {"signal": sig2, "score": round(sc2,1), "rsi": round(rsi2,1),
+                           "color": "#00f59d" if sig2=="BUY" else "#ff3060" if sig2=="SELL" else "#1a3a65"}
+        except: pass
+    if not results: return {}
+    buys2 = sum(1 for v in results.values() if v["signal"]=="BUY")
+    sells2 = sum(1 for v in results.values() if v["signal"]=="SELL")
+    total2 = len(results); dom2 = "BUY" if buys2>sells2 else "SELL" if sells2>buys2 else "HOLD"
+    return {"timeframes": results, "buy_count": buys2, "sell_count": sells2, "total": total2,
+            "convergence": buys2==total2 or sells2==total2, "dominant": dom2,
+            "conv_pct": round(max(buys2,sells2)/max(total2,1)*100,0)}
+
+
+def get_eco_calendar():
+    return [
+        {"j":"Lun","h":"14h30","e":"ISM Manufacturing PMI","p":"US","i":"FORT","d":"Activite industrielle US. >50=expansion, bullish USD et actions."},
+        {"j":"Mer","h":"14h30","e":"ADP Employment","p":"US","i":"MOYEN","d":"Emploi prive US. Precurseur NFP. Market mover."},
+        {"j":"Mer","h":"15h30","e":"EIA Crude Oil Stocks","p":"US","i":"FORT","d":"Stocks petrole US. Baisse=CL/BZ montent. Incontournable."},
+        {"j":"Jeu","h":"12h45","e":"Decision BCE + Conference","p":"EU","i":"FORT","d":"Taux zone euro. Impact majeur EUR/USD, DAX, CAC40."},
+        {"j":"Ven","h":"13h30","e":"NFP Non-Farm Payrolls","p":"US","i":"FORT","d":"Emploi US mensuel. Evenement le + impactant. Eviter 30min avant/apres."},
+        {"j":"Ven","h":"14h30","e":"CPI Core USA","p":"US","i":"FORT","d":"Inflation sous-jacente US. Driver Fed, dollar, gold, crypto."},
+        {"j":"2x/mois","h":"Variable","e":"FOMC Minutes","p":"US","i":"FORT","d":"Compte-rendu Fed. Orientation taux. Impact global."},
+        {"j":"Mensuel","h":"Variable","e":"OPEC+ Decision","p":"MONDE","i":"FORT","d":"Production petrole. Impact CL=F, BZ=F, CAD, NOK direct."},
+        {"j":"Trimestriel","h":"Variable","e":"Earnings GAFAM","p":"US","i":"FORT","d":"Resultats AAPL/NVDA/MSFT/META/GOOGL. Impact indices + tech."},
+        {"j":"Mensuel","h":"14h30","e":"Retail Sales USA","p":"US","i":"MOYEN","d":"Ventes detail US. Indicateur consommation = 70% PIB US."},
+    ]
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  PIPELINE ANALYSE
@@ -3094,6 +3301,9 @@ if btn_scan_comm:
         st.session_state.scan_data=_scan_markets(tuple(comm))
     st.rerun()
 
+if st.session_state.get("notif_enabled") and not _scheduler_active[0]:
+    start_notif_scheduler(symbol, capital)
+
 # ══════════════════════════════════════════════════════════════════════════════
 #  ONGLETS
 # ══════════════════════════════════════════════════════════════════════════════
@@ -3101,9 +3311,10 @@ sig=st.session_state.signal; df=st.session_state.df_feat
 sent=st.session_state.sentiment; news=st.session_state.news_data
 bt=st.session_state.backtest_result
 
-(t_sig,t_chart,t_models,t_risk,t_profit,t_news,t_scan,t_chat,t_bt,t_hist,t_profil,t_audit)=st.tabs([
+(t_sig,t_chart,t_models,t_risk,t_profit,t_news,t_scan,t_chat,t_bt,t_hist,t_profil,t_audit,t_pro,t_notif)=st.tabs([
     "⬡ SIGNAL","📈 GRAPHIQUE","🤖 MODÈLES IA","⚡ RISQUE","💰 PROFIT",
-    "📰 NEWS","🌐 SCANNER","⬡ IA ORACLE","📊 BACKTEST","🕐 HISTORIQUE","👤 MON ESPACE","🔬 AUDIT TRADING"])
+    "📰 NEWS","🌐 SCANNER","⬡ IA ORACLE","📊 BACKTEST","🕐 HISTORIQUE",
+    "👤 MON ESPACE","🔬 AUDIT TRADING","🏆 PRO FEATURES","📧 NOTIFICATIONS"])
 
 # ── SIGNAL ─────────────────────────────────────────────────────────────────
 with t_sig:
@@ -5118,3 +5329,167 @@ with t_audit:
           ])}
         </div>
         ''', unsafe_allow_html=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  PRO FEATURES TAB
+# ══════════════════════════════════════════════════════════════════════════════
+with t_pro:
+    _CCp = C
+    st.markdown(f'<div style="background:linear-gradient(135deg,rgba(144,96,255,.12),rgba(0,200,240,.08));border:1px solid rgba(144,96,255,.3);border-radius:12px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#9060ff,#00c8f0,#00f59d,transparent)"></div><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div style="font-size:48px">🏆</div><div><div style="font-family:Orbitron,sans-serif;font-size:16px;font-weight:900;color:{_CCp["bright"]};letter-spacing:3px">QTO — LE SEUL SAAS QUI COMBINE TOUT</div><div style="font-family:JetBrains Mono,monospace;font-size:10px;color:{_CCp["muted2"]};margin-top:6px">Smart Money · Fear & Greed · Multi-TF · Calendrier Eco · 282 Actifs · Email Auto</div></div></div></div>', unsafe_allow_html=True)
+
+    _pp1, _pp2 = st.columns(2)
+    with _pp1:
+        qtitle("🐋 Smart Money Index","Detection institutionnelle")
+        if df is not None and not df.empty:
+            _smi = compute_smart_money(df, symbol)
+            if _smi:
+                _smi_c = "#00f59d" if _smi["smi"]>0.1 else "#ff3060" if _smi["smi"]<-0.1 else "#1a3a65"
+                _smi_p = (_smi["smi"]+1)/2*100
+                st.markdown(f'<div style="background:linear-gradient(135deg,{_CCp["card"]},{_CCp["card2"]});border:1px solid {_smi_c}33;border-radius:10px;padding:18px 20px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,{_smi_c},{_smi_c}88,transparent)"></div><div style="font-family:Orbitron,sans-serif;font-size:9px;color:{_CCp["muted"]};letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">🐋 SMART MONEY INDEX</div><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:{_smi_c};letter-spacing:2px">🟢 {_smi["label"]}</div><div style="font-family:Orbitron,sans-serif;font-size:28px;font-weight:700;color:{_smi_c}">{_smi["smi"]*100:+.0f}</div></div><div style="margin-top:12px;height:6px;background:{_CCp["border"]};border-radius:3px;overflow:hidden"><div style="height:100%;width:{_smi_p:.0f}%;background:linear-gradient(90deg,#ff3060,#f0c800,#00f59d)"></div></div><div style="display:flex;justify-content:space-between;font-family:JetBrains Mono,monospace;font-size:8px;color:{_CCp["muted"]};margin-top:3px"><span>DISTRIBUTION</span><span>NEUTRE</span><span>ACCUMULATION</span></div><div style="margin-top:10px;font-family:Manrope,sans-serif;font-size:11px;color:{_CCp["text"]};line-height:1.6">{_smi["interp"]}</div></div>', unsafe_allow_html=True)
+                if _smi.get("divergence"):
+                    st.warning(f"⚠️ {_smi['div_label']}")
+            explain_box("Qu'est-ce que le Smart Money ?",
+                "Les institutions (hedge funds, banques) bougent AVANT le grand public. "
+                "Ce widget detecte leurs empreintes via Money Flow x Volume. "
+                "Score > 0 = accumulation (bullish). Score < 0 = distribution (bearish). "
+                "Divergence = prix monte mais institutions vendent : DANGER.", "#9060ff")
+        else:
+            st.info("Lancez une analyse pour calculer le Smart Money Index.")
+
+    with _pp2:
+        qtitle("😱 Fear & Greed Index","Sentiment propriétaire 0–100")
+        if df is not None and not df.empty:
+            _fg = compute_fear_greed(df, symbol)
+            if _fg:
+                _fg_c = _fg["color"]; _fg_s = _fg["score"]
+                st.markdown(f'<div style="background:linear-gradient(135deg,{_CCp["card"]},{_CCp["card2"]});border:1px solid {_fg_c}33;border-radius:10px;padding:20px;text-align:center;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,{_fg_c},{_fg_c}88,transparent)"></div><div style="font-family:Orbitron,sans-serif;font-size:9px;color:{_CCp["muted"]};letter-spacing:2px;margin-bottom:12px">😱 FEAR & GREED INDEX</div><div style="font-family:Bebas Neue,sans-serif;font-size:56px;color:{_fg_c};letter-spacing:4px;line-height:1;text-shadow:0 0 30px {_fg_c}66">{_fg_s:.0f}</div><div style="font-family:Bebas Neue,sans-serif;font-size:16px;color:{_fg_c};letter-spacing:3px;margin-top:6px">{_fg["label"]}</div><div style="margin-top:14px;height:8px;background:linear-gradient(90deg,#00f59d,#f0c800,#ff7040,#ff3060);border-radius:4px;position:relative"><div style="position:absolute;top:-4px;left:{_fg_s:.0f}%;transform:translateX(-50%);width:16px;height:16px;background:{_fg_c};border-radius:50%;border:2px solid {_CCp["card"]};box-shadow:0 0 8px {_fg_c}66"></div></div><div style="display:flex;justify-content:space-between;font-family:JetBrains Mono,monospace;font-size:8px;color:{_CCp["muted"]};margin-top:4px"><span>0 FEAR</span><span>25</span><span>50</span><span>75</span><span>100 GREED</span></div><div style="margin-top:10px;font-family:JetBrains Mono,monospace;font-size:10px;color:{_CCp["muted"]}">Signal: <span style="color:{_fg_c}">{_fg["signal"]}</span></div></div>', unsafe_allow_html=True)
+                st.markdown("<br>", unsafe_allow_html=True)
+                qtitle("Composants du Score")
+                for _comp_n, _comp_v in _fg.get("components",{}).items():
+                    _comp_c = "#00f59d" if _comp_v>60 else "#ff3060" if _comp_v<40 else _CCp["accent"]
+                    pbar(_comp_n, _comp_v, _comp_c, h=4)
+                explain_box("Strategie contrariante",
+                    "FEAR EXTREME (<25) = meilleur moment d'achat historique. "
+                    "GREED EXTREME (>75) = risque de correction imminent. "
+                    "Buffett: 'Soyez craintif quand les autres sont avides.'", "#f0c800")
+        else:
+            st.info("Lancez une analyse pour le Fear & Greed Index.")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    qtitle("🕐 Analyse Multi-Timeframe","Signal sur 4 intervalles")
+    with st.spinner("Analyse multi-TF..."):
+        _mtf = compute_multi_tf(symbol)
+    if _mtf and _mtf.get("timeframes"):
+        _dom2 = _mtf["dominant"]; _conv2 = _mtf["convergence"]; _cpct2 = _mtf["conv_pct"]
+        _dom_c2 = "#00f59d" if _dom2=="BUY" else "#ff3060" if _dom2=="SELL" else "#1a3a65"
+        _tf_lbl = {"1h":"1H","4h":"4H","1d":"Journalier","1wk":"Hebdo"}
+        _tf_cards = "".join([
+            f'<div style="background:{_CCp["surface"]};border:1px solid {v["color"]}44;border-top:3px solid {v["color"]};border-radius:8px;padding:12px;text-align:center;flex:1;min-width:80px"><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCp["muted"]};margin-bottom:4px">{_tf_lbl.get(tf,tf)}</div><div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:{v["color"]};letter-spacing:2px">{v["signal"]}</div><div style="font-family:JetBrains Mono,monospace;font-size:8px;color:{_CCp["muted"]};margin-top:2px">RSI {v["rsi"]:.0f}</div></div>'
+            for tf,v in _mtf["timeframes"].items()
+        ])
+        _conv_badge2 = (f'<span style="background:rgba(0,245,157,.15);border:1px solid rgba(0,245,157,.4);color:#00f59d;font-family:JetBrains Mono,monospace;font-size:10px;padding:4px 12px;border-radius:20px">CONVERGENCE {_cpct2:.0f}%</span>'
+            if _conv2 else f'<span style="background:rgba(240,200,0,.1);border:1px solid rgba(240,200,0,.3);color:#f0c800;font-family:JetBrains Mono,monospace;font-size:10px;padding:4px 12px;border-radius:20px">MIXTES {_cpct2:.0f}%</span>')
+        st.markdown(f'<div style="background:linear-gradient(135deg,{_CCp["card"]},{_CCp["card2"]});border:1px solid rgba(0,200,240,.12);border-radius:10px;padding:18px 20px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px"><div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:{_dom_c2};letter-spacing:3px">Signal dominant : {_dom2}</div>{_conv_badge2}</div><div style="display:flex;gap:8px;flex-wrap:wrap">{_tf_cards}</div><div style="margin-top:12px;font-family:Manrope,sans-serif;font-size:11px;color:{_CCp["text"]};line-height:1.6">{"Convergence totale — Entree haute conviction sur " + _dom2 if _conv2 else "Signaux mixtes — Attendez alignement de plus de timeframes."}</div></div>', unsafe_allow_html=True)
+        explain_box("Pourquoi le Multi-Timeframe ?",
+            "Les institutionnels analysent TOUJOURS plusieurs timeframes. "
+            "Regle d'or : n'entrez QUE si 3+ intervalles pointent dans la meme direction. "
+            "Convergence totale = setup de la semaine.", _CCp["green"])
+    else:
+        st.info("Analyse multi-TF en cours...")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    qtitle("📅 Calendrier Economique","Evenements cles a surveiller")
+    _eco = get_eco_calendar()
+    _ic_m = {"FORT":"#ff3060","MOYEN":"#f0c800","FAIBLE":"#00f59d"}
+    _eco_rows = "".join([
+        f'<tr><td style="padding:8px 12px;border-bottom:1px solid {_CCp["border"]};font-family:JetBrains Mono,monospace;font-size:10px;color:{_CCp["muted"]};white-space:nowrap">{e["p"]} {e["j"]}</td><td style="padding:8px 12px;border-bottom:1px solid {_CCp["border"]};font-family:JetBrains Mono,monospace;font-size:10px;color:{_CCp["muted"]};white-space:nowrap">{e["h"]}</td><td style="padding:8px 12px;border-bottom:1px solid {_CCp["border"]}"><div style="font-family:Space Grotesk,sans-serif;font-size:12px;font-weight:700;color:{_CCp["bright"]};margin-bottom:3px">{e["e"]}</div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCp["text"]};line-height:1.5">{e["d"]}</div></td><td style="padding:8px 12px;border-bottom:1px solid {_CCp["border"]};text-align:center"><span style="background:{_ic_m.get(e["i"],_CCp["muted"])}18;border:1px solid {_ic_m.get(e["i"],_CCp["muted"])}44;color:{_ic_m.get(e["i"],_CCp["muted"])};font-family:JetBrains Mono,monospace;font-size:9px;padding:3px 10px;border-radius:10px">{e["i"]}</span></td></tr>'
+        for e in _eco
+    ])
+    st.markdown(f'<div style="border:1px solid rgba(0,200,240,.12);border-radius:8px;overflow:hidden;overflow-x:auto"><table style="width:100%;border-collapse:collapse;background:{_CCp["card"]}"><thead><tr style="background:{_CCp["card2"]}"><th style="padding:10px 12px;text-align:left;font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCp["accent"]};letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid {_CCp["border"]}">DATE</th><th style="padding:10px 12px;text-align:left;font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCp["accent"]};letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid {_CCp["border"]}">HEURE</th><th style="padding:10px 12px;text-align:left;font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCp["accent"]};letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid {_CCp["border"]}">EVENEMENT</th><th style="padding:10px 12px;text-align:center;font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCp["accent"]};letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid {_CCp["border"]}">IMPACT</th></tr></thead><tbody>{_eco_rows}</tbody></table></div>', unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    qtitle("🥇 Pourquoi QTO est superieur","Comparaison concurrents")
+    _comp = [("Fonctionnalite","✅ QTO","TradingView","eToro","Capitalise","Kryll"),
+             ("Smart Money Index","✅ Exclusif","❌","❌","❌","❌"),
+             ("Fear & Greed IA","✅ Multi","Partiel","❌","❌","❌"),
+             ("Multi-TF Auto","✅ 4 TF","Manuel","❌","❌","Partiel"),
+             ("Email Horaire HTML","✅ Premium","❌","❌","Basique","❌"),
+             ("Calendrier Eco","✅ Integre","Separe","❌","❌","❌"),
+             ("282 Actifs","✅","✅","Limite","✅","Partiel"),
+             ("Auditeur IA","✅ Exclusif","❌","❌","❌","❌"),
+             ("Monte Carlo 300","✅","❌","❌","❌","❌"),
+             ("Prevision 1 an","✅ 3 modeles","Partiel","❌","❌","❌"),
+             ("Score Setup /100","✅ Exclusif","❌","❌","❌","❌"),
+             ("Prix mensuel","19EUR/mois","$15-60","$0 limite","$50+","$20+")]
+    _hdr_h = "".join([f'<th style="padding:10px 12px;text-align:left;background:{"rgba(0,200,240,.08)" if i==1 else _CCp["card2"]};font-family:JetBrains Mono,monospace;font-size:9px;color:{"#00c8f0" if i==1 else _CCp["muted"]};letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid {_CCp["border"]}">{h}</th>' for i,h in enumerate(_comp[0])])
+    _rows_h = "".join(["<tr>" + "".join([f'<td style="padding:8px 12px;border-bottom:1px solid {_CCp["border"]};background:{"rgba(0,200,240,.04)" if i==1 else "transparent"};font-family:JetBrains Mono,monospace;font-size:10px;color:{"#00f59d" if "✅" in str(c) else "#ff3060" if "❌" in str(c) else _CCp["bright"]}">{c}</td>' for i,c in enumerate(row)]) + "</tr>" for row in _comp[1:]])
+    st.markdown(f'<div style="overflow-x:auto;border:1px solid rgba(0,200,240,.12);border-radius:8px;overflow:hidden"><table style="width:100%;border-collapse:collapse;background:{_CCp["card"]}"><thead><tr>{_hdr_h}</tr></thead><tbody>{_rows_h}</tbody></table></div>', unsafe_allow_html=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  NOTIFICATIONS TAB
+# ══════════════════════════════════════════════════════════════════════════════
+with t_notif:
+    _CCn = C
+    _notif_on = st.session_state.get("notif_enabled", False)
+    _nb_cn = _CCn["green"] if _notif_on else _CCn["muted"]
+    st.markdown(f'<div style="background:linear-gradient(135deg,rgba(0,245,157,.08),{_CCn["card"]});border:1px solid {_nb_cn}44;border-radius:12px;padding:22px 26px;margin-bottom:18px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,{_nb_cn},{_nb_cn}88,transparent)"></div><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div style="font-size:40px">{"📧" if _notif_on else "🔕"}</div><div><div style="font-family:Orbitron,sans-serif;font-size:13px;font-weight:700;color:{_nb_cn};letter-spacing:2px">{"✅ NOTIFICATIONS ACTIVES" if _notif_on else "❌ NOTIFICATIONS DÉSACTIVÉES"}</div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCn["muted"]};margin-top:5px">{"Email auto toutes les " + str(st.session_state.get("notif_interval",60)) + " min" if _notif_on else "Configurez SMTP ci-dessous"}</div>{f'<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:#00f59d;margin-top:3px">Dernier envoi : {st.session_state.get("notif_last_sent","—")}</div>' if st.session_state.get("notif_last_sent") else ""}</div></div></div>', unsafe_allow_html=True)
+
+    _nn1, _nn2 = st.columns([1, 1])
+    with _nn1:
+        qtitle("Configuration SMTP")
+        st.markdown(f'<div style="background:{_CCn["card"]};border:1px solid {_CCn["border2"]};border-radius:8px;padding:14px 16px;margin-bottom:12px"><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCn["accent"]};letter-spacing:1px;margin-bottom:8px">GUIDE GMAIL (recommande)</div><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCn["muted"]};line-height:2">1. Compte Google → Securite → Validation 2 etapes<br>2. Mots de passe application → Generer<br>3. Copiez le mot de passe 16 caracteres<br>4. Host: smtp.gmail.com · Port: 587</div></div>', unsafe_allow_html=True)
+        _ni_email = st.text_input("Email destinataire", value=st.session_state.get("notif_email",""), placeholder="trader@email.com", key="nn_email")
+        _ni_host  = st.text_input("Serveur SMTP", value=st.session_state.get("notif_smtp_host","smtp.gmail.com"), key="nn_host")
+        _ni_port  = st.number_input("Port", value=int(st.session_state.get("notif_smtp_port",587)), min_value=25, max_value=65535, key="nn_port")
+        _ni_user  = st.text_input("Email expediteur", value=st.session_state.get("notif_smtp_user",""), placeholder="votre@gmail.com", key="nn_user")
+        _ni_pass  = st.text_input("Mot de passe application", value=st.session_state.get("notif_smtp_pass",""), type="password", placeholder="xxxx xxxx xxxx xxxx", key="nn_pass")
+        _ni_ivs   = st.selectbox("Frequence", [15,30,60,120,240], index=[15,30,60,120,240].index(min([15,30,60,120,240], key=lambda x: abs(x-int(st.session_state.get("notif_interval",60))))),
+                    format_func=lambda x: f"Toutes les {x} min" + (f" ({x//60}h)" if x>=60 else ""), key="nn_ivs")
+        _nb1n, _nb2n, _nb3n = st.columns(3)
+        with _nb1n:
+            if st.button("SAUVEGARDER", use_container_width=True, key="save_n"):
+                for k,v in [("notif_email",_ni_email),("notif_smtp_host",_ni_host),("notif_smtp_port",_ni_port),("notif_smtp_user",_ni_user),("notif_smtp_pass",_ni_pass),("notif_interval",_ni_ivs)]:
+                    st.session_state[k]=v
+                st.success("Configuration sauvegardee !")
+        with _nb2n:
+            _btn_test_n = st.button("TEST EMAIL", use_container_width=True, key="test_n")
+        with _nb3n:
+            _btn_tog_n = st.button("STOP" if _notif_on else "ACTIVER", use_container_width=True, key="tog_n")
+        if _btn_test_n:
+            for k,v in [("notif_email",_ni_email),("notif_smtp_host",_ni_host),("notif_smtp_port",_ni_port),("notif_smtp_user",_ni_user),("notif_smtp_pass",_ni_pass)]:
+                st.session_state[k]=v
+            _cur_s = st.session_state.get("signal")
+            if not _cur_s: st.warning("Lancez d'abord une analyse.")
+            elif not _ni_email or not _ni_user: st.error("Email et SMTP requis.")
+            else:
+                with st.spinner("Envoi..."):
+                    _ok_t, _msg_t = send_signal_email(_ni_email, _ni_host, _ni_port, _ni_user, _ni_pass, _cur_s, symbol, capital, "EMAIL DE TEST - QTO operationnel!")
+                (st.success if _ok_t else st.error)(f"{'✅' if _ok_t else '❌'} {_msg_t}")
+        if _btn_tog_n:
+            _new_s = not st.session_state.get("notif_enabled",False)
+            for k,v in [("notif_email",_ni_email),("notif_smtp_host",_ni_host),("notif_smtp_port",_ni_port),("notif_smtp_user",_ni_user),("notif_smtp_pass",_ni_pass),("notif_interval",_ni_ivs),("notif_enabled",_new_s)]:
+                st.session_state[k]=v
+            if _new_s: start_notif_scheduler(symbol, capital); st.success(f"Notifications activees - email toutes les {_ni_ivs} min !")
+            else: st.info("Notifications desactivees.")
+            st.rerun()
+
+    with _nn2:
+        qtitle("Apercu de l'Email")
+        _cs2 = st.session_state.get("signal")
+        if _cs2:
+            _ac2 = "#00f59d" if _cs2.get("action")=="BUY" else "#ff3060" if _cs2.get("action")=="SELL" else "#1a3a65"
+            _r2 = _cs2.get("risk_management",{})
+            st.markdown(f'<div style="background:#030912;border:1px solid #0d2540;border-radius:10px;overflow:hidden"><div style="background:linear-gradient(135deg,#040d18,#071526);border-bottom:2px solid #00c8f0;padding:16px;text-align:center"><div style="font-size:18px;letter-spacing:4px;color:#00c8f0;font-weight:900">⬡ QTO</div><div style="color:#1a3a65;font-size:8px;letter-spacing:2px">QUANTUM TRADE ORACLE · SIGNAL HORAIRE</div></div><div style="padding:16px;text-align:center;border-bottom:1px solid #0d2540"><div style="color:#4a8ab0;font-size:9px;margin-bottom:6px">{get_name(symbol)} · {symbol}</div><div style="font-size:40px;font-weight:900;color:{_ac2};letter-spacing:6px;text-shadow:0 0 20px {_ac2}66">{_cs2.get("action","HOLD")}</div></div><div style="padding:14px">{"".join([f'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #0d2540"><span style="color:#4a8ab0;font-family:Courier New;font-size:10px">{lbl}</span><span style="color:#b8e0f8;font-family:Courier New;font-size:10px;font-weight:bold">{val}</span></div>' for lbl,val in [("Prix",f"${_cs2.get('price',0):,.4f}"),("Signal",_cs2.get("action","HOLD")),("Confiance",f"{_cs2.get('ai_confidence',0)*100:.0f}%"),("RSI",f"{_cs2.get('rsi',50):.1f}"),("SL",f"${_r2.get('stop_loss',0):,.4f}"),("TP",f"${_r2.get('take_profit',0):,.4f}"),("R/R",f"{_r2.get('risk_reward_ratio',0):.2f}:1")]])}</div><div style="padding:10px;text-align:center;background:#040d18;border-top:1px solid #0d2540"><div style="color:#0e2a50;font-size:9px">Outil educatif - Pas un conseil financier</div></div></div>', unsafe_allow_html=True)
+        else:
+            st.info("Lancez une analyse pour previsualiser l'email.")
+        st.markdown("<br>", unsafe_allow_html=True)
+        qtitle("Historique Envois", f"{len(st.session_state.get('notif_log',[]))} emails")
+        _logs_n = st.session_state.get("notif_log",[])
+        if not _logs_n:
+            st.markdown(f'<div style="text-align:center;color:{_CCn["muted"]};font-family:JetBrains Mono,monospace;font-size:10px;padding:20px">Aucun email envoye</div>', unsafe_allow_html=True)
+        else:
+            for _logn in _logs_n[:25]:
+                _lc_n = _CCn["green"] if _logn["ok"] else _CCn["red"]
+                st.markdown(f'<div style="display:flex;gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid {_CCn["border"]};background:{_CCn["card"]};border-radius:3px;margin-bottom:2px"><span>{"✅" if _logn["ok"] else "❌"}</span><span style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCn["muted"]};min-width:45px">{_logn["ts"]}</span><span style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_lc_n};font-weight:600">{_logn.get("signal","?")}</span><span style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCn["accent"]}">{_logn.get("symbol","")}</span><span style="font-family:JetBrains Mono,monospace;font-size:9px;color:{_CCn["muted"]};flex:1">{str(_logn.get("msg",""))[:50]}</span></div>', unsafe_allow_html=True)
